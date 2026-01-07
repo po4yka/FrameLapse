@@ -549,28 +549,6 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="23"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="23"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
         message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
         errorLine1="koin = &quot;4.0.0&quot;"
         errorLine2="       ~~~~~~~">
@@ -582,13 +560,35 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
+        message="A newer version of app.cash.sqldelight:android-driver than 2.0.2 is available: 2.2.1"
+        errorLine1="sqldelight = &quot;2.0.2&quot;"
+        errorLine2="             ~~~~~~~">
         <location
             file="../gradle/libs.versions.toml"
-            line="23"
-            column="8"/>
+            line="26"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of app.cash.sqldelight:native-driver than 2.0.2 is available: 2.2.1"
+        errorLine1="sqldelight = &quot;2.0.2&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="26"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.9.0 is available: 1.10.2"
+        errorLine1="coroutines = &quot;1.9.0&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="29"
+            column="14"/>
     </issue>
 
     <issue
@@ -769,7 +769,18 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of io.insert-koin:koin-compose-viewmodel than 4.0.0 is available: 4.1.0"
+        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="23"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
         errorLine1="koin = &quot;4.0.0&quot;"
         errorLine2="       ~~~~~~~">
         <location
@@ -792,6 +803,28 @@
     <issue
         id="NewerVersionAvailable"
         message="A newer version of io.insert-koin:koin-compose-viewmodel than 4.0.0 is available: 4.1.0"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="23"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-compose-viewmodel than 4.0.0 is available: 4.1.0"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="23"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
         errorLine1="koin = &quot;4.0.0&quot;"
         errorLine2="       ~~~~~~~">
         <location
@@ -868,17 +901,6 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of app.cash.sqldelight:android-driver than 2.0.2 is available: 2.2.1"
-        errorLine1="sqldelight = &quot;2.0.2&quot;"
-        errorLine2="             ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="26"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
         message="A newer version of app.cash.sqldelight:coroutines-extensions than 2.0.2 is available: 2.2.1"
         errorLine1="sqldelight = &quot;2.0.2&quot;"
         errorLine2="             ~~~~~~~">
@@ -929,28 +951,6 @@
         <location
             file="../gradle/libs.versions.toml"
             line="26"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of app.cash.sqldelight:native-driver than 2.0.2 is available: 2.2.1"
-        errorLine1="sqldelight = &quot;2.0.2&quot;"
-        errorLine2="             ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="26"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.9.0 is available: 1.10.2"
-        errorLine1="coroutines = &quot;1.9.0&quot;"
-        errorLine2="             ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="29"
             column="14"/>
     </issue>
 

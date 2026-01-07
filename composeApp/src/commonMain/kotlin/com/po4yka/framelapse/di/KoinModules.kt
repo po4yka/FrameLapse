@@ -32,6 +32,12 @@ import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.platform.DatabaseDriverFactory
+import com.po4yka.framelapse.presentation.capture.CaptureViewModel
+import com.po4yka.framelapse.presentation.export.ExportViewModel
+import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
+import com.po4yka.framelapse.presentation.main.MainViewModel
+import com.po4yka.framelapse.presentation.projectlist.ProjectListViewModel
+import com.po4yka.framelapse.presentation.settings.SettingsViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -106,8 +112,13 @@ val domainModule = module {
  * Presentation layer module for ViewModels.
  */
 val presentationModule = module {
-    // Add presentation layer dependencies here
-    // viewModel { ProjectListViewModel(get()) }
+    // ViewModels - factory scope for new instance per screen
+    factory { MainViewModel(get()) }
+    factory { ProjectListViewModel(get(), get(), get()) }
+    factory { CaptureViewModel(get(), get(), get(), get()) }
+    factory { GalleryViewModel(get(), get(), get(), get()) }
+    factory { ExportViewModel(get(), get(), get()) }
+    factory { SettingsViewModel(get(), get()) }
 }
 
 /**
