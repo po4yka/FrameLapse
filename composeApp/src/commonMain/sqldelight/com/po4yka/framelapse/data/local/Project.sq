@@ -1,0 +1,51 @@
+-- Project table for storing timelapse projects
+CREATE TABLE Project (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL,
+    fps INTEGER NOT NULL DEFAULT 30,
+    resolution TEXT NOT NULL DEFAULT 'HD_1080P',
+    orientation TEXT NOT NULL DEFAULT 'PORTRAIT',
+    thumbnailPath TEXT
+);
+
+-- Get all projects ordered by most recently updated
+selectAll:
+SELECT * FROM Project ORDER BY updatedAt DESC;
+
+-- Get a single project by ID
+selectById:
+SELECT * FROM Project WHERE id = ?;
+
+-- Insert a new project
+insert:
+INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Update an existing project
+update:
+UPDATE Project SET
+    name = ?,
+    updatedAt = ?,
+    fps = ?,
+    resolution = ?,
+    orientation = ?,
+    thumbnailPath = ?
+WHERE id = ?;
+
+-- Update only the thumbnail path
+updateThumbnail:
+UPDATE Project SET thumbnailPath = ?, updatedAt = ? WHERE id = ?;
+
+-- Delete a project by ID
+delete:
+DELETE FROM Project WHERE id = ?;
+
+-- Get the total number of projects
+getProjectCount:
+SELECT COUNT(*) FROM Project;
+
+-- Check if a project exists
+exists:
+SELECT EXISTS(SELECT 1 FROM Project WHERE id = ?);

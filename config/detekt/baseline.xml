@@ -1,0 +1,210 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries$(-364_833_268, """UPDATE Frame SET alignedPath = ?, confidence = ?, landmarksJson = ? WHERE id = ?""", 4)</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries$(754_489_791, arrayOf("Frame"), driver, "Frame.sq", "getTotalFrameCount", "SELECT COUNT(*) FROM Frame")</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries.GetFrameCountQuery$(1_451_216_969, """SELECT COUNT(*) FROM Frame WHERE projectId = ?""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries.GetMaxSortOrderQuery$(-1_214_157_261, """SELECT MAX(sortOrder) FROM Frame WHERE projectId = ?""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries.SelectByIdQuery$(1_328_629_725, """SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE id = ?""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries.SelectByProjectQuery$(-1_189_119_593, """SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE projectId = ? ORDER BY sortOrder ASC, timestamp ASC""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$(-2_034_082_288, """SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE projectId = ? ORDER BY timestamp DESC LIMIT 1""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:ProjectQueries.kt$ProjectQueries$(-1_746_638_799, arrayOf("Project"), driver, "Project.sq", "getProjectCount", "SELECT COUNT(*) FROM Project")</ID>
+    <ID>ArgumentListWrapping:ProjectQueries.kt$ProjectQueries$(-1_750_678_936, """UPDATE Project SET thumbnailPath = ?, updatedAt = ? WHERE id = ?""", 3)</ID>
+    <ID>ArgumentListWrapping:ProjectQueries.kt$ProjectQueries$(-673_027_318, arrayOf("Project"), driver, "Project.sq", "selectAll", "SELECT Project.id, Project.name, Project.createdAt, Project.updatedAt, Project.fps, Project.resolution, Project.orientation, Project.thumbnailPath FROM Project ORDER BY updatedAt DESC")</ID>
+    <ID>ArgumentListWrapping:ProjectQueries.kt$ProjectQueries.ExistsQuery$(-2_135_168_393, """SELECT EXISTS(SELECT 1 FROM Project WHERE id = ?)""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$(611_030_921, """SELECT Project.id, Project.name, Project.createdAt, Project.updatedAt, Project.fps, Project.resolution, Project.orientation, Project.thumbnailPath FROM Project WHERE id = ?""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:SettingsQueries.kt$SettingsQueries$(-1_780_445_976, arrayOf("Settings"), driver, "Settings.sq", "selectAll", "SELECT Settings.key, Settings.value FROM Settings")</ID>
+    <ID>ArgumentListWrapping:SettingsQueries.kt$SettingsQueries.ExistsQuery$(-624_016_039, """SELECT EXISTS(SELECT 1 FROM Settings WHERE key = ?)""", mapper, 1)</ID>
+    <ID>ArgumentListWrapping:SettingsQueries.kt$SettingsQueries.SelectByKeyQuery$(-1_610_316_785, """SELECT value FROM Settings WHERE key = ?""", mapper, 1)</ID>
+    <ID>ConstructorParameterNaming:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$public val timestamp_: Long</ID>
+    <ID>ConstructorParameterNaming:GetMaxSortOrder.kt$GetMaxSortOrder$public val MAX: Long?</ID>
+    <ID>ConstructorParameterNaming:Settings.kt$Settings$public val value_: String</ID>
+    <ID>FunctionParameterNaming:FrameQueries.kt$FrameQueries$timestamp_: Long</ID>
+    <ID>FunctionParameterNaming:SettingsQueries.kt$SettingsQueries$value_: String</ID>
+    <ID>ImportOrdering:ExpectResourceCollectors.kt$import kotlin.String import kotlin.collections.Map import org.jetbrains.compose.resources.DrawableResource import org.jetbrains.compose.resources.ExperimentalResourceApi import org.jetbrains.compose.resources.FontResource import org.jetbrains.compose.resources.PluralStringResource import org.jetbrains.compose.resources.StringArrayResource import org.jetbrains.compose.resources.StringResource</ID>
+    <ID>ImportOrdering:Res.kt$import kotlin.ByteArray import kotlin.OptIn import kotlin.String import org.jetbrains.compose.resources.ExperimentalResourceApi import org.jetbrains.compose.resources.getResourceUri import org.jetbrains.compose.resources.readResourceBytes</ID>
+    <ID>Indentation:Frame.kt$Frame$ </ID>
+    <ID>Indentation:FrameLapseDatabase.kt$FrameLapseDatabase$ </ID>
+    <ID>Indentation:FrameLapseDatabase.kt$FrameLapseDatabase.Companion$ </ID>
+    <ID>Indentation:FrameLapseDatabaseImpl.kt$ </ID>
+    <ID>Indentation:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl$ </ID>
+    <ID>Indentation:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.GetFrameCountQuery$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.GetMaxSortOrderQuery$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.SelectByIdQuery$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.SelectByProjectQuery$ </ID>
+    <ID>Indentation:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$ </ID>
+    <ID>Indentation:GetMaxSortOrder.kt$GetMaxSortOrder$ </ID>
+    <ID>Indentation:Project.kt$Project$ </ID>
+    <ID>Indentation:ProjectQueries.kt$ProjectQueries$ </ID>
+    <ID>Indentation:ProjectQueries.kt$ProjectQueries.ExistsQuery$ </ID>
+    <ID>Indentation:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$ </ID>
+    <ID>Indentation:Res.kt$ </ID>
+    <ID>Indentation:Res.kt$Res$ </ID>
+    <ID>Indentation:Settings.kt$Settings$ </ID>
+    <ID>Indentation:SettingsQueries.kt$SettingsQueries$ </ID>
+    <ID>Indentation:SettingsQueries.kt$SettingsQueries.ExistsQuery$ </ID>
+    <ID>Indentation:SettingsQueries.kt$SettingsQueries.SelectByKeyQuery$ </ID>
+    <ID>LongParameterList:FrameQueries.kt$FrameQueries$( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, )</ID>
+    <ID>LongParameterList:ProjectQueries.kt$ProjectQueries$( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, )</ID>
+    <ID>LongParameterList:ProjectQueries.kt$ProjectQueries$( name: String, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, id: String, )</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$136_740_296</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$1_244_624_410</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$1_396_290_344</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$211_858_952</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$3</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$364_833_268</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$4</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$5</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$6</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$7</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$754_489_791</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$8</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries$9</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.GetFrameCountQuery$1_451_216_969</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.GetMaxSortOrderQuery$1_214_157_261</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$3</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$350_780_717</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.SelectByIdQuery$1_328_629_725</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.SelectByProjectQuery$1_189_119_593</ID>
+    <ID>MagicNumber:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$2_034_082_288</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$1_684_656_412</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$1_746_638_799</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$1_750_678_936</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$2_029_602_604</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$2_113_698_758</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$3</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$4</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$5</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$6</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$673_027_318</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$7</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries$8</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries.ExistsQuery$2_135_168_393</ID>
+    <ID>MagicNumber:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$611_030_921</ID>
+    <ID>MagicNumber:SettingsQueries.kt$SettingsQueries$1_780_445_976</ID>
+    <ID>MagicNumber:SettingsQueries.kt$SettingsQueries$310_132_795</ID>
+    <ID>MagicNumber:SettingsQueries.kt$SettingsQueries$670_116_184</ID>
+    <ID>MagicNumber:SettingsQueries.kt$SettingsQueries.ExistsQuery$624_016_039</ID>
+    <ID>MagicNumber:SettingsQueries.kt$SettingsQueries.SelectByKeyQuery$1_610_316_785</ID>
+    <ID>MaxLineLength:FrameQueries.kt$FrameQueries.SelectByIdQuery$"""SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE id = ?"""</ID>
+    <ID>MaxLineLength:FrameQueries.kt$FrameQueries.SelectByProjectQuery$"""SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE projectId = ? ORDER BY sortOrder ASC, timestamp ASC"""</ID>
+    <ID>MaxLineLength:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$"""SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame WHERE projectId = ? ORDER BY timestamp DESC LIMIT 1"""</ID>
+    <ID>MaxLineLength:ProjectQueries.kt$ProjectQueries$"SELECT Project.id, Project.name, Project.createdAt, Project.updatedAt, Project.fps, Project.resolution, Project.orientation, Project.thumbnailPath FROM Project ORDER BY updatedAt DESC"</ID>
+    <ID>MaxLineLength:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$"""SELECT Project.id, Project.name, Project.createdAt, Project.updatedAt, Project.fps, Project.resolution, Project.orientation, Project.thumbnailPath FROM Project WHERE id = ?"""</ID>
+    <ID>MaximumLineLength:FrameQueries.kt$FrameQueries.SelectByIdQuery$ </ID>
+    <ID>MaximumLineLength:FrameQueries.kt$FrameQueries.SelectByProjectQuery$ </ID>
+    <ID>MaximumLineLength:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$ </ID>
+    <ID>MaximumLineLength:ProjectQueries.kt$ProjectQueries$ </ID>
+    <ID>MaximumLineLength:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$ </ID>
+    <ID>ModifierMissing:App.kt$App</ID>
+    <ID>MultilineRawStringIndentation:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$""" |CREATE TABLE Frame ( | id TEXT NOT NULL PRIMARY KEY, | projectId TEXT NOT NULL, | originalPath TEXT NOT NULL, | alignedPath TEXT, | timestamp INTEGER NOT NULL, | capturedAt INTEGER NOT NULL, | confidence REAL, | landmarksJson TEXT, | sortOrder INTEGER NOT NULL DEFAULT 0, | FOREIGN KEY (projectId) REFERENCES Project(id) ON DELETE CASCADE |) """</ID>
+    <ID>MultilineRawStringIndentation:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$""" |CREATE TABLE Project ( | id TEXT NOT NULL PRIMARY KEY, | name TEXT NOT NULL, | createdAt INTEGER NOT NULL, | updatedAt INTEGER NOT NULL, | fps INTEGER NOT NULL DEFAULT 30, | resolution TEXT NOT NULL DEFAULT 'HD_1080P', | orientation TEXT NOT NULL DEFAULT 'PORTRAIT', | thumbnailPath TEXT |) """</ID>
+    <ID>MultilineRawStringIndentation:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$""" |CREATE TABLE Settings ( | key TEXT NOT NULL PRIMARY KEY, | value TEXT NOT NULL |) """</ID>
+    <ID>MultilineRawStringIndentation:FrameQueries.kt$FrameQueries$""" |INSERT INTO Frame (id, projectId, originalPath, alignedPath, timestamp, capturedAt, confidence, landmarksJson, sortOrder) |VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) """</ID>
+    <ID>MultilineRawStringIndentation:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$""" |SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame |WHERE projectId = ? AND timestamp &gt;= ? AND timestamp &lt;= ? |ORDER BY sortOrder ASC, timestamp ASC """</ID>
+    <ID>MultilineRawStringIndentation:ProjectQueries.kt$ProjectQueries$""" |INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath) |VALUES (?, ?, ?, ?, ?, ?, ?, ?) """</ID>
+    <ID>MultilineRawStringIndentation:ProjectQueries.kt$ProjectQueries$""" |UPDATE Project SET | name = ?, | updatedAt = ?, | fps = ?, | resolution = ?, | orientation = ?, | thumbnailPath = ? |WHERE id = ? """</ID>
+    <ID>PackageName:Frame.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:FrameLapseDatabase.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:FrameLapseDatabaseImpl.kt$package com.po4yka.framelapse.`data`.local.composeApp</ID>
+    <ID>PackageName:FrameQueries.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:GetMaxSortOrder.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:Project.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:ProjectQueries.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:Settings.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>PackageName:SettingsQueries.kt$package com.po4yka.framelapse.`data`.local</ID>
+    <ID>ParameterListWrapping:FrameQueries.kt$FrameQueries$(id: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T)</ID>
+    <ID>ParameterListWrapping:FrameQueries.kt$FrameQueries$(projectId: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T)</ID>
+    <ID>ParameterListWrapping:ProjectQueries.kt$ProjectQueries$(id: String, mapper: ( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, ) -&gt; T)</ID>
+    <ID>ParameterListWrapping:ProjectQueries.kt$ProjectQueries$(mapper: ( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, ) -&gt; T)</ID>
+    <ID>RedundantVisibilityModifierRule:Frame.kt$Frame</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase : Transacter</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase$public val frameQueries: FrameQueries</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase$public val projectQueries: ProjectQueries</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase$public val settingsQueries: SettingsQueries</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase.Companion$public operator fun invoke(driver: SqlDriver): FrameLapseDatabase</ID>
+    <ID>RedundantVisibilityModifierRule:FrameLapseDatabase.kt$FrameLapseDatabase.Companion$public val Schema: SqlSchema&lt;QueryResult.Value&lt;Unit&gt;&gt; get() = FrameLapseDatabase::class.schema</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries : TransacterImpl</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun &lt;T : Any&gt; getMaxSortOrder(projectId: String, mapper: (MAX: Long?) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun &lt;T : Any&gt; selectByDateRange( projectId: String, timestamp: Long, timestamp_: Long, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T, ): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun &lt;T : Any&gt; selectById(id: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun &lt;T : Any&gt; selectByProject(projectId: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun &lt;T : Any&gt; selectLatestByProject(projectId: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun delete(id: String)</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun deleteByProject(projectId: String)</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun getFrameCount(projectId: String): Query&lt;Long&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun getMaxSortOrder(projectId: String): Query&lt;GetMaxSortOrder&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun getTotalFrameCount(): Query&lt;Long&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun insert( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, )</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun selectByDateRange( projectId: String, timestamp: Long, timestamp_: Long, ): Query&lt;Frame&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun selectById(id: String): Query&lt;Frame&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun selectByProject(projectId: String): Query&lt;Frame&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun selectLatestByProject(projectId: String): Query&lt;Frame&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun updateAligned( alignedPath: String?, confidence: Double?, landmarksJson: String?, id: String, )</ID>
+    <ID>RedundantVisibilityModifierRule:FrameQueries.kt$FrameQueries$public fun updateSortOrder(sortOrder: Long, id: String)</ID>
+    <ID>RedundantVisibilityModifierRule:GetMaxSortOrder.kt$GetMaxSortOrder</ID>
+    <ID>RedundantVisibilityModifierRule:Project.kt$Project</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries : TransacterImpl</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun &lt;T : Any&gt; selectAll(mapper: ( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, ) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun &lt;T : Any&gt; selectById(id: String, mapper: ( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, ) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun delete(id: String)</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun exists(id: String): Query&lt;Boolean&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun getProjectCount(): Query&lt;Long&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun insert( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, )</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun selectAll(): Query&lt;Project&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun selectById(id: String): Query&lt;Project&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun update( name: String, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, id: String, )</ID>
+    <ID>RedundantVisibilityModifierRule:ProjectQueries.kt$ProjectQueries$public fun updateThumbnail( thumbnailPath: String?, updatedAt: Long, id: String, )</ID>
+    <ID>RedundantVisibilityModifierRule:Res.kt$Res$@ExperimentalResourceApi public fun getUri(path: String): String</ID>
+    <ID>RedundantVisibilityModifierRule:Res.kt$Res$@ExperimentalResourceApi public suspend fun readBytes(path: String): ByteArray</ID>
+    <ID>RedundantVisibilityModifierRule:Settings.kt$Settings</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries : TransacterImpl</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun &lt;T : Any&gt; selectAll(mapper: (key: String, value_: String) -&gt; T): Query&lt;T&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun delete(key: String)</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun exists(key: String): Query&lt;Boolean&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun insertOrReplace(key: String, value_: String)</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun selectAll(): Query&lt;Settings&gt;</ID>
+    <ID>RedundantVisibilityModifierRule:SettingsQueries.kt$SettingsQueries$public fun selectByKey(key: String): Query&lt;String&gt;</ID>
+    <ID>SpacingAroundCurly:SettingsQueries.kt$SettingsQueries${</ID>
+    <ID>TooManyFunctions:FrameQueries.kt$FrameQueries : TransacterImpl</ID>
+    <ID>UnnecessaryBackticks:Frame.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:FrameLapseDatabase.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:FrameLapseDatabaseImpl.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:FrameQueries.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:GetMaxSortOrder.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:Project.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:ProjectQueries.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:Settings.kt$`data`</ID>
+    <ID>UnnecessaryBackticks:SettingsQueries.kt$`data`</ID>
+    <ID>UseCheckOrError:Result.kt$Result$throw IllegalStateException("Result is still loading")</ID>
+    <ID>UseDataClass:Platform.kt$Platform</ID>
+    <ID>Wrapping:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$(</ID>
+    <ID>Wrapping:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$(null, """ |CREATE TABLE Frame ( | id TEXT NOT NULL PRIMARY KEY, | projectId TEXT NOT NULL, | originalPath TEXT NOT NULL, | alignedPath TEXT, | timestamp INTEGER NOT NULL, | capturedAt INTEGER NOT NULL, | confidence REAL, | landmarksJson TEXT, | sortOrder INTEGER NOT NULL DEFAULT 0, | FOREIGN KEY (projectId) REFERENCES Project(id) ON DELETE CASCADE |) """.trimMargin(), 0)</ID>
+    <ID>Wrapping:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$(null, """ |CREATE TABLE Project ( | id TEXT NOT NULL PRIMARY KEY, | name TEXT NOT NULL, | createdAt INTEGER NOT NULL, | updatedAt INTEGER NOT NULL, | fps INTEGER NOT NULL DEFAULT 30, | resolution TEXT NOT NULL DEFAULT 'HD_1080P', | orientation TEXT NOT NULL DEFAULT 'PORTRAIT', | thumbnailPath TEXT |) """.trimMargin(), 0)</ID>
+    <ID>Wrapping:FrameLapseDatabaseImpl.kt$FrameLapseDatabaseImpl.Schema$(null, """ |CREATE TABLE Settings ( | key TEXT NOT NULL PRIMARY KEY, | value TEXT NOT NULL |) """.trimMargin(), 0)</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries$(1_396_290_344, """ |INSERT INTO Frame (id, projectId, originalPath, alignedPath, timestamp, capturedAt, confidence, landmarksJson, sortOrder) |VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) """.trimMargin(), 9)</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries$(id: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T)</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries$(projectId: String, mapper: ( id: String, projectId: String, originalPath: String, alignedPath: String?, timestamp: Long, capturedAt: Long, confidence: Double?, landmarksJson: String?, sortOrder: Long, ) -&gt; T)</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.GetFrameCountQuery$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.GetMaxSortOrderQuery$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.SelectByDateRangeQuery$(350_780_717, """ |SELECT Frame.id, Frame.projectId, Frame.originalPath, Frame.alignedPath, Frame.timestamp, Frame.capturedAt, Frame.confidence, Frame.landmarksJson, Frame.sortOrder FROM Frame |WHERE projectId = ? AND timestamp &gt;= ? AND timestamp &lt;= ? |ORDER BY sortOrder ASC, timestamp ASC """.trimMargin(), mapper, 3)</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.SelectByIdQuery$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.SelectByProjectQuery$(</ID>
+    <ID>Wrapping:FrameQueries.kt$FrameQueries.SelectLatestByProjectQuery$(</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries$(</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries$(-1_684_656_412, """ |UPDATE Project SET | name = ?, | updatedAt = ?, | fps = ?, | resolution = ?, | orientation = ?, | thumbnailPath = ? |WHERE id = ? """.trimMargin(), 7)</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries$(-2_029_602_604, """ |INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath) |VALUES (?, ?, ?, ?, ?, ?, ?, ?) """.trimMargin(), 8)</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries$(id: String, mapper: ( id: String, name: String, createdAt: Long, updatedAt: Long, fps: Long, resolution: String, orientation: String, thumbnailPath: String?, ) -&gt; T)</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries.ExistsQuery$(</ID>
+    <ID>Wrapping:ProjectQueries.kt$ProjectQueries.SelectByIdQuery$(</ID>
+    <ID>Wrapping:SettingsQueries.kt$SettingsQueries$(</ID>
+    <ID>Wrapping:SettingsQueries.kt$SettingsQueries.ExistsQuery$(</ID>
+    <ID>Wrapping:SettingsQueries.kt$SettingsQueries.SelectByKeyQuery$(</ID>
+  </CurrentIssues>
+</SmellBaseline>

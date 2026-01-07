@@ -1,0 +1,69 @@
+-- Frame table for storing individual photos in a timelapse project
+CREATE TABLE Frame (
+    id TEXT NOT NULL PRIMARY KEY,
+    projectId TEXT NOT NULL,
+    originalPath TEXT NOT NULL,
+    alignedPath TEXT,
+    timestamp INTEGER NOT NULL,
+    capturedAt INTEGER NOT NULL,
+    confidence REAL,
+    landmarksJson TEXT,
+    sortOrder INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (projectId) REFERENCES Project(id) ON DELETE CASCADE
+);
+
+-- Indexes for faster queries
+CREATE INDEX frame_project_id ON Frame(projectId);
+CREATE INDEX frame_timestamp ON Frame(timestamp);
+CREATE INDEX frame_sort_order ON Frame(projectId, sortOrder);
+
+-- Get all frames for a project, ordered by sort order then timestamp
+selectByProject:
+SELECT * FROM Frame WHERE projectId = ? ORDER BY sortOrder ASC, timestamp ASC;
+
+-- Get a single frame by ID
+selectById:
+SELECT * FROM Frame WHERE id = ?;
+
+-- Get the most recent frame for a project (for ghost image)
+selectLatestByProject:
+SELECT * FROM Frame WHERE projectId = ? ORDER BY timestamp DESC LIMIT 1;
+
+-- Get frames within a date range
+selectByDateRange:
+SELECT * FROM Frame
+WHERE projectId = ? AND timestamp >= ? AND timestamp <= ?
+ORDER BY sortOrder ASC, timestamp ASC;
+
+-- Insert a new frame
+insert:
+INSERT INTO Frame (id, projectId, originalPath, alignedPath, timestamp, capturedAt, confidence, landmarksJson, sortOrder)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Update alignment data for a frame
+updateAligned:
+UPDATE Frame SET alignedPath = ?, confidence = ?, landmarksJson = ? WHERE id = ?;
+
+-- Update sort order for a frame
+updateSortOrder:
+UPDATE Frame SET sortOrder = ? WHERE id = ?;
+
+-- Delete a single frame
+delete:
+DELETE FROM Frame WHERE id = ?;
+
+-- Delete all frames for a project
+deleteByProject:
+DELETE FROM Frame WHERE projectId = ?;
+
+-- Get the frame count for a project
+getFrameCount:
+SELECT COUNT(*) FROM Frame WHERE projectId = ?;
+
+-- Get the total frame count across all projects
+getTotalFrameCount:
+SELECT COUNT(*) FROM Frame;
+
+-- Get the max sort order for a project (for adding new frames)
+getMaxSortOrder:
+SELECT MAX(sortOrder) FROM Frame WHERE projectId = ?;

@@ -19,11 +19,12 @@
 # Run Android unit tests
 ./gradlew :composeApp:testDebugUnitTest
 
-# Check code style
-./gradlew ktlintCheck
-
-# Format code
-./gradlew ktlintFormat
+# Static analysis (run after every change)
+./gradlew staticAnalysis          # Run all checks (Spotless + Detekt + Lint)
+./gradlew spotlessCheck           # Check code formatting
+./gradlew spotlessApply           # Auto-fix formatting issues
+./gradlew detekt                  # Run Detekt static analysis
+./gradlew :composeApp:lintDebug   # Run Android Lint
 
 # Clean build
 ./gradlew clean
@@ -122,6 +123,20 @@ class CaptureViewModel : ViewModel() {
 - `AlignFaceUseCase` - Aligns face to reference coordinates
 - `CompileVideoUseCase` - Generates timelapse video from frames
 - `ImportPhotosUseCase` - Batch imports photos from gallery
+
+## Static Analysis
+
+The project uses strict static analysis with warnings treated as errors:
+
+| Tool | Purpose | Config File |
+|------|---------|-------------|
+| Spotless | Code formatting (ktlint backend) | `.editorconfig` |
+| Detekt | Kotlin static analysis + Compose rules | `config/detekt/detekt.yml` |
+| Android Lint | Android-specific checks | `composeApp/build.gradle.kts` |
+
+**Always run `./gradlew staticAnalysis` after making changes.** This runs all checks and will fail on any violations.
+
+To auto-fix formatting issues: `./gradlew spotlessApply`
 
 ## Coding Conventions
 

@@ -191,4 +191,9 @@ This document defines specialized agents for working on the FrameLapse codebase.
 1. **Combine agents** when tasks span multiple domains (e.g., camera + face detection)
 2. **Start with exploration** - agents should read relevant files before making changes
 3. **Verify platform parity** - changes to shared code should work on both Android and iOS
-4. **Test after changes** - always run relevant tests after modifications
+4. **Run checks after every change** - always run static analysis after modifications:
+   ```shell
+   ./gradlew spotlessApply  # Auto-fix formatting
+   ./gradlew staticAnalysis # Run all checks (Spotless + Detekt + Lint)
+   ```
+5. **Test after changes** - always run relevant tests after modifications

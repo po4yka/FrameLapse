@@ -10,23 +10,23 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 ---
 
-## Phase 1: Project Foundation
+## Phase 1: Project Foundation ✅
 
 ### 1.1 Project Setup
-- [ ] Configure Gradle with KMP plugins and version catalog
-- [ ] Set up composeApp module with commonMain, androidMain, iosMain source sets
-- [ ] Configure iOS app entry point in iosApp directory
-- [ ] Add Compose Multiplatform dependencies
-- [ ] Configure Koin for dependency injection
-- [ ] Set up SQLDelight with database schema
-- [ ] Add Coroutines and Flow dependencies
-- [ ] Configure ktlint for code formatting
+- [x] Configure Gradle with KMP plugins and version catalog
+- [x] Set up composeApp module with commonMain, androidMain, iosMain source sets
+- [x] Configure iOS app entry point in iosApp directory
+- [x] Add Compose Multiplatform dependencies
+- [x] Configure Koin for dependency injection
+- [x] Set up SQLDelight with database schema
+- [x] Add Coroutines and Flow dependencies
+- [x] Configure Detekt + Spotless for code formatting
 - [ ] Set up CI/CD pipeline (GitHub Actions)
 
 ### 1.2 Core Architecture Scaffolding
-- [ ] Create base package structure:
+- [x] Create base package structure:
   ```
-  commonMain/kotlin/com/framelapse/
+  commonMain/kotlin/com/po4yka/framelapse/
   ├── data/
   │   ├── local/
   │   └── repository/
@@ -35,27 +35,25 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
   │   ├── repository/
   │   └── usecase/
   ├── presentation/
-  │   └── viewmodel/
+  │   └── base/
   ├── ui/
-  │   ├── component/
-  │   ├── navigation/
-  │   ├── screen/
   │   └── theme/
+  ├── navigation/
   └── platform/
   ```
-- [ ] Define expect/actual interfaces for platform capabilities
-- [ ] Set up Koin modules (common, Android, iOS)
-- [ ] Create base ViewModel class with StateFlow pattern
-- [ ] Implement Result wrapper for error handling
+- [x] Define expect/actual interfaces for platform capabilities
+- [x] Set up Koin modules (common, Android, iOS)
+- [x] Create base ViewModel class with StateFlow pattern
+- [x] Implement Result wrapper for error handling
 
 ### 1.3 Database Schema
-- [ ] Design SQLDelight schema:
-  - [ ] `Project` table (id, name, createdAt, fps, resolution, orientation)
-  - [ ] `Frame` table (id, projectId, originalPath, alignedPath, timestamp, confidence, landmarks)
-  - [ ] `Settings` table (key, value)
-- [ ] Create database driver expect/actual
-- [ ] Implement migrations strategy
-- [ ] Create DAO interfaces
+- [x] Design SQLDelight schema:
+  - [x] `Project` table (id, name, createdAt, fps, resolution, orientation)
+  - [x] `Frame` table (id, projectId, originalPath, alignedPath, timestamp, confidence, landmarks)
+  - [x] `Settings` table (key, value)
+- [x] Create database driver expect/actual
+- [x] Implement migrations strategy
+- [x] Create DAO interfaces (via SQLDelight generated queries)
 
 ---
 
@@ -177,15 +175,15 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
   - [ ] Handle frame presentation times
 
 ### 3.5 File System Interface
-- [ ] Define `FileManager` expect class
-  - [ ] getAppDirectory(): String
-  - [ ] getProjectDirectory(projectId): String
-  - [ ] deleteFile(path)
-  - [ ] fileExists(path): Boolean
+- [x] Define `FileManager` expect class
+  - [x] getAppDirectory(): String
+  - [x] getProjectDirectory(projectId): String
+  - [x] deleteFile(path)
+  - [x] fileExists(path): Boolean
 
-- [ ] **Android/iOS Implementations**
-  - [ ] Map to platform file systems
-  - [ ] Handle app sandbox directories
+- [x] **Android/iOS Implementations**
+  - [x] Map to platform file systems
+  - [x] Handle app sandbox directories
 
 ---
 
@@ -235,8 +233,8 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 ## Phase 6: UI Layer (Compose Multiplatform)
 
 ### 6.1 Theme & Design System
-- [ ] Define color scheme (light/dark)
-- [ ] Define typography
+- [x] Define color scheme (light/dark)
+- [x] Define typography
 - [ ] Create custom shapes
 - [ ] Build reusable components:
   - [ ] `FramelapseButton`
@@ -441,12 +439,12 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| 1. Project Foundation | Not Started | 0% |
+| 1. Project Foundation | Complete | 95% |
 | 2. Domain Layer | Not Started | 0% |
-| 3. Platform Layer | Not Started | 0% |
+| 3. Platform Layer | Partial | 10% |
 | 4. Data Layer | Not Started | 0% |
 | 5. Presentation Layer | Not Started | 0% |
-| 6. UI Layer | Not Started | 0% |
+| 6. UI Layer | Partial | 5% |
 | 7. Core Features | Not Started | 0% |
 | 8. Advanced Features | Not Started | 0% |
 | 9. Testing | Not Started | 0% |

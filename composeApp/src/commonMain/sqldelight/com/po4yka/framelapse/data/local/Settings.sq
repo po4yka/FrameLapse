@@ -1,0 +1,25 @@
+-- Settings table for storing app preferences as key-value pairs
+CREATE TABLE Settings (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+-- Get a setting by key
+selectByKey:
+SELECT value FROM Settings WHERE key = ?;
+
+-- Get all settings
+selectAll:
+SELECT * FROM Settings;
+
+-- Insert or replace a setting
+insertOrReplace:
+INSERT OR REPLACE INTO Settings (key, value) VALUES (?, ?);
+
+-- Delete a setting by key
+delete:
+DELETE FROM Settings WHERE key = ?;
+
+-- Check if a setting exists
+exists:
+SELECT EXISTS(SELECT 1 FROM Settings WHERE key = ?);

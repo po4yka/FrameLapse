@@ -1,0 +1,71 @@
+[versions]
+# Kotlin & Compose
+kotlin = "2.1.0"
+agp = "8.5.0"
+compose-multiplatform = "1.7.1"
+
+# AndroidX
+androidx-activityCompose = "1.9.3"
+androidx-core = "1.15.0"
+androidx-lifecycle = "2.8.7"
+navigation3 = "0.1.0-alpha01"
+
+# Dependency Injection
+koin = "4.0.0"
+
+# Database
+sqldelight = "2.0.2"
+
+# Async
+coroutines = "1.9.0"
+
+# Serialization
+serialization = "1.7.3"
+
+# Code Quality
+detekt = "1.23.7"
+spotless = "6.25.0"
+detekt-compose-rules = "0.4.22"
+
+[libraries]
+# Kotlin
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
+# Koin - Dependency Injection
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+# SQLDelight - Database
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+
+# AndroidX
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+
+# Navigation 3
+navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+
+# Detekt plugins
+detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose-rules" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
