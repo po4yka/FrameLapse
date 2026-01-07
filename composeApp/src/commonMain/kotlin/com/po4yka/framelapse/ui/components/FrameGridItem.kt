@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -12,16 +13,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.ui.util.ImageLoadResult
+import com.po4yka.framelapse.ui.util.rememberImageFromPath
 
 private val CORNER_RADIUS = 8.dp
 private val BORDER_WIDTH = 3.dp
@@ -61,20 +66,39 @@ fun FrameGridItem(
                 onLongClick = onLongClick,
             ),
     ) {
-        // Frame thumbnail placeholder
+        // Frame thumbnail
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center,
         ) {
-            // TODO: Load actual frame thumbnail
-            Icon(
-                imageVector = Icons.Default.Image,
-                contentDescription = null,
-                modifier = Modifier.size(ICON_SIZE),
-                tint = MaterialTheme.colorScheme.outline,
-            )
+            val imagePath = frame.alignedPath ?: frame.originalPath
+            val imageResult = rememberImageFromPath(imagePath)
+
+            when (imageResult) {
+                is ImageLoadResult.Success -> {
+                    Image(
+                        bitmap = imageResult.image,
+                        contentDescription = "Frame",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+                is ImageLoadResult.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(ICON_SIZE),
+                    )
+                }
+                is ImageLoadResult.Error -> {
+                    Icon(
+                        imageVector = Icons.Default.BrokenImage,
+                        contentDescription = null,
+                        modifier = Modifier.size(ICON_SIZE),
+                        tint = MaterialTheme.colorScheme.outline,
+                    )
+                }
+            }
         }
 
         // Selection indicator

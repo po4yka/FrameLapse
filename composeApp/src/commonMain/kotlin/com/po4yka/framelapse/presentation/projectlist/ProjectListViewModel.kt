@@ -1,9 +1,13 @@
 package com.po4yka.framelapse.presentation.projectlist
 
+import com.po4yka.framelapse.domain.entity.Project
+import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.usecase.project.CreateProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.DeleteProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.presentation.base.BaseViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -16,6 +20,7 @@ class ProjectListViewModel(
     private val getProjectsUseCase: GetProjectsUseCase,
     private val createProjectUseCase: CreateProjectUseCase,
     private val deleteProjectUseCase: DeleteProjectUseCase,
+    private val frameRepository: FrameRepository,
 ) : BaseViewModel<ProjectListState, ProjectListEvent, ProjectListEffect>(ProjectListState()) {
 
     init {
@@ -43,10 +48,27 @@ class ProjectListViewModel(
                     sendEffect(ProjectListEffect.ShowError(error.message ?: "Failed to load projects"))
                 }
                 .collect { projects ->
-                    updateState { copy(projects = projects, isLoading = false) }
+                    val projectsWithDetails = loadProjectDetails(projects)
+                    updateState { copy(projectsWithDetails = projectsWithDetails, isLoading = false) }
                 }
         }
     }
+
+    private suspend fun loadProjectDetails(projects: List<Project>): List<ProjectWithDetails> =
+        projects.map { project ->
+            viewModelScope.async {
+                val frameCount = frameRepository.getFrameCount(project.id)
+                    .getOrNull()?.toInt() ?: 0
+                val latestFrame = frameRepository.getLatestFrame(project.id).getOrNull()
+                val thumbnailPath = latestFrame?.alignedPath ?: latestFrame?.originalPath
+
+                ProjectWithDetails(
+                    project = project,
+                    frameCount = frameCount,
+                    thumbnailPath = thumbnailPath,
+                )
+            }
+        }.awaitAll()
 
     private fun showCreateDialog() {
         updateState { copy(showCreateDialog = true, newProjectName = "") }

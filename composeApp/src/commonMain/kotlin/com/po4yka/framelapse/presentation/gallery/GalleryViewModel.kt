@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.gallery
 
+import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.usecase.frame.DeleteFrameUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetFramesUseCase
 import com.po4yka.framelapse.domain.usecase.frame.ImportPhotosUseCase
@@ -16,6 +17,7 @@ class GalleryViewModel(
     private val getFramesUseCase: GetFramesUseCase,
     private val deleteFrameUseCase: DeleteFrameUseCase,
     private val importPhotosUseCase: ImportPhotosUseCase,
+    private val frameRepository: FrameRepository,
 ) : BaseViewModel<GalleryState, GalleryEvent, GalleryEffect>(GalleryState()) {
 
     override fun onEvent(event: GalleryEvent) {
@@ -140,7 +142,12 @@ class GalleryViewModel(
 
         updateState { copy(frames = frames) }
 
-        // TODO: Persist reorder to database when frame reordering is implemented
+        // Persist reorder to database
+        viewModelScope.launch {
+            frames.forEachIndexed { index, reorderedFrame ->
+                frameRepository.updateSortOrder(reorderedFrame.id, index)
+            }
+        }
     }
 
     private fun navigateToCapture() {

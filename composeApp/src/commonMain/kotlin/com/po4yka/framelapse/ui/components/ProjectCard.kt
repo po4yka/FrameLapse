@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,9 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,9 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.po4yka.framelapse.domain.entity.Project
+import com.po4yka.framelapse.ui.util.ImageLoadResult
+import com.po4yka.framelapse.ui.util.rememberImageFromPath
 
 private val CARD_CORNER_RADIUS = 12.dp
 private val CONTENT_PADDING = 12.dp
@@ -70,13 +75,30 @@ fun ProjectCard(
                 contentAlignment = Alignment.Center,
             ) {
                 if (thumbnailPath != null) {
-                    // TODO: Load actual thumbnail image
-                    Icon(
-                        imageVector = Icons.Default.PhotoLibrary,
-                        contentDescription = null,
-                        modifier = Modifier.size(ICON_SIZE),
-                        tint = MaterialTheme.colorScheme.outline,
-                    )
+                    val imageResult = rememberImageFromPath(thumbnailPath)
+                    when (imageResult) {
+                        is ImageLoadResult.Success -> {
+                            Image(
+                                bitmap = imageResult.image,
+                                contentDescription = "Project thumbnail",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                        is ImageLoadResult.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(ICON_SIZE),
+                            )
+                        }
+                        is ImageLoadResult.Error -> {
+                            Icon(
+                                imageVector = Icons.Default.CameraAlt,
+                                contentDescription = null,
+                                modifier = Modifier.size(ICON_SIZE),
+                                tint = MaterialTheme.colorScheme.outline,
+                            )
+                        }
+                    }
                 } else {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,

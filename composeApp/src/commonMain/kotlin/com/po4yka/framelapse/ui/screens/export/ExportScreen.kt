@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.po4yka.framelapse.domain.entity.ExportQuality
 import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.domain.entity.VideoCodec
+import com.po4yka.framelapse.domain.service.ShareHandler
 import com.po4yka.framelapse.presentation.export.ExportEffect
 import com.po4yka.framelapse.presentation.export.ExportEvent
 import com.po4yka.framelapse.presentation.export.ExportState
@@ -39,6 +41,8 @@ import com.po4yka.framelapse.ui.components.SettingsDropdown
 import com.po4yka.framelapse.ui.components.SettingsSection
 import com.po4yka.framelapse.ui.components.SettingsSlider
 import com.po4yka.framelapse.ui.util.HandleEffects
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private val CONTENT_PADDING = 16.dp
@@ -56,16 +60,26 @@ fun ExportScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ExportViewModel = koinViewModel(),
+    shareHandler: ShareHandler = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     HandleEffects(viewModel.effect) { effect ->
         when (effect) {
             is ExportEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             is ExportEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
-            is ExportEffect.ShareVideo -> { /* TODO: Open share sheet */ }
-            is ExportEffect.OpenVideo -> { /* TODO: Open video player */ }
+            is ExportEffect.ShareVideo -> {
+                scope.launch {
+                    shareHandler.shareFile(effect.path, VIDEO_MIME_TYPE)
+                }
+            }
+            is ExportEffect.OpenVideo -> {
+                scope.launch {
+                    shareHandler.openFile(effect.path, VIDEO_MIME_TYPE)
+                }
+            }
             is ExportEffect.ExportComplete -> { /* Handled by UI state */ }
         }
     }
@@ -256,3 +270,4 @@ private fun formatDuration(seconds: Float): String {
 }
 
 private const val SECONDS_PER_MINUTE = 60
+private const val VIDEO_MIME_TYPE = "video/mp4"

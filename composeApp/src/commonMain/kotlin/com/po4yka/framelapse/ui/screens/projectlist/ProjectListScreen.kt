@@ -136,15 +136,15 @@ private fun ProjectListContent(
                     verticalArrangement = Arrangement.spacedBy(ITEM_SPACING),
                 ) {
                     items(
-                        items = state.projects,
-                        key = { it.id },
-                    ) { project ->
+                        items = state.projectsWithDetails,
+                        key = { it.project.id },
+                    ) { projectWithDetails ->
                         ProjectCard(
-                            project = project,
-                            frameCount = 0, // TODO: Get actual frame count
-                            thumbnailPath = null, // TODO: Get thumbnail
-                            onClick = { onEvent(ProjectListEvent.SelectProject(project.id)) },
-                            onLongClick = { onEvent(ProjectListEvent.DeleteProject(project.id)) },
+                            project = projectWithDetails.project,
+                            frameCount = projectWithDetails.frameCount,
+                            thumbnailPath = projectWithDetails.thumbnailPath,
+                            onClick = { onEvent(ProjectListEvent.SelectProject(projectWithDetails.project.id)) },
+                            onLongClick = { onEvent(ProjectListEvent.DeleteProject(projectWithDetails.project.id)) },
                         )
                     }
                 }

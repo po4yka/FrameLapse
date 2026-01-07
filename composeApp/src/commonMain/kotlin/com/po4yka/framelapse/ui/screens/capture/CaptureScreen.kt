@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.po4yka.framelapse.domain.entity.FlashMode
 import com.po4yka.framelapse.domain.service.CameraController
+import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.presentation.capture.CaptureEffect
 import com.po4yka.framelapse.presentation.capture.CaptureEvent
 import com.po4yka.framelapse.presentation.capture.CaptureState
@@ -61,6 +62,7 @@ import com.po4yka.framelapse.ui.components.PermissionDeniedScreen
 import com.po4yka.framelapse.ui.util.HandleEffects
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 private val CONTROL_BUTTON_SIZE = 48.dp
@@ -77,6 +79,7 @@ fun CaptureScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel = koinViewModel(),
+    soundPlayer: SoundPlayer = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -87,7 +90,7 @@ fun CaptureScreen(
             is CaptureEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             is CaptureEffect.NavigateToGallery -> onNavigateToGallery()
             is CaptureEffect.TriggerCapture -> { /* Handled by camera */ }
-            is CaptureEffect.PlayCaptureSound -> { /* TODO: Play sound */ }
+            is CaptureEffect.PlayCaptureSound -> soundPlayer.playCaptureSound()
         }
     }
 

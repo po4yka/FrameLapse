@@ -114,9 +114,9 @@ val domainModule = module {
 val presentationModule = module {
     // ViewModels - factory scope for new instance per screen
     factory { MainViewModel(get()) }
-    factory { ProjectListViewModel(get(), get(), get()) }
+    factory { ProjectListViewModel(get(), get(), get(), get()) }
     factory { CaptureViewModel(get(), get(), get(), get()) }
-    factory { GalleryViewModel(get(), get(), get(), get()) }
+    factory { GalleryViewModel(get(), get(), get(), get(), get()) }
     factory { ExportViewModel(get(), get(), get()) }
     factory { SettingsViewModel(get(), get()) }
 }

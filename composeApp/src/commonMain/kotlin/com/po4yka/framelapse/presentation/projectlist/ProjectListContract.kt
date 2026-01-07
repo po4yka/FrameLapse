@@ -6,15 +6,23 @@ import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
 
 /**
+ * Combined project data with frame count and thumbnail for display.
+ */
+data class ProjectWithDetails(val project: Project, val frameCount: Int, val thumbnailPath: String?)
+
+/**
  * UI state for the project list screen.
  */
 data class ProjectListState(
-    val projects: List<Project> = emptyList(),
+    val projectsWithDetails: List<ProjectWithDetails> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val showCreateDialog: Boolean = false,
     val newProjectName: String = "",
-) : UiState
+) : UiState {
+    // Convenience property for compatibility
+    val projects: List<Project> get() = projectsWithDetails.map { it.project }
+}
 
 /**
  * User events for the project list screen.
