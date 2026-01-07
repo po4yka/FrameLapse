@@ -20,7 +20,7 @@ mediapipe = "0.10.18"
 exifinterface = "1.3.7"
 
 # Dependency Injection
-koin = "4.0.0"
+koin = "4.1.1"
 
 # Database
 sqldelight = "2.0.2"
