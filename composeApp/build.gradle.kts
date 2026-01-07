@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kover)
 }
 
 kotlin {
@@ -108,6 +109,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Allow unsigned release builds for CI
+            signingConfig = null
         }
     }
 
@@ -138,4 +141,30 @@ sqldelight {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+}
+
+kover {
+    reports {
+        total {
+            filters {
+                excludes {
+                    classes(
+                        "*_Factory",
+                        "*BuildConfig",
+                        "*ComposableSingletons*",
+                        "*_Impl",
+                    )
+                    packages("*.generated.*")
+                    annotatedBy("androidx.compose.ui.tooling.preview.Preview")
+                }
+            }
+            xml {
+                xmlFile = layout.buildDirectory.file("reports/kover/report.xml")
+            }
+            html {
+                title = "FrameLapse Coverage Report"
+                htmlDir = layout.buildDirectory.dir("reports/kover/html")
+            }
+        }
+    }
 }

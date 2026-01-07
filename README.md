@@ -1,5 +1,8 @@
 # FrameLapse
 
+[![CI](https://github.com/po4yka/FrameLapse/actions/workflows/ci.yml/badge.svg)](https://github.com/po4yka/FrameLapse/actions/workflows/ci.yml)
+[![CI - iOS](https://github.com/po4yka/FrameLapse/actions/workflows/ci-ios.yml/badge.svg)](https://github.com/po4yka/FrameLapse/actions/workflows/ci-ios.yml)
+
 A Kotlin Multiplatform application for creating stabilized daily self-portrait timelapse videos. FrameLapse automatically aligns and compiles facial photographs to document physical transformations over time.
 
 ## Features

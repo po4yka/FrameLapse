@@ -21,7 +21,7 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 - [x] Set up SQLDelight with database schema
 - [x] Add Coroutines and Flow dependencies
 - [x] Configure Detekt + Spotless for code formatting
-- [ ] Set up CI/CD pipeline (GitHub Actions)
+- [x] Set up CI/CD pipeline (GitHub Actions)
 
 ### 1.2 Core Architecture Scaffolding
 - [x] Create base package structure:
@@ -57,47 +57,60 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 ---
 
-## Phase 2: Domain Layer
+## Phase 2: Domain Layer ✅
 
 ### 2.1 Entities
-- [ ] `Project` - timelapse project with settings
-- [ ] `Frame` - individual photo with metadata
-- [ ] `FaceLandmarks` - 478 3D facial landmarks
-- [ ] `AlignmentMatrix` - affine transformation data
-- [ ] `ExportSettings` - video export configuration
-- [ ] `CaptureSettings` - camera capture preferences
+- [x] `Project` - timelapse project with settings
+- [x] `Frame` - individual photo with metadata
+- [x] `FaceLandmarks` - 478 3D facial landmarks
+- [x] `AlignmentMatrix` - affine transformation data
+- [x] `ExportSettings` - video export configuration
+- [x] `CaptureSettings` - camera capture preferences
+- [x] `AlignmentSettings` - face alignment configuration
 
 ### 2.2 Repository Interfaces
-- [ ] `ProjectRepository`
-  - [ ] createProject, getProject, getAllProjects, deleteProject
-  - [ ] updateProjectSettings
-- [ ] `FrameRepository`
-  - [ ] addFrame, getFrames, deleteFrame
-  - [ ] getFrameCount, getLatestFrame
-- [ ] `SettingsRepository`
-  - [ ] get/set preferences (guide photo, reminder time)
+- [x] `ProjectRepository`
+  - [x] createProject, getProject, getAllProjects, deleteProject
+  - [x] updateProjectSettings, observeProjects
+- [x] `FrameRepository`
+  - [x] addFrame, getFrames, deleteFrame
+  - [x] getFrameCount, getLatestFrame, observeFrames
+- [x] `SettingsRepository`
+  - [x] get/set preferences (string, int, boolean, float)
 
-### 2.3 Use Cases
-- [ ] **Project Management**
-  - [ ] `CreateProjectUseCase`
-  - [ ] `GetProjectsUseCase`
-  - [ ] `DeleteProjectUseCase`
-  - [ ] `UpdateProjectSettingsUseCase`
+### 2.3 Platform Service Interfaces
+- [x] `ImageProcessor` - load, save, transform, crop, resize images
+- [x] `FaceDetector` - detect face landmarks
+- [x] `VideoEncoder` - encode frames to video
+- [x] `CameraController` - camera capture control
 
-- [ ] **Photo Capture**
-  - [ ] `CaptureImageUseCase`
-  - [ ] `ImportPhotosUseCase`
-  - [ ] `DeleteFrameUseCase`
+### 2.4 Use Cases
+- [x] **Project Management**
+  - [x] `CreateProjectUseCase`
+  - [x] `GetProjectsUseCase`
+  - [x] `GetProjectUseCase`
+  - [x] `DeleteProjectUseCase`
+  - [x] `UpdateProjectSettingsUseCase`
 
-- [ ] **Face Processing**
-  - [ ] `DetectFaceUseCase`
-  - [ ] `AlignFaceUseCase`
-  - [ ] `ValidateAlignmentUseCase`
+- [x] **Frame Management**
+  - [x] `AddFrameUseCase`
+  - [x] `GetFramesUseCase`
+  - [x] `GetLatestFrameUseCase`
+  - [x] `DeleteFrameUseCase`
+  - [x] `ImportPhotosUseCase`
 
-- [ ] **Video Export**
-  - [ ] `CompileVideoUseCase`
-  - [ ] `ExportGifUseCase`
-  - [ ] `GetExportProgressUseCase`
+- [x] **Face Processing**
+  - [x] `DetectFaceUseCase`
+  - [x] `AlignFaceUseCase`
+  - [x] `CalculateAlignmentMatrixUseCase`
+  - [x] `ValidateAlignmentUseCase`
+
+- [x] **Video Export**
+  - [x] `CompileVideoUseCase`
+  - [x] `ExportGifUseCase`
+
+- [x] **Capture Flow**
+  - [x] `CaptureImageUseCase`
 
 ---
 
@@ -439,9 +452,9 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 | Phase | Status | Progress |
 |-------|--------|----------|
-| 1. Project Foundation | Complete | 95% |
-| 2. Domain Layer | Not Started | 0% |
-| 3. Platform Layer | Partial | 10% |
+| 1. Project Foundation | Complete | 100% |
+| 2. Domain Layer | Complete | 100% |
+| 3. Platform Layer | Partial | 15% |
 | 4. Data Layer | Not Started | 0% |
 | 5. Presentation Layer | Not Started | 0% |
 | 6. UI Layer | Partial | 5% |

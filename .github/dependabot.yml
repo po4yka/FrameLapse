@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # Gradle dependencies
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx*"
+      compose:
+        patterns:
+          - "org.jetbrains.compose*"
+          - "androidx.compose*"
+      androidx:
+        patterns:
+          - "androidx.*"
+      koin:
+        patterns:
+          - "io.insert-koin*"
+      sqldelight:
+        patterns:
+          - "app.cash.sqldelight*"
+      code-quality:
+        patterns:
+          - "io.gitlab.arturbosch.detekt*"
+          - "com.diffplug.spotless*"
+          - "io.nlopez.compose.rules*"
+    labels:
+      - "dependencies"
+      - "gradle"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci):"
