@@ -1,0 +1,258 @@
+package com.po4yka.framelapse.ui.screens.export
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.po4yka.framelapse.domain.entity.ExportQuality
+import com.po4yka.framelapse.domain.entity.Resolution
+import com.po4yka.framelapse.domain.entity.VideoCodec
+import com.po4yka.framelapse.presentation.export.ExportEffect
+import com.po4yka.framelapse.presentation.export.ExportEvent
+import com.po4yka.framelapse.presentation.export.ExportState
+import com.po4yka.framelapse.presentation.export.ExportViewModel
+import com.po4yka.framelapse.ui.components.ExportCompleteCard
+import com.po4yka.framelapse.ui.components.ExportProgressCard
+import com.po4yka.framelapse.ui.components.FrameLapseTopBar
+import com.po4yka.framelapse.ui.components.SettingsDropdown
+import com.po4yka.framelapse.ui.components.SettingsSection
+import com.po4yka.framelapse.ui.components.SettingsSlider
+import com.po4yka.framelapse.ui.util.HandleEffects
+import org.koin.compose.viewmodel.koinViewModel
+
+private val CONTENT_PADDING = 16.dp
+private val SECTION_SPACING = 24.dp
+private const val MIN_FPS = 1f
+private const val MAX_FPS = 60f
+private const val FPS_STEPS = 59
+
+/**
+ * Export screen for configuring and exporting video.
+ */
+@Composable
+fun ExportScreen(
+    projectId: String,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ExportViewModel = koinViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    HandleEffects(viewModel.effect) { effect ->
+        when (effect) {
+            is ExportEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+            is ExportEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
+            is ExportEffect.ShareVideo -> { /* TODO: Open share sheet */ }
+            is ExportEffect.OpenVideo -> { /* TODO: Open video player */ }
+            is ExportEffect.ExportComplete -> { /* Handled by UI state */ }
+        }
+    }
+
+    LaunchedEffect(projectId) {
+        viewModel.onEvent(ExportEvent.Initialize(projectId))
+    }
+
+    ExportContent(
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onEvent = viewModel::onEvent,
+        onNavigateBack = onNavigateBack,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun ExportContent(
+    state: ExportState,
+    snackbarHostState: SnackbarHostState,
+    onEvent: (ExportEvent) -> Unit,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            FrameLapseTopBar(
+                title = "Export Video",
+                onBackClick = onNavigateBack,
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            when {
+                state.isExporting -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(CONTENT_PADDING),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        ExportProgressCard(
+                            progress = state.exportProgress,
+                            onCancel = { onEvent(ExportEvent.CancelExport) },
+                        )
+                    }
+                }
+
+                state.exportedVideoPath != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(CONTENT_PADDING),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        ExportCompleteCard(
+                            onShare = { onEvent(ExportEvent.ShareVideo) },
+                            onDismiss = { onEvent(ExportEvent.DismissResult) },
+                        )
+                    }
+                }
+
+                else -> {
+                    ExportSettingsForm(
+                        state = state,
+                        onEvent = onEvent,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(CONTENT_PADDING),
+        verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
+    ) {
+        // Preview card
+        ExportPreviewCard(
+            frameCount = state.frameCount,
+            estimatedDuration = state.estimatedDuration,
+            fps = state.exportSettings.fps,
+        )
+
+        // Video settings
+        SettingsSection(title = "Video Settings") {
+            SettingsDropdown(
+                title = "Resolution",
+                selectedValue = state.exportSettings.resolution,
+                options = Resolution.entries,
+                onSelect = { onEvent(ExportEvent.UpdateResolution(it)) },
+                valueLabel = { it.displayName },
+            )
+
+            SettingsSlider(
+                title = "Frame Rate",
+                value = state.exportSettings.fps.toFloat(),
+                onValueChange = { onEvent(ExportEvent.UpdateFps(it.toInt())) },
+                valueRange = MIN_FPS..MAX_FPS,
+                steps = FPS_STEPS,
+                valueLabel = { "${it.toInt()} FPS" },
+            )
+
+            SettingsDropdown(
+                title = "Codec",
+                selectedValue = state.exportSettings.codec,
+                options = VideoCodec.entries,
+                onSelect = { onEvent(ExportEvent.UpdateCodec(it)) },
+                valueLabel = { it.displayName },
+            )
+
+            SettingsDropdown(
+                title = "Quality",
+                selectedValue = state.exportSettings.quality,
+                options = ExportQuality.entries,
+                onSelect = { onEvent(ExportEvent.UpdateQuality(it)) },
+                valueLabel = { it.displayName },
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Export button
+        Button(
+            onClick = { onEvent(ExportEvent.StartExport) },
+            enabled = state.canExport,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Export Video")
+        }
+    }
+}
+
+@Composable
+private fun ExportPreviewCard(frameCount: Int, estimatedDuration: Float, fps: Int, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(CONTENT_PADDING),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "$frameCount frames",
+                style = MaterialTheme.typography.headlineMedium,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Estimated duration: ${formatDuration(estimatedDuration)}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text(
+                text = "at $fps FPS",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+private fun formatDuration(seconds: Float): String {
+    val totalSeconds = seconds.toInt()
+    val minutes = totalSeconds / SECONDS_PER_MINUTE
+    val remainingSeconds = totalSeconds % SECONDS_PER_MINUTE
+    return if (minutes > 0) {
+        "${minutes}m ${remainingSeconds}s"
+    } else {
+        "${remainingSeconds}s"
+    }
+}
+
+private const val SECONDS_PER_MINUTE = 60

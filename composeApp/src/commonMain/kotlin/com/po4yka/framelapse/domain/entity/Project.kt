@@ -37,9 +37,9 @@ enum class Resolution(val width: Int, val height: Int, val displayName: String) 
  * Video orientation options.
  */
 @Serializable
-enum class Orientation {
-    PORTRAIT,
-    LANDSCAPE,
+enum class Orientation(val displayName: String) {
+    PORTRAIT("Portrait"),
+    LANDSCAPE("Landscape"),
     ;
 
     companion object {
