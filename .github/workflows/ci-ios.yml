@@ -42,14 +42,14 @@ jobs:
         run: ./gradlew :composeApp:linkReleaseFrameworkIosSimulatorArm64 --no-daemon
 
       - name: Upload Debug Framework
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-framework-debug
           path: composeApp/build/bin/iosSimulatorArm64/debugFramework/
           retention-days: 7
 
       - name: Upload Release Framework
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-framework-release
           path: composeApp/build/bin/iosSimulatorArm64/releaseFramework/
@@ -80,7 +80,7 @@ jobs:
         run: ./gradlew :composeApp:iosSimulatorArm64Test --no-daemon
 
       - name: Upload Test Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: ios-test-reports
