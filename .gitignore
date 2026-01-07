@@ -1,0 +1,99 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE - Android Studio / IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# IDE - Fleet
+.fleet/
+
+# IDE - VS Code
+.vscode/
+
+# Kotlin
+.kotlin/
+
+# Android
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+*.log
+gen/
+local.properties
+
+# iOS / Xcode
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
+iosApp/iosApp.xcodeproj/xcuserdata/
+iosApp/*.xcworkspace/xcuserdata/
+iosApp/Pods/
+iosApp/Podfile.lock
+iosApp/.xcode.env.local
+**/xcuserdata/
+**/DerivedData/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Kotlin Multiplatform
+/kotlin-js-store/
+
+# CocoaPods
+iosApp/Pods/
+Podfile.lock
+
+# SPM (Swift Package Manager)
+.build/
+Package.resolved
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Local configuration
+*.local
+.env
+.env.*
+secrets.properties
+
+# Crash reports
+crash_reports/
+*.crash
+
+# Test outputs
+test-results/
+test-reports/
+
+# Coverage reports
+coverage/
+*.exec
+*.ec
+
+# Compose Multiplatform
+/composeApp/build/
+/shared/build/
+
+# Generated files
+*.generated.*
