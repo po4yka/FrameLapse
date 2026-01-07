@@ -1,5 +1,19 @@
 package com.po4yka.framelapse.di
 
+import com.po4yka.framelapse.data.local.FrameLapseDatabase
+import com.po4yka.framelapse.data.local.FrameLocalDataSource
+import com.po4yka.framelapse.data.local.ProjectLocalDataSource
+import com.po4yka.framelapse.data.local.SettingsLocalDataSource
+import com.po4yka.framelapse.data.repository.FrameRepositoryImpl
+import com.po4yka.framelapse.data.repository.ProjectRepositoryImpl
+import com.po4yka.framelapse.data.repository.SettingsRepositoryImpl
+import com.po4yka.framelapse.data.storage.ImageStorageManager
+import com.po4yka.framelapse.data.storage.StorageCleanupManager
+import com.po4yka.framelapse.data.storage.ThumbnailGenerator
+import com.po4yka.framelapse.data.storage.VideoStorageManager
+import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.repository.ProjectRepository
+import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
 import com.po4yka.framelapse.domain.usecase.export.CompileVideoUseCase
 import com.po4yka.framelapse.domain.usecase.export.ExportGifUseCase
@@ -17,6 +31,7 @@ import com.po4yka.framelapse.domain.usecase.project.DeleteProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
+import com.po4yka.framelapse.platform.DatabaseDriverFactory
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -29,13 +44,30 @@ val commonModule = module {
 
 /**
  * Data layer module for repositories and data sources.
- * Note: Repository implementations will be added in Phase 4.
  */
 val dataModule = module {
-    // Add data layer dependencies here
-    // single { ProjectRepositoryImpl(get()) } bind ProjectRepository::class
-    // single { FrameRepositoryImpl(get()) } bind FrameRepository::class
-    // single { SettingsRepositoryImpl(get()) } bind SettingsRepository::class
+    // Database
+    single { get<DatabaseDriverFactory>().createDriver() }
+    single { FrameLapseDatabase(get()) }
+    single { get<FrameLapseDatabase>().projectQueries }
+    single { get<FrameLapseDatabase>().frameQueries }
+    single { get<FrameLapseDatabase>().settingsQueries }
+
+    // Local Data Sources
+    single { ProjectLocalDataSource(get()) }
+    single { FrameLocalDataSource(get()) }
+    single { SettingsLocalDataSource(get()) }
+
+    // Storage Managers
+    single { ImageStorageManager(get()) }
+    single { VideoStorageManager(get()) }
+    single { ThumbnailGenerator(get(), get()) }
+    single { StorageCleanupManager(get(), get(), get()) }
+
+    // Repositories
+    single<ProjectRepository> { ProjectRepositoryImpl(get(), get()) }
+    single<FrameRepository> { FrameRepositoryImpl(get(), get()) }
+    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
 }
 
 /**
