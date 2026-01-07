@@ -40,10 +40,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.po4yka.framelapse.domain.entity.FlashMode
+import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.presentation.capture.CaptureEffect
 import com.po4yka.framelapse.presentation.capture.CaptureEvent
 import com.po4yka.framelapse.presentation.capture.CaptureState
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel
+import com.po4yka.framelapse.ui.components.PermissionDeniedScreen
 import com.po4yka.framelapse.ui.util.HandleEffects
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -64,6 +66,7 @@ fun CaptureScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val permissionState = rememberCameraPermissionState()
 
     HandleEffects(viewModel.effect) { effect ->
         when (effect) {
@@ -78,13 +81,33 @@ fun CaptureScreen(
         viewModel.onEvent(CaptureEvent.Initialize(projectId))
     }
 
-    CaptureContent(
-        state = state,
-        snackbarHostState = snackbarHostState,
-        onEvent = viewModel::onEvent,
-        onNavigateBack = onNavigateBack,
-        modifier = modifier,
-    )
+    // Request permission on first launch
+    LaunchedEffect(permissionState.hasPermission) {
+        if (!permissionState.hasPermission) {
+            permissionState.requestPermission()
+        }
+    }
+
+    if (permissionState.hasPermission) {
+        CaptureContent(
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onEvent = viewModel::onEvent,
+            onCameraReady = { controller ->
+                viewModel.cameraController = controller
+                viewModel.onEvent(CaptureEvent.CameraReady)
+            },
+            onNavigateBack = onNavigateBack,
+            modifier = modifier,
+        )
+    } else {
+        PermissionDeniedScreen(
+            title = "Camera Permission Required",
+            description = "FrameLapse needs camera access to capture your daily photos for the timelapse.",
+            onRequestPermission = permissionState.requestPermission,
+            onNavigateBack = onNavigateBack,
+        )
+    }
 }
 
 @Composable
@@ -92,6 +115,7 @@ private fun CaptureContent(
     state: CaptureState,
     snackbarHostState: SnackbarHostState,
     onEvent: (CaptureEvent) -> Unit,
+    onCameraReady: (CameraController) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -107,8 +131,9 @@ private fun CaptureContent(
         ) {
             // Camera preview
             CameraPreview(
-                onCameraReady = { onEvent(CaptureEvent.CameraReady) },
-                onCaptureRequest = { /* Capture handled by button */ },
+                cameraFacing = state.captureSettings.cameraFacing,
+                flashMode = state.captureSettings.flashMode,
+                onCameraReady = onCameraReady,
                 modifier = Modifier.fillMaxSize(),
             )
 

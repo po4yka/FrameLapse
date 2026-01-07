@@ -104,8 +104,8 @@ val domainModule = module {
     factory { CompileVideoUseCase(get(), get(), get()) }
     factory { ExportGifUseCase(get(), get(), get()) }
 
-    // Capture Use Cases
-    factory { CaptureImageUseCase(get(), get(), get(), get()) }
+    // Capture Use Cases (CameraController passed at runtime from UI layer)
+    factory { CaptureImageUseCase(get(), get(), get()) }
 }
 
 /**

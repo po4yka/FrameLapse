@@ -18,7 +18,6 @@ import com.po4yka.framelapse.platform.currentTimeMillis
  * 3. Face detection and alignment
  */
 class CaptureImageUseCase(
-    private val cameraController: CameraController,
     private val addFrameUseCase: AddFrameUseCase,
     private val alignFaceUseCase: AlignFaceUseCase,
     private val fileManager: FileManager,
@@ -27,12 +26,14 @@ class CaptureImageUseCase(
      * Captures an image and adds it to the project.
      *
      * @param projectId The project ID.
+     * @param cameraController The camera controller to use for capturing.
      * @param alignFace Whether to perform face alignment.
      * @param alignmentSettings Optional alignment configuration.
      * @return Result containing the captured Frame.
      */
     suspend operator fun invoke(
         projectId: String,
+        cameraController: CameraController,
         alignFace: Boolean = true,
         alignmentSettings: AlignmentSettings = AlignmentSettings(),
     ): Result<Frame> {

@@ -3,6 +3,7 @@ package com.po4yka.framelapse.presentation.capture
 import com.po4yka.framelapse.domain.entity.CameraFacing
 import com.po4yka.framelapse.domain.entity.FlashMode
 import com.po4yka.framelapse.domain.repository.SettingsRepository
+import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetFramesUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetLatestFrameUseCase
@@ -19,6 +20,12 @@ class CaptureViewModel(
     private val getFramesUseCase: GetFramesUseCase,
     private val settingsRepository: SettingsRepository,
 ) : BaseViewModel<CaptureState, CaptureEvent, CaptureEffect>(CaptureState()) {
+
+    /**
+     * Camera controller reference set from the UI layer.
+     * Must be set before capture operations can be performed.
+     */
+    var cameraController: CameraController? = null
 
     override fun onEvent(event: CaptureEvent) {
         when (event) {
@@ -92,11 +99,15 @@ class CaptureViewModel(
             return
         }
 
+        val controller = cameraController ?: run {
+            sendEffect(CaptureEffect.ShowError("Camera not ready"))
+            return
+        }
+
         updateState { copy(isProcessing = true, error = null) }
 
         viewModelScope.launch {
-            // CaptureImageUseCase handles camera capture internally
-            captureImageUseCase(currentState.projectId, alignFace = true)
+            captureImageUseCase(currentState.projectId, controller, alignFace = true)
                 .onSuccess { frame ->
                     sendEffect(CaptureEffect.PlayCaptureSound)
                     val ghostPath = frame.alignedPath ?: frame.originalPath
@@ -123,10 +134,12 @@ class CaptureViewModel(
             FlashMode.ON -> FlashMode.AUTO
             FlashMode.AUTO -> FlashMode.OFF
         }
+        cameraController?.setFlashMode(newFlashMode)
         updateState { copy(captureSettings = captureSettings.copy(flashMode = newFlashMode)) }
     }
 
     private fun flipCamera() {
+        cameraController?.switchCamera()
         val newFacing = when (currentState.captureSettings.cameraFacing) {
             CameraFacing.FRONT -> CameraFacing.BACK
             CameraFacing.BACK -> CameraFacing.FRONT
