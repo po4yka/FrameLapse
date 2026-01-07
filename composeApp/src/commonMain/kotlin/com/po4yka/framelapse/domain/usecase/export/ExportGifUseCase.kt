@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Exports frames as an animated GIF.
@@ -85,7 +86,7 @@ class ExportGifUseCase(
 
         // Generate output path
         val projectDir = fileManager.getProjectDirectory(projectId)
-        val timestamp = System.currentTimeMillis()
+        val timestamp = currentTimeMillis()
         val outputPath = "$projectDir/timelapse_$timestamp.gif"
 
         // Process frames

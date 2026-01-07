@@ -1,10 +1,12 @@
 package com.po4yka.framelapse.platform
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
+@OptIn(ExperimentalForeignApi::class)
 actual class FileManager {
     private val fileManager = NSFileManager.defaultManager
 

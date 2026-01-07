@@ -10,6 +10,15 @@ androidx-core = "1.15.0"
 androidx-lifecycle = "2.8.7"
 navigation3 = "0.1.0-alpha01"
 
+# CameraX
+camerax = "1.4.1"
+
+# MediaPipe
+mediapipe = "0.10.18"
+
+# Image Processing
+exifinterface = "1.3.7"
+
 # Dependency Injection
 koin = "4.0.0"
 
@@ -55,6 +64,18 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 # Navigation 3
 navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+
+# CameraX
+camerax-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
+camerax-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camerax-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+
+# MediaPipe
+mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipe" }
+
+# Image Processing
+androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 
 # Detekt plugins
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose-rules" }

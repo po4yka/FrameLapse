@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Captures an image, adds it to a project, and performs face alignment.
@@ -44,7 +45,7 @@ class CaptureImageUseCase(
 
         // Generate output path for captured image
         val projectDir = fileManager.getProjectDirectory(projectId)
-        val timestamp = System.currentTimeMillis()
+        val timestamp = currentTimeMillis()
         val capturePath = "$projectDir/capture_$timestamp.jpg"
 
         // Capture image

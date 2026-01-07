@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Adds a new frame to a project.
@@ -59,7 +60,7 @@ class AddFrameUseCase(
         val sortOrder = frameCountResult.getOrNull()?.toInt() ?: 0
 
         // Create frame
-        val now = System.currentTimeMillis()
+        val now = currentTimeMillis()
         val frame = Frame(
             id = generateFrameId(),
             projectId = projectId,
@@ -83,5 +84,5 @@ class AddFrameUseCase(
         return addResult
     }
 
-    private fun generateFrameId(): String = "frame_${System.currentTimeMillis()}_${(0..9999).random()}"
+    private fun generateFrameId(): String = "frame_${currentTimeMillis()}_${(0..9999).random()}"
 }

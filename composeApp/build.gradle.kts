@@ -75,6 +75,18 @@ kotlin {
 
             // Database
             implementation(libs.sqldelight.android.driver)
+
+            // CameraX
+            implementation(libs.camerax.core)
+            implementation(libs.camerax.camera2)
+            implementation(libs.camerax.lifecycle)
+            implementation(libs.camerax.view)
+
+            // MediaPipe
+            implementation(libs.mediapipe.tasks.vision)
+
+            // Image Processing
+            implementation(libs.androidx.exifinterface)
         }
 
         iosMain.dependencies {

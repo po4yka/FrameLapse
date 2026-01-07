@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.VideoEncoder
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Compiles frames into a timelapse video.
@@ -82,7 +83,7 @@ class CompileVideoUseCase(
 
         // Generate output path
         val projectDir = fileManager.getProjectDirectory(projectId)
-        val timestamp = System.currentTimeMillis()
+        val timestamp = currentTimeMillis()
         val extension = if (settings.codec == com.po4yka.framelapse.domain.entity.VideoCodec.HEVC) {
             "mp4" // HEVC still uses mp4 container
         } else {
