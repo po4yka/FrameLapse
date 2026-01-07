@@ -47,6 +47,8 @@ import com.po4yka.framelapse.ui.components.FrameLapseTopBar
 import com.po4yka.framelapse.ui.components.LoadingIndicator
 import com.po4yka.framelapse.ui.components.SelectionTopBar
 import com.po4yka.framelapse.ui.util.HandleEffects
+import com.po4yka.framelapse.ui.util.PhotoPickerResult
+import com.po4yka.framelapse.ui.util.rememberPhotoPickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
 
 private val GRID_SPACING = 4.dp
@@ -70,13 +72,28 @@ fun GalleryScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var deleteCount by remember { mutableStateOf(0) }
 
+    // Photo picker launcher
+    val photoPickerLauncher = rememberPhotoPickerLauncher { result ->
+        when (result) {
+            is PhotoPickerResult.Success -> {
+                viewModel.onPhotosSelected(result.uris)
+            }
+            is PhotoPickerResult.Error -> {
+                // Error will be shown via snackbar
+            }
+            is PhotoPickerResult.Cancelled -> {
+                // User cancelled, no action needed
+            }
+        }
+    }
+
     HandleEffects(viewModel.effect) { effect ->
         when (effect) {
             is GalleryEffect.NavigateToCapture -> onNavigateToCapture()
             is GalleryEffect.NavigateToExport -> onNavigateToExport()
             is GalleryEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             is GalleryEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
-            is GalleryEffect.OpenPhotoPicker -> { /* TODO: Open photo picker */ }
+            is GalleryEffect.OpenPhotoPicker -> photoPickerLauncher.launch(maxItems = 0)
             is GalleryEffect.ShowDeleteConfirmation -> {
                 deleteCount = effect.count
                 showDeleteDialog = true

@@ -181,9 +181,10 @@ private fun SettingsContent(
 }
 
 private fun formatStorageSize(sizeInMb: Float): String = if (sizeInMb >= BYTES_THRESHOLD) {
-    String.format("%.1f", sizeInMb / BYTES_THRESHOLD) + " GB"
+    val gb = sizeInMb / BYTES_THRESHOLD
+    "${(gb * 10).toInt() / 10.0} GB"
 } else {
-    String.format("%.1f", sizeInMb)
+    "${(sizeInMb * 10).toInt() / 10.0} MB"
 }
 
 private const val BYTES_THRESHOLD = 1024f

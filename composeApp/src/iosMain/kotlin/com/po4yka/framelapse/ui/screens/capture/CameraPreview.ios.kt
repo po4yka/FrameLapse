@@ -69,29 +69,38 @@ actual fun CameraPreview(
     // Camera preview view
     UIKitView(
         factory = {
-            val containerView = UIView()
-            containerView.backgroundColor = platform.UIKit.UIColor.blackColor
-
-            // Create and configure preview layer
+            // Create a custom UIView that handles layout
             val session = cameraController.getCaptureSession()
-            if (session != null) {
-                val layer = AVCaptureVideoPreviewLayer(session = session)
-                layer.videoGravity = AVLayerVideoGravityResizeAspectFill
-                containerView.layer.addSublayer(layer)
-                previewLayer = layer
+            val layer = if (session != null) {
+                AVCaptureVideoPreviewLayer(session = session).apply {
+                    videoGravity = AVLayerVideoGravityResizeAspectFill
+                }
+            } else {
+                null
             }
+            previewLayer = layer
 
-            containerView
+            CameraPreviewUIView(layer)
         },
         modifier = modifier,
-        onResize = { view, size ->
-            // Update preview layer frame to match view size
-            previewLayer?.frame = CGRectMake(
-                x = 0.0,
-                y = 0.0,
-                width = size.width.toDouble(),
-                height = size.height.toDouble(),
-            )
-        },
     )
+}
+
+/**
+ * Custom UIView that properly handles preview layer frame updates on layout.
+ */
+@OptIn(ExperimentalForeignApi::class)
+private class CameraPreviewUIView(private val previewLayer: AVCaptureVideoPreviewLayer?) :
+    UIView(frame = CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+
+    init {
+        backgroundColor = platform.UIKit.UIColor.blackColor
+        previewLayer?.let { layer.addSublayer(it) }
+    }
+
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+        // Update preview layer frame to match view bounds
+        previewLayer?.frame = bounds
+    }
 }

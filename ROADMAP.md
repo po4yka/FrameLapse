@@ -114,78 +114,78 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 ---
 
-## Phase 3: Platform Layer (expect/actual)
+## Phase 3: Platform Layer (expect/actual) ✅
 
 ### 3.1 Camera Interface
-- [ ] Define `CameraController` expect class
-  - [ ] startPreview, stopPreview
-  - [ ] captureImage
-  - [ ] switchCamera (front/back)
-  - [ ] setFlashMode
+- [x] Define `CameraController` expect class
+  - [x] startPreview, stopPreview
+  - [x] captureImage
+  - [x] switchCamera (front/back)
+  - [x] setFlashMode
 
-- [ ] **Android Implementation**
-  - [ ] Implement with CameraX
-  - [ ] Handle lifecycle binding
-  - [ ] Configure ImageCapture use case
-  - [ ] Handle rotation/orientation
+- [x] **Android Implementation**
+  - [x] Implement with CameraX
+  - [x] Handle lifecycle binding
+  - [x] Configure ImageCapture use case
+  - [x] Handle rotation/orientation
 
-- [ ] **iOS Implementation**
-  - [ ] Implement with AVFoundation
-  - [ ] Configure AVCaptureSession
-  - [ ] Handle AVCapturePhotoOutput
-  - [ ] Manage capture device
+- [x] **iOS Implementation**
+  - [x] Implement with AVFoundation
+  - [x] Configure AVCaptureSession
+  - [x] Handle AVCapturePhotoOutput
+  - [x] Manage capture device
 
 ### 3.2 Face Detection Interface
-- [ ] Define `FaceDetector` expect class
-  - [ ] detectFace(imageBytes): FaceLandmarks?
-  - [ ] detectFaceRealtime(frame): FaceLandmarks?
+- [x] Define `FaceDetector` expect class
+  - [x] detectFace(imageBytes): FaceLandmarks?
+  - [x] detectFaceRealtime(frame): FaceLandmarks?
 
-- [ ] **Android Implementation**
-  - [ ] Integrate MediaPipe Face Landmarker
-  - [ ] Configure for 478 landmarks
-  - [ ] Optimize for real-time detection
-  - [ ] Handle image format conversion
+- [x] **Android Implementation**
+  - [x] Integrate MediaPipe Face Landmarker
+  - [x] Configure for 478 landmarks
+  - [x] Optimize for real-time detection
+  - [x] Handle image format conversion
 
-- [ ] **iOS Implementation**
-  - [ ] Integrate Vision Framework
-  - [ ] Use VNDetectFaceLandmarksRequest
-  - [ ] Map Vision landmarks to common format
-  - [ ] Handle CIImage conversion
+- [x] **iOS Implementation**
+  - [x] Integrate Vision Framework
+  - [x] Use VNDetectFaceLandmarksRequest
+  - [x] Map Vision landmarks to common format
+  - [x] Handle CIImage conversion
 
 ### 3.3 Image Processor Interface
-- [ ] Define `ImageProcessor` expect class
-  - [ ] applyAffineTransform(image, matrix): ByteArray
-  - [ ] cropImage(image, rect): ByteArray
-  - [ ] resizeImage(image, size): ByteArray
-  - [ ] saveImage(bytes, path)
+- [x] Define `ImageProcessor` expect class
+  - [x] applyAffineTransform(image, matrix): ByteArray
+  - [x] cropImage(image, rect): ByteArray
+  - [x] resizeImage(image, size): ByteArray
+  - [x] saveImage(bytes, path)
 
-- [ ] **Android Implementation**
-  - [ ] Use Android Bitmap and Matrix
-  - [ ] Implement hardware-accelerated transforms
-  - [ ] Handle EXIF orientation
+- [x] **Android Implementation**
+  - [x] Use Android Bitmap and Matrix
+  - [x] Implement hardware-accelerated transforms
+  - [x] Handle EXIF orientation
 
-- [ ] **iOS Implementation**
-  - [ ] Use CoreGraphics
-  - [ ] Implement CGAffineTransform operations
-  - [ ] Handle image orientation metadata
+- [x] **iOS Implementation**
+  - [x] Use CoreGraphics
+  - [x] Implement CGAffineTransform operations
+  - [x] Handle image orientation metadata
 
 ### 3.4 Video Encoder Interface
-- [ ] Define `VideoEncoder` expect class
-  - [ ] encode(frames, settings, progressCallback): String
-  - [ ] cancel()
-  - [ ] getSupportedCodecs(): List<Codec>
+- [x] Define `VideoEncoder` expect class
+  - [x] encode(frames, settings, progressCallback): String
+  - [x] cancel()
+  - [x] getSupportedCodecs(): List<Codec>
 
-- [ ] **Android Implementation**
-  - [ ] Implement with MediaCodec + MediaMuxer
-  - [ ] Configure Surface input
-  - [ ] Support H.264/HEVC encoding
-  - [ ] Handle frame timing
+- [x] **Android Implementation**
+  - [x] Implement with MediaCodec + MediaMuxer
+  - [x] Configure Surface input
+  - [x] Support H.264/HEVC encoding
+  - [x] Handle frame timing
 
-- [ ] **iOS Implementation**
-  - [ ] Implement with AVAssetWriter
-  - [ ] Use AVAssetWriterInputPixelBufferAdaptor
-  - [ ] Configure video settings
-  - [ ] Handle frame presentation times
+- [x] **iOS Implementation**
+  - [x] Implement with AVAssetWriter
+  - [x] Use AVAssetWriterInputPixelBufferAdaptor
+  - [x] Configure video settings
+  - [x] Handle frame presentation times
 
 ### 3.5 File System Interface
 - [x] Define `FileManager` expect class
@@ -200,124 +200,132 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 
 ---
 
-## Phase 4: Data Layer
+## Phase 4: Data Layer ✅
 
 ### 4.1 Local Data Sources
-- [ ] `ProjectLocalDataSource` - SQLDelight queries
-- [ ] `FrameLocalDataSource` - SQLDelight queries
-- [ ] `SettingsLocalDataSource` - key-value storage
+- [x] `ProjectLocalDataSource` - SQLDelight queries
+- [x] `FrameLocalDataSource` - SQLDelight queries
+- [x] `SettingsLocalDataSource` - key-value storage
 
 ### 4.2 Repository Implementations
-- [ ] `ProjectRepositoryImpl`
-- [ ] `FrameRepositoryImpl`
-- [ ] `SettingsRepositoryImpl`
+- [x] `ProjectRepositoryImpl`
+- [x] `FrameRepositoryImpl`
+- [x] `SettingsRepositoryImpl`
 
 ### 4.3 File Storage
-- [ ] Implement image file management
-- [ ] Implement video file management
-- [ ] Add thumbnail generation
-- [ ] Handle storage cleanup
+- [x] Implement image file management (ImageStorageManager)
+- [x] Implement video file management (VideoStorageManager)
+- [x] Add thumbnail generation (ThumbnailGenerator)
+- [x] Handle storage cleanup (StorageCleanupManager)
 
 ---
 
-## Phase 5: Presentation Layer
+## Phase 5: Presentation Layer ✅
 
 ### 5.1 ViewModels
-- [ ] `MainViewModel` - app-level state, navigation
-- [ ] `ProjectListViewModel` - project list, create/delete
-- [ ] `CaptureViewModel` - camera state, capture flow
-- [ ] `GalleryViewModel` - frame list, selection, deletion
-- [ ] `ExportViewModel` - export settings, progress
-- [ ] `SettingsViewModel` - app preferences
+- [x] `MainViewModel` - app-level state, navigation
+- [x] `ProjectListViewModel` - project list, create/delete
+- [x] `CaptureViewModel` - camera state, capture flow
+- [x] `GalleryViewModel` - frame list, selection, deletion
+- [x] `ExportViewModel` - export settings, progress
+- [x] `SettingsViewModel` - app preferences
 
 ### 5.2 UI State Classes
-- [ ] `ProjectListState`
-- [ ] `CaptureState`
-- [ ] `GalleryState`
-- [ ] `ExportState`
-- [ ] `SettingsState`
+- [x] `ProjectListState`
+- [x] `CaptureState`
+- [x] `GalleryState`
+- [x] `ExportState`
+- [x] `SettingsState`
 
 ### 5.3 UI Events
-- [ ] Define sealed classes for one-time events
-- [ ] Implement event channels (SharedFlow)
+- [x] Define sealed classes for one-time events
+- [x] Implement event channels (SharedFlow)
 
 ---
 
-## Phase 6: UI Layer (Compose Multiplatform)
+## Phase 6: UI Layer (Compose Multiplatform) ✅
 
 ### 6.1 Theme & Design System
 - [x] Define color scheme (light/dark)
 - [x] Define typography
-- [ ] Create custom shapes
-- [ ] Build reusable components:
-  - [ ] `FramelapseButton`
-  - [ ] `FramelapseCard`
-  - [ ] `FramelapseDialog`
-  - [ ] `LoadingIndicator`
-  - [ ] `ProgressBar`
+- [x] Create custom shapes
+- [x] Build reusable components:
+  - [x] `AppBars` - Top app bar, navigation
+  - [x] `ProjectCard` - Project list item
+  - [x] `FrameGridItem` - Frame thumbnail in gallery
+  - [x] `Dialogs` - Create project, confirm delete
+  - [x] `LoadingIndicator`
+  - [x] `ProgressIndicators`
+  - [x] `EmptyState` - Empty list state
+  - [x] `ErrorDisplay` - Error states
+  - [x] `SettingsItems` - Settings list items
+  - [x] `PermissionDenied` - Permission denial screen
 
 ### 6.2 Navigation
-- [ ] Set up navigation framework (Voyager or Navigation Compose)
-- [ ] Define navigation routes:
-  - [ ] ProjectList (home)
-  - [ ] Capture
-  - [ ] Gallery
-  - [ ] Export
-  - [ ] Settings
-- [ ] Implement navigation transitions
+- [x] Set up navigation framework (Navigation Compose)
+- [x] Define navigation routes:
+  - [x] ProjectList (home)
+  - [x] Capture
+  - [x] Gallery
+  - [x] Export
+  - [x] Settings
+- [x] Implement navigation transitions (AppNavHost, AppNavController, Route)
 
 ### 6.3 Screens
-- [ ] **Project List Screen**
-  - [ ] Project cards with thumbnail and frame count
-  - [ ] Create new project FAB
-  - [ ] Delete project (swipe or long press)
-  - [ ] Navigate to capture/gallery
+- [x] **Project List Screen**
+  - [x] Project cards with thumbnail and frame count
+  - [x] Create new project FAB
+  - [x] Delete project (swipe or long press)
+  - [x] Navigate to capture/gallery
 
-- [ ] **Capture Screen**
-  - [ ] Camera preview (platform view)
+- [x] **Capture Screen**
+  - [x] Camera preview (platform view)
   - [ ] Ghost image overlay with opacity slider
-  - [ ] Grid overlay toggle
-  - [ ] Capture button
-  - [ ] Flash toggle
-  - [ ] Camera flip button
+  - [x] Grid overlay toggle
+  - [x] Capture button
+  - [x] Flash toggle
+  - [x] Camera flip button
   - [ ] Last captured frame thumbnail
 
-- [ ] **Gallery Screen**
-  - [ ] Grid view of all frames
-  - [ ] Frame selection mode
-  - [ ] Delete selected frames
+- [x] **Gallery Screen**
+  - [x] Grid view of all frames
+  - [x] Frame selection mode
+  - [x] Delete selected frames
   - [ ] Reorder frames (drag and drop)
   - [ ] Frame detail view
   - [ ] Play preview button
 
-- [ ] **Export Screen**
-  - [ ] Resolution selector (480p-4K)
-  - [ ] FPS selector (24/30/60)
-  - [ ] Codec selector (H.264/HEVC)
+- [x] **Export Screen**
+  - [x] Resolution selector (480p-4K)
+  - [x] FPS selector (24/30/60)
+  - [x] Codec selector (H.264/HEVC)
   - [ ] Date range filter
-  - [ ] Export progress indicator
+  - [x] Export progress indicator
   - [ ] Share/save options
 
-- [ ] **Settings Screen**
-  - [ ] Default project settings
+- [x] **Settings Screen**
+  - [x] Default project settings
   - [ ] Reminder notifications
   - [ ] Storage management
-  - [ ] About/version info
+  - [x] About/version info
 
 ### 6.4 Platform Views
-- [ ] **Camera Preview Composable**
-  - [ ] Android: Wrap PreviewView
-  - [ ] iOS: Wrap AVCaptureVideoPreviewLayer
+- [x] **Camera Preview Composable**
+  - [x] Android: Wrap PreviewView (CameraX)
+  - [x] iOS: Wrap AVCaptureVideoPreviewLayer
+- [x] **Camera Permission Handling**
+  - [x] Android: Activity Result API
+  - [x] iOS: AVCaptureDevice authorization
 
 ---
 
 ## Phase 7: Core Features Implementation
 
 ### 7.1 Photo Capture Flow
-- [ ] Initialize camera with permissions
-- [ ] Display real-time preview
+- [x] Initialize camera with permissions
+- [x] Display real-time preview
 - [ ] Overlay ghost image from previous capture
-- [ ] Capture photo on button press
+- [x] Capture photo on button press
 - [ ] Run face detection on captured image
 - [ ] Calculate alignment matrix
 - [ ] Apply transformation and crop
@@ -422,7 +430,7 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 - [ ] Implement lazy loading for galleries
 
 ### 10.2 Error Handling
-- [ ] Graceful camera permission denial
+- [x] Graceful camera permission denial
 - [ ] Handle storage full scenarios
 - [ ] Face detection failure recovery
 - [ ] Export error handling
@@ -454,11 +462,11 @@ This roadmap outlines the implementation plan for FrameLapse, a Kotlin Multiplat
 |-------|--------|----------|
 | 1. Project Foundation | Complete | 100% |
 | 2. Domain Layer | Complete | 100% |
-| 3. Platform Layer | Partial | 15% |
-| 4. Data Layer | Not Started | 0% |
-| 5. Presentation Layer | Not Started | 0% |
-| 6. UI Layer | Partial | 5% |
-| 7. Core Features | Not Started | 0% |
+| 3. Platform Layer | Complete | 100% |
+| 4. Data Layer | Complete | 100% |
+| 5. Presentation Layer | Complete | 100% |
+| 6. UI Layer | Complete | 90% |
+| 7. Core Features | In Progress | 30% |
 | 8. Advanced Features | Not Started | 0% |
 | 9. Testing | Not Started | 0% |
 | 10. Polish & Release | Not Started | 0% |
