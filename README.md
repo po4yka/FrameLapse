@@ -121,6 +121,12 @@ FrameLapse follows **Clean Architecture** with **Unidirectional Data Flow (UDF)*
 
 # Static analysis
 ./gradlew spotlessCheck :composeApp:lintDebug
+
+# Check for dependency updates
+./gradlew dependencyUpdates
+
+# Auto-update libs.versions.toml
+./gradlew versionCatalogUpdate
 ```
 
 ### iOS

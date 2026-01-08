@@ -26,6 +26,10 @@
 ./gradlew spotlessApply           # Auto-fix formatting issues
 ./gradlew :composeApp:lintDebug   # Run Android Lint
 
+# Dependency updates
+./gradlew dependencyUpdates       # Check for available updates (report only)
+./gradlew versionCatalogUpdate    # Update libs.versions.toml with new versions
+
 # Clean build
 ./gradlew clean
 ```

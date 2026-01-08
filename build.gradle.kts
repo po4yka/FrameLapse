@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.kover) apply false
+    alias(libs.plugins.versions)
+    alias(libs.plugins.versionCatalogUpdate)
 }
 
 // Detekt configuration for all subprojects
@@ -69,4 +71,41 @@ tasks.register("format") {
     group = "formatting"
     description = "Formats all code with Spotless"
     dependsOn("spotlessApply")
+}
+
+// Version catalog update configuration
+versionCatalogUpdate {
+    // Sort entries in the version catalog by key
+    sortByKey = true
+
+    // Keep unused entries (don't remove them automatically)
+    keep {
+        keepUnusedVersions = true
+        keepUnusedLibraries = true
+        keepUnusedPlugins = true
+    }
+
+    // Pin specific versions that should not be updated automatically
+    pin {
+        // Example: pin a version if needed
+        // versions.add("kotlin")
+    }
+}
+
+// Configure which dependency updates to reject (e.g., alpha, beta, rc versions)
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
+
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+    checkForGradleUpdate = true
+    outputFormatter = "json,plain"
+    outputDir = "build/dependencyUpdates"
+    reportfileName = "report"
 }
