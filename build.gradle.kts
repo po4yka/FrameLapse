@@ -3,6 +3,7 @@ plugins {
     // in each subproject's classloader
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
@@ -64,7 +65,7 @@ allprojects {
 tasks.register("staticAnalysis") {
     group = "verification"
     description = "Runs all static analysis tools"
-    dependsOn("spotlessCheck", ":composeApp:detekt", ":composeApp:lintDebug")
+    dependsOn("spotlessCheck", ":composeApp:detekt", ":androidApp:lintDebug")
 }
 
 tasks.register("format") {

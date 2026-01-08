@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen Theme for Android 12+ (API 31+) -->
+    <style name="Theme.FrameLapse.Splash" parent="Theme.FrameLapse">
+        <!-- Set the splash screen background color -->
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        <!-- Set the splash screen icon using the launcher foreground -->
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!-- Keep the splash screen on-screen for a short time -->
+        <item name="android:windowSplashScreenAnimationDuration">300</item>
+    </style>
+</resources>
