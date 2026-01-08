@@ -29,6 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.po4yka.framelapse.domain.entity.ContentType
+import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.domain.service.NotificationScheduler
@@ -56,7 +58,9 @@ import framelapse.composeapp.generated.resources.settings_about_section
 import framelapse.composeapp.generated.resources.settings_app_version
 import framelapse.composeapp.generated.resources.settings_capture_section
 import framelapse.composeapp.generated.resources.settings_clear_cache
+import framelapse.composeapp.generated.resources.settings_content_type
 import framelapse.composeapp.generated.resources.settings_frame_rate
+import framelapse.composeapp.generated.resources.settings_muscle_region
 import framelapse.composeapp.generated.resources.settings_orientation
 import framelapse.composeapp.generated.resources.settings_reminder_description
 import framelapse.composeapp.generated.resources.settings_reminder_enabled
@@ -173,6 +177,25 @@ private fun SettingsContent(
                     onSelect = { onEvent(SettingsEvent.UpdateDefaultOrientation(it)) },
                     valueLabel = { it.displayName },
                 )
+
+                SettingsDropdown(
+                    title = stringResource(Res.string.settings_content_type),
+                    selectedValue = state.defaultContentType,
+                    options = ContentType.entries,
+                    onSelect = { onEvent(SettingsEvent.UpdateDefaultContentType(it)) },
+                    valueLabel = { it.displayName },
+                )
+
+                // Show muscle region selector only when content type is MUSCLE
+                if (state.defaultContentType == ContentType.MUSCLE) {
+                    SettingsDropdown(
+                        title = stringResource(Res.string.settings_muscle_region),
+                        selectedValue = state.defaultMuscleRegion,
+                        options = MuscleRegion.entries,
+                        onSelect = { onEvent(SettingsEvent.UpdateDefaultMuscleRegion(it)) },
+                        valueLabel = { it.displayName },
+                    )
+                }
             }
 
             HorizontalDivider()

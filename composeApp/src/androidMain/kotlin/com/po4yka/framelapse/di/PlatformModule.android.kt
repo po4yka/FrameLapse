@@ -1,11 +1,13 @@
 package com.po4yka.framelapse.di
 
+import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.NotificationScheduler
 import com.po4yka.framelapse.domain.service.ShareHandler
 import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.domain.service.VideoEncoder
+import com.po4yka.framelapse.platform.BodyPoseDetectorImpl
 import com.po4yka.framelapse.platform.DatabaseDriverFactory
 import com.po4yka.framelapse.platform.FaceDetectorImpl
 import com.po4yka.framelapse.platform.FileManager
@@ -23,6 +25,7 @@ actual val platformModule: Module = module {
     single { FileManager(androidContext()) }
     single<ImageProcessor> { ImageProcessorImpl(androidContext()) }
     single<FaceDetector> { FaceDetectorImpl(androidContext()) }
+    single<BodyPoseDetector> { BodyPoseDetectorImpl(androidContext()) }
     single<VideoEncoder> { VideoEncoderImpl(androidContext()) }
     single<NotificationScheduler> { NotificationSchedulerImpl(androidContext()) }
     single<ShareHandler> { ShareHandlerImpl(androidContext()) }

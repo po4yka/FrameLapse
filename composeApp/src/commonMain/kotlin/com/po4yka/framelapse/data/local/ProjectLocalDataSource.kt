@@ -53,6 +53,8 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             resolution = params.resolution,
             orientation = params.orientation,
             thumbnailPath = params.thumbnailPath,
+            contentType = params.contentType,
+            muscleRegion = params.muscleRegion,
         )
     }
 
@@ -67,6 +69,8 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             resolution = params.resolution,
             orientation = params.orientation,
             thumbnailPath = params.thumbnailPath,
+            contentType = params.contentType,
+            muscleRegion = params.muscleRegion,
             id = params.id,
         )
     }

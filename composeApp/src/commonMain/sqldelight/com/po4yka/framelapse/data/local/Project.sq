@@ -7,7 +7,9 @@ CREATE TABLE Project (
     fps INTEGER NOT NULL DEFAULT 30,
     resolution TEXT NOT NULL DEFAULT 'HD_1080P',
     orientation TEXT NOT NULL DEFAULT 'PORTRAIT',
-    thumbnailPath TEXT
+    thumbnailPath TEXT,
+    contentType TEXT NOT NULL DEFAULT 'FACE',
+    muscleRegion TEXT
 );
 
 -- Get all projects ordered by most recently updated
@@ -20,8 +22,8 @@ SELECT * FROM Project WHERE id = ?;
 
 -- Insert a new project
 insert:
-INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath, contentType, muscleRegion)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Update an existing project
 update:
@@ -31,7 +33,9 @@ UPDATE Project SET
     fps = ?,
     resolution = ?,
     orientation = ?,
-    thumbnailPath = ?
+    thumbnailPath = ?,
+    contentType = ?,
+    muscleRegion = ?
 WHERE id = ?;
 
 -- Update only the thumbnail path

@@ -1,5 +1,7 @@
 package com.po4yka.framelapse.presentation.settings
 
+import com.po4yka.framelapse.domain.entity.ContentType
+import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.presentation.base.UiEffect
@@ -13,6 +15,8 @@ data class SettingsState(
     val defaultFps: Int = DEFAULT_FPS,
     val defaultResolution: Resolution = Resolution.HD_1080P,
     val defaultOrientation: Orientation = Orientation.PORTRAIT,
+    val defaultContentType: ContentType = ContentType.FACE,
+    val defaultMuscleRegion: MuscleRegion = MuscleRegion.FULL_BODY,
     val reminderEnabled: Boolean = false,
     val reminderTime: String = DEFAULT_REMINDER_TIME,
     val storageUsedBytes: Long = 0,
@@ -50,6 +54,16 @@ sealed interface SettingsEvent : UiEvent {
      * Update default orientation for new projects.
      */
     data class UpdateDefaultOrientation(val orientation: Orientation) : SettingsEvent
+
+    /**
+     * Update default content type for new projects.
+     */
+    data class UpdateDefaultContentType(val contentType: ContentType) : SettingsEvent
+
+    /**
+     * Update default muscle region for new MUSCLE projects.
+     */
+    data class UpdateDefaultMuscleRegion(val region: MuscleRegion) : SettingsEvent
 
     /**
      * Toggle reminder notifications.

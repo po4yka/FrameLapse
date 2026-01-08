@@ -15,6 +15,8 @@ data class AlignmentSettings(
     val outputSize: Int = DEFAULT_OUTPUT_SIZE,
     /** Vertical offset for face centering as a fraction of output size. */
     val verticalOffset: Float = DEFAULT_VERTICAL_OFFSET,
+    /** Multi-pass stabilization settings. */
+    val stabilizationSettings: StabilizationSettings = StabilizationSettings(),
 ) {
     init {
         require(minConfidence in 0f..1f) {

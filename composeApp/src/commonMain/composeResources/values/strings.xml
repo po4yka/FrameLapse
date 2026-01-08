@@ -108,6 +108,8 @@
     <string name="settings_resolution">Resolution</string>
     <string name="settings_frame_rate">Frame Rate</string>
     <string name="settings_orientation">Orientation</string>
+    <string name="settings_content_type">Alignment Mode</string>
+    <string name="settings_muscle_region">Muscle Region</string>
     <string name="settings_reminder_section">Daily Reminder</string>
     <string name="settings_reminder_enabled">Enable Reminder</string>
     <string name="settings_reminder_description">Get notified daily to capture your photo</string>

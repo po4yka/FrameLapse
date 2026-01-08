@@ -1,7 +1,8 @@
 package com.po4yka.framelapse.domain.repository
 
-import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.entity.Landmarks
+import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
 
@@ -73,14 +74,16 @@ interface FrameRepository {
      * @param id The frame ID.
      * @param alignedPath Path to the aligned image.
      * @param confidence Detection confidence score.
-     * @param landmarks Detected face landmarks.
+     * @param landmarks Detected landmarks (face or body).
+     * @param stabilizationResult Optional multi-pass stabilization result.
      * @return Result indicating success or failure.
      */
     suspend fun updateAlignedFrame(
         id: String,
         alignedPath: String,
         confidence: Float,
-        landmarks: FaceLandmarks,
+        landmarks: Landmarks,
+        stabilizationResult: StabilizationResult? = null,
     ): Result<Unit>
 
     /**

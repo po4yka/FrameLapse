@@ -1,55 +1,54 @@
-package com.po4yka.framelapse.domain.usecase.face
+package com.po4yka.framelapse.domain.usecase.body
 
-import com.po4yka.framelapse.domain.entity.AlignmentSettings
+import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
+import com.po4yka.framelapse.domain.entity.BodyLandmarks
 import com.po4yka.framelapse.domain.entity.BoundingBox
-import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.StabilizationProgress
 import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
-import com.po4yka.framelapse.domain.service.FaceDetector
+import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
 
 /**
- * Performs face alignment pipeline using multi-pass stabilization.
+ * Performs body alignment pipeline using multi-pass stabilization.
  *
- * This use case replaces the original single-pass alignment with AgeLapse's
- * multi-pass stabilization algorithm that supports both FAST (4 passes) and
- * SLOW (10+ passes) modes for improved alignment accuracy.
+ * This use case aligns body poses based on shoulder positions, similar to
+ * AlignFaceUseCase but using shoulders as reference points instead of eyes.
  *
  * The pipeline:
  * 1. Load the original image
- * 2. Determine goal eye positions (from reference frame or defaults)
+ * 2. Determine goal shoulder positions (from reference frame or defaults)
  * 3. Execute multi-pass stabilization
  * 4. Save aligned image
  * 5. Update frame in database with stabilization metrics
  */
-class AlignFaceUseCase(
-    private val faceDetector: FaceDetector,
+class AlignBodyUseCase(
+    private val bodyPoseDetector: BodyPoseDetector,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
     private val fileManager: FileManager,
-    private val multiPassStabilization: MultiPassStabilizationUseCase,
-    private val validateAlignment: ValidateAlignmentUseCase = ValidateAlignmentUseCase(),
+    private val multiPassBodyStabilization: MultiPassBodyStabilizationUseCase,
+    private val validateBodyAlignment: ValidateBodyAlignmentUseCase = ValidateBodyAlignmentUseCase(),
 ) {
     /**
-     * Aligns a face in the given frame using multi-pass stabilization.
+     * Aligns a body in the given frame using multi-pass stabilization.
      *
      * @param frame The frame to process.
-     * @param referenceFrame Optional reference frame for goal eye positions.
-     *                       If provided and has landmarks, its eye positions become the goal.
+     * @param referenceFrame Optional reference frame for goal shoulder positions.
+     *                       If provided and has body landmarks, its shoulder positions become the goal.
      *                       Otherwise, default centered positions are calculated.
-     * @param settings Alignment configuration (includes stabilization mode).
+     * @param settings Body alignment configuration (includes stabilization mode).
      * @param onProgress Optional callback for progress updates during stabilization.
      * @return Result containing the updated Frame with alignment data and stabilization metrics.
      */
     suspend operator fun invoke(
         frame: Frame,
         referenceFrame: Frame? = null,
-        settings: AlignmentSettings = AlignmentSettings(),
+        settings: BodyAlignmentSettings = BodyAlignmentSettings(),
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Frame> {
         // Skip if already aligned
@@ -57,11 +56,11 @@ class AlignFaceUseCase(
             return Result.Success(frame)
         }
 
-        // Check if face detection is available
-        if (!faceDetector.isAvailable) {
+        // Check if body pose detection is available
+        if (!bodyPoseDetector.isAvailable) {
             return Result.Error(
-                UnsupportedOperationException("Face detection is not available"),
-                "Face detection not available",
+                UnsupportedOperationException("Body pose detection is not available"),
+                "Body pose detection not available",
             )
         }
 
@@ -75,18 +74,18 @@ class AlignFaceUseCase(
         }
         val imageData = imageResult.getOrNull()!!
 
-        // Calculate goal eye positions
-        val (goalLeftEye, goalRightEye) = calculateGoalEyePositions(
+        // Calculate goal shoulder positions
+        val (goalLeftShoulder, goalRightShoulder) = calculateGoalShoulderPositions(
             referenceFrame = referenceFrame,
             settings = settings,
         )
 
         // Execute multi-pass stabilization
-        val stabilizationResult = multiPassStabilization(
+        val stabilizationResult = multiPassBodyStabilization(
             imageData = imageData,
-            goalLeftEye = goalLeftEye,
-            goalRightEye = goalRightEye,
-            alignmentSettings = settings,
+            goalLeftShoulder = goalLeftShoulder,
+            goalRightShoulder = goalRightShoulder,
+            bodyAlignmentSettings = settings,
             onProgress = onProgress,
         )
 
@@ -113,12 +112,12 @@ class AlignFaceUseCase(
         }
 
         // Detect landmarks on aligned image for database storage
-        val alignedDetectResult = faceDetector.detectFace(alignedImage)
+        val alignedDetectResult = bodyPoseDetector.detectBodyPose(alignedImage)
         val landmarks = alignedDetectResult.getOrNull()
 
         // Validate alignment quality if landmarks detected
-        if (landmarks != null && !validateAlignment(landmarks, settings)) {
-            val validation = validateAlignment.getDetailedValidation(landmarks, settings)
+        if (landmarks != null && !validateBodyAlignment(landmarks, settings)) {
+            val validation = validateBodyAlignment.getDetailedValidation(landmarks, settings)
             return Result.Error(
                 IllegalStateException("Alignment quality too low: ${validation.issues.joinToString()}"),
                 "Alignment quality too low",
@@ -143,13 +142,7 @@ class AlignFaceUseCase(
                 id = frame.id,
                 alignedPath = alignedPath,
                 confidence = confidence,
-                landmarks = FaceLandmarks(
-                    points = emptyList(),
-                    leftEyeCenter = normalizePoint(goalLeftEye, settings.outputSize),
-                    rightEyeCenter = normalizePoint(goalRightEye, settings.outputSize),
-                    noseTip = LandmarkPoint(0.5f, 0.6f, 0f),
-                    boundingBox = BoundingBox(0f, 0f, 1f, 1f),
-                ),
+                landmarks = createMinimalBodyLandmarks(goalLeftShoulder, goalRightShoulder, settings.outputSize),
                 stabilizationResult = stabResult,
             )
         }
@@ -173,58 +166,86 @@ class AlignFaceUseCase(
     }
 
     /**
-     * Calculates goal eye positions for stabilization.
+     * Calculates goal shoulder positions for stabilization.
      *
-     * If a reference frame with landmarks is provided, uses its eye positions.
+     * If a reference frame with body landmarks is provided, uses its shoulder positions.
      * Otherwise, calculates default centered positions based on settings.
      *
      * @param referenceFrame Optional reference frame with landmarks.
-     * @param settings Alignment settings with output size and target eye distance.
-     * @return Pair of goal eye positions (left, right) in pixel coordinates.
+     * @param settings Body alignment settings with output size and target shoulder distance.
+     * @return Pair of goal shoulder positions (left, right) in pixel coordinates.
      */
-    private fun calculateGoalEyePositions(
+    private fun calculateGoalShoulderPositions(
         referenceFrame: Frame?,
-        settings: AlignmentSettings,
+        settings: BodyAlignmentSettings,
     ): Pair<LandmarkPoint, LandmarkPoint> {
         // Try to use reference frame landmarks
-        referenceFrame?.landmarks?.let { refLandmarks ->
+        val refLandmarks = referenceFrame?.landmarks as? BodyLandmarks
+        refLandmarks?.let { bodyLandmarks ->
             // Convert from normalized to pixel coordinates
             val outputSize = settings.outputSize.toFloat()
             return Pair(
                 LandmarkPoint(
-                    x = refLandmarks.leftEyeCenter.x * outputSize,
-                    y = refLandmarks.leftEyeCenter.y * outputSize,
-                    z = refLandmarks.leftEyeCenter.z,
+                    x = bodyLandmarks.leftShoulder.x * outputSize,
+                    y = bodyLandmarks.leftShoulder.y * outputSize,
+                    z = bodyLandmarks.leftShoulder.z,
                 ),
                 LandmarkPoint(
-                    x = refLandmarks.rightEyeCenter.x * outputSize,
-                    y = refLandmarks.rightEyeCenter.y * outputSize,
-                    z = refLandmarks.rightEyeCenter.z,
+                    x = bodyLandmarks.rightShoulder.x * outputSize,
+                    y = bodyLandmarks.rightShoulder.y * outputSize,
+                    z = bodyLandmarks.rightShoulder.z,
                 ),
             )
         }
 
         // Calculate default centered positions
         val outputSize = settings.outputSize.toFloat()
-        val eyeDistance = settings.targetEyeDistance * outputSize
+        val shoulderDistance = settings.targetShoulderDistance * outputSize
         val centerX = outputSize / 2
         val centerY = outputSize / 2 - settings.verticalOffset * outputSize
 
         return Pair(
-            LandmarkPoint(x = centerX - eyeDistance / 2, y = centerY, z = 0f),
-            LandmarkPoint(x = centerX + eyeDistance / 2, y = centerY, z = 0f),
+            LandmarkPoint(x = centerX - shoulderDistance / 2, y = centerY, z = 0f),
+            LandmarkPoint(x = centerX + shoulderDistance / 2, y = centerY, z = 0f),
         )
     }
 
     /**
-     * Normalizes a pixel coordinate point to 0-1 range.
+     * Creates minimal body landmarks for storage when detection fails on aligned image.
      */
-    private fun normalizePoint(point: LandmarkPoint, outputSize: Int): LandmarkPoint =
-        LandmarkPoint(
-            x = point.x / outputSize,
-            y = point.y / outputSize,
-            z = point.z,
+    private fun createMinimalBodyLandmarks(
+        goalLeftShoulder: LandmarkPoint,
+        goalRightShoulder: LandmarkPoint,
+        outputSize: Int,
+    ): BodyLandmarks {
+        val normalizedLeft = LandmarkPoint(
+            x = goalLeftShoulder.x / outputSize,
+            y = goalLeftShoulder.y / outputSize,
+            z = 0f,
         )
+        val normalizedRight = LandmarkPoint(
+            x = goalRightShoulder.x / outputSize,
+            y = goalRightShoulder.y / outputSize,
+            z = 0f,
+        )
+        val hipY = (normalizedLeft.y + normalizedRight.y) / 2 + 0.25f
+        val neckCenter = LandmarkPoint(
+            x = (normalizedLeft.x + normalizedRight.x) / 2,
+            y = (normalizedLeft.y + normalizedRight.y) / 2 - 0.05f,
+            z = 0f,
+        )
+
+        return BodyLandmarks(
+            keypoints = emptyList(),
+            leftShoulder = normalizedLeft,
+            rightShoulder = normalizedRight,
+            leftHip = LandmarkPoint(normalizedLeft.x, hipY, 0f),
+            rightHip = LandmarkPoint(normalizedRight.x, hipY, 0f),
+            neckCenter = neckCenter,
+            boundingBox = BoundingBox(0f, 0f, 1f, 1f),
+            confidence = 0.5f,
+        )
+    }
 
     /**
      * Calculates confidence score from stabilization result.

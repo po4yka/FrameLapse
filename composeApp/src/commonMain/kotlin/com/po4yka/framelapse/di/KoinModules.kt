@@ -17,9 +17,24 @@ import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
 import com.po4yka.framelapse.domain.usecase.export.CompileVideoUseCase
 import com.po4yka.framelapse.domain.usecase.export.ExportGifUseCase
+import com.po4yka.framelapse.domain.usecase.alignment.AlignContentUseCase
+import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
+import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
+import com.po4yka.framelapse.domain.usecase.body.DetectBodyPoseUseCase
+import com.po4yka.framelapse.domain.usecase.body.MultiPassBodyStabilizationUseCase
+import com.po4yka.framelapse.domain.usecase.body.ValidateBodyAlignmentUseCase
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.CalculateMuscleRegionBoundsUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.CropToMuscleRegionUseCase
 import com.po4yka.framelapse.domain.usecase.face.CalculateAlignmentMatrixUseCase
+import com.po4yka.framelapse.domain.usecase.face.CalculateStabilizationScoreUseCase
 import com.po4yka.framelapse.domain.usecase.face.DetectFaceUseCase
+import com.po4yka.framelapse.domain.usecase.face.DetectOvershootUseCase
+import com.po4yka.framelapse.domain.usecase.face.MultiPassStabilizationUseCase
+import com.po4yka.framelapse.domain.usecase.face.RefineRotationUseCase
+import com.po4yka.framelapse.domain.usecase.face.RefineScaleUseCase
+import com.po4yka.framelapse.domain.usecase.face.RefineTranslationUseCase
 import com.po4yka.framelapse.domain.usecase.face.ValidateAlignmentUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.usecase.frame.DeleteFrameUseCase
@@ -98,7 +113,87 @@ val domainModule = module {
     factory { DetectFaceUseCase(get()) }
     factory { CalculateAlignmentMatrixUseCase() }
     factory { ValidateAlignmentUseCase() }
-    factory { AlignFaceUseCase(get(), get(), get(), get(), get(), get()) }
+
+    // Multi-Pass Stabilization Use Cases
+    factory { CalculateStabilizationScoreUseCase() }
+    factory { DetectOvershootUseCase() }
+    factory { RefineRotationUseCase() }
+    factory { RefineScaleUseCase() }
+    factory { RefineTranslationUseCase() }
+    factory {
+        MultiPassStabilizationUseCase(
+            faceDetector = get(),
+            imageProcessor = get(),
+            calculateMatrix = get(),
+            calculateScore = get(),
+            detectOvershoot = get(),
+            refineRotation = get(),
+            refineScale = get(),
+            refineTranslation = get(),
+        )
+    }
+
+    // Face Alignment Use Case (uses multi-pass stabilization)
+    factory {
+        AlignFaceUseCase(
+            faceDetector = get(),
+            imageProcessor = get(),
+            frameRepository = get(),
+            fileManager = get(),
+            multiPassStabilization = get(),
+            validateAlignment = get(),
+        )
+    }
+
+    // Body Processing Use Cases
+    factory { DetectBodyPoseUseCase(get()) }
+    factory { CalculateBodyAlignmentMatrixUseCase() }
+    factory { ValidateBodyAlignmentUseCase() }
+    factory {
+        MultiPassBodyStabilizationUseCase(
+            bodyPoseDetector = get(),
+            imageProcessor = get(),
+            calculateMatrix = get<CalculateBodyAlignmentMatrixUseCase>(),
+        )
+    }
+    factory {
+        AlignBodyUseCase(
+            bodyPoseDetector = get(),
+            imageProcessor = get(),
+            frameRepository = get(),
+            fileManager = get(),
+            multiPassBodyStabilization = get(),
+            validateBodyAlignment = get(),
+        )
+    }
+
+    // Muscle Processing Use Cases
+    factory { CalculateMuscleRegionBoundsUseCase() }
+    factory {
+        CropToMuscleRegionUseCase(
+            imageProcessor = get(),
+            calculateBounds = get(),
+        )
+    }
+    factory {
+        AlignMuscleUseCase(
+            alignBody = get(),
+            bodyPoseDetector = get(),
+            cropToRegion = get(),
+            imageProcessor = get(),
+            frameRepository = get(),
+            fileManager = get(),
+        )
+    }
+
+    // Content Alignment Dispatcher (routes between Face, Body, and Muscle alignment)
+    factory {
+        AlignContentUseCase(
+            alignFace = get(),
+            alignBody = get(),
+            alignMuscle = get(),
+        )
+    }
 
     // Export Use Cases
     factory { CompileVideoUseCase(get(), get(), get()) }

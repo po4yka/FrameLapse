@@ -2,6 +2,8 @@ package com.po4yka.framelapse.presentation.settings
 
 import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.data.storage.StorageCleanupManager
+import com.po4yka.framelapse.domain.entity.ContentType
+import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.domain.repository.SettingsRepository
@@ -27,6 +29,8 @@ class SettingsViewModel(
             is SettingsEvent.UpdateDefaultFps -> updateDefaultFps(event.fps)
             is SettingsEvent.UpdateDefaultResolution -> updateDefaultResolution(event.resolution)
             is SettingsEvent.UpdateDefaultOrientation -> updateDefaultOrientation(event.orientation)
+            is SettingsEvent.UpdateDefaultContentType -> updateDefaultContentType(event.contentType)
+            is SettingsEvent.UpdateDefaultMuscleRegion -> updateDefaultMuscleRegion(event.region)
             is SettingsEvent.UpdateReminderEnabled -> updateReminderEnabled(event.enabled)
             is SettingsEvent.UpdateReminderTime -> updateReminderTime(event.time)
             is SettingsEvent.ClearCache -> clearCache()
@@ -40,12 +44,16 @@ class SettingsViewModel(
             val fpsResult = settingsRepository.getInt(KEY_DEFAULT_FPS, DEFAULT_FPS)
             val resolutionResult = settingsRepository.getString(KEY_DEFAULT_RESOLUTION)
             val orientationResult = settingsRepository.getString(KEY_DEFAULT_ORIENTATION)
+            val contentTypeResult = settingsRepository.getString(KEY_DEFAULT_CONTENT_TYPE)
+            val muscleRegionResult = settingsRepository.getString(KEY_DEFAULT_MUSCLE_REGION)
             val reminderEnabledResult = settingsRepository.getBoolean(KEY_REMINDER_ENABLED, false)
             val reminderTimeResult = settingsRepository.getString(KEY_REMINDER_TIME)
 
             val fps = fpsResult.getOrNull() ?: DEFAULT_FPS
             val resolution = Resolution.fromString(resolutionResult.getOrNull() ?: Resolution.HD_1080P.name)
             val orientation = Orientation.fromString(orientationResult.getOrNull() ?: Orientation.PORTRAIT.name)
+            val contentType = ContentType.fromString(contentTypeResult.getOrNull() ?: ContentType.FACE.name)
+            val muscleRegion = MuscleRegion.fromString(muscleRegionResult.getOrNull() ?: MuscleRegion.FULL_BODY.name)
             val reminderEnabled = reminderEnabledResult.getOrNull() ?: false
             val reminderTime = reminderTimeResult.getOrNull() ?: DEFAULT_REMINDER_TIME
 
@@ -56,6 +64,8 @@ class SettingsViewModel(
                     defaultFps = fps,
                     defaultResolution = resolution,
                     defaultOrientation = orientation,
+                    defaultContentType = contentType,
+                    defaultMuscleRegion = muscleRegion,
                     reminderEnabled = reminderEnabled,
                     reminderTime = reminderTime,
                     storageUsedBytes = storageUsage.totalBytes,
@@ -87,6 +97,22 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             settingsRepository.setString(KEY_DEFAULT_ORIENTATION, orientation.name)
+        }
+    }
+
+    private fun updateDefaultContentType(contentType: ContentType) {
+        updateState { copy(defaultContentType = contentType) }
+
+        viewModelScope.launch {
+            settingsRepository.setString(KEY_DEFAULT_CONTENT_TYPE, contentType.name)
+        }
+    }
+
+    private fun updateDefaultMuscleRegion(region: MuscleRegion) {
+        updateState { copy(defaultMuscleRegion = region) }
+
+        viewModelScope.launch {
+            settingsRepository.setString(KEY_DEFAULT_MUSCLE_REGION, region.name)
         }
     }
 
@@ -136,6 +162,8 @@ class SettingsViewModel(
         private const val KEY_DEFAULT_FPS = "settings_default_fps"
         private const val KEY_DEFAULT_RESOLUTION = "settings_default_resolution"
         private const val KEY_DEFAULT_ORIENTATION = "settings_default_orientation"
+        private const val KEY_DEFAULT_CONTENT_TYPE = "settings_default_content_type"
+        private const val KEY_DEFAULT_MUSCLE_REGION = "settings_default_muscle_region"
         private const val KEY_REMINDER_ENABLED = "settings_reminder_enabled"
         private const val KEY_REMINDER_TIME = "settings_reminder_time"
 

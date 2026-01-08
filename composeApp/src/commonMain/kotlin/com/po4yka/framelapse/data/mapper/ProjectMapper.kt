@@ -1,5 +1,7 @@
 package com.po4yka.framelapse.data.mapper
 
+import com.po4yka.framelapse.domain.entity.ContentType
+import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.Resolution
@@ -22,6 +24,8 @@ object ProjectMapper {
         resolution = Resolution.fromString(entity.resolution),
         orientation = Orientation.fromString(entity.orientation),
         thumbnailPath = entity.thumbnailPath,
+        contentType = ContentType.fromString(entity.contentType),
+        muscleRegion = entity.muscleRegion?.let { MuscleRegion.fromString(it) },
     )
 
     /**
@@ -36,6 +40,8 @@ object ProjectMapper {
         resolution = domain.resolution.name,
         orientation = domain.orientation.name,
         thumbnailPath = domain.thumbnailPath,
+        contentType = domain.contentType.name,
+        muscleRegion = domain.muscleRegion?.name,
     )
 
     /**
@@ -49,6 +55,8 @@ object ProjectMapper {
         resolution = domain.resolution.name,
         orientation = domain.orientation.name,
         thumbnailPath = domain.thumbnailPath,
+        contentType = domain.contentType.name,
+        muscleRegion = domain.muscleRegion?.name,
     )
 }
 
@@ -64,6 +72,8 @@ data class InsertProjectParams(
     val resolution: String,
     val orientation: String,
     val thumbnailPath: String?,
+    val contentType: String,
+    val muscleRegion: String?,
 )
 
 /**
@@ -77,4 +87,6 @@ data class UpdateProjectParams(
     val resolution: String,
     val orientation: String,
     val thumbnailPath: String?,
+    val contentType: String,
+    val muscleRegion: String?,
 )

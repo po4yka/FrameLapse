@@ -9,6 +9,7 @@ CREATE TABLE Frame (
     confidence REAL,
     landmarksJson TEXT,
     sortOrder INTEGER NOT NULL DEFAULT 0,
+    stabilizationResultJson TEXT,
     FOREIGN KEY (projectId) REFERENCES Project(id) ON DELETE CASCADE
 );
 
@@ -37,12 +38,12 @@ ORDER BY sortOrder ASC, timestamp ASC;
 
 -- Insert a new frame
 insert:
-INSERT INTO Frame (id, projectId, originalPath, alignedPath, timestamp, capturedAt, confidence, landmarksJson, sortOrder)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO Frame (id, projectId, originalPath, alignedPath, timestamp, capturedAt, confidence, landmarksJson, sortOrder, stabilizationResultJson)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Update alignment data for a frame
 updateAligned:
-UPDATE Frame SET alignedPath = ?, confidence = ?, landmarksJson = ? WHERE id = ?;
+UPDATE Frame SET alignedPath = ?, confidence = ?, landmarksJson = ?, stabilizationResultJson = ? WHERE id = ?;
 
 -- Update sort order for a frame
 updateSortOrder:

@@ -15,6 +15,13 @@ data class Project(
     val resolution: Resolution = Resolution.HD_1080P,
     val orientation: Orientation = Orientation.PORTRAIT,
     val thumbnailPath: String? = null,
+    /** The content type for this project's alignment (FACE, BODY, or MUSCLE). */
+    val contentType: ContentType = ContentType.FACE,
+    /**
+     * The muscle region for MUSCLE content type projects.
+     * Only used when contentType is MUSCLE, null otherwise.
+     */
+    val muscleRegion: MuscleRegion? = null,
 )
 
 /**

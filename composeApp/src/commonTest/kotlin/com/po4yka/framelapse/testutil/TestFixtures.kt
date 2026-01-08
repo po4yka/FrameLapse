@@ -4,14 +4,22 @@ import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.DateRange
+import com.po4yka.framelapse.domain.entity.EarlyStopReason
 import com.po4yka.framelapse.domain.entity.ExportQuality
 import com.po4yka.framelapse.domain.entity.ExportSettings
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.Orientation
+import com.po4yka.framelapse.domain.entity.OvershootCorrection
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.Resolution
+import com.po4yka.framelapse.domain.entity.StabilizationMode
+import com.po4yka.framelapse.domain.entity.StabilizationPass
+import com.po4yka.framelapse.domain.entity.StabilizationResult
+import com.po4yka.framelapse.domain.entity.StabilizationScore
+import com.po4yka.framelapse.domain.entity.StabilizationSettings
+import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.entity.VideoCodec
 
 /**
@@ -230,4 +238,98 @@ object TestFixtures {
         rightEyeCenter = LandmarkPoint(450f, 200f, 0f), // 400px distance
         boundingBox = BoundingBox(0f, 0f, 500f, 500f),
     )
+
+    // ==================== Stabilization ====================
+
+    fun createStabilizationSettings(
+        mode: StabilizationMode = StabilizationMode.FAST,
+        rotationStopThreshold: Float = 0.1f,
+        scaleErrorThreshold: Float = 1.0f,
+        convergenceThreshold: Float = 0.05f,
+        successScoreThreshold: Float = 20.0f,
+        noActionScoreThreshold: Float = 0.5f,
+    ): StabilizationSettings = StabilizationSettings(
+        mode = mode,
+        rotationStopThreshold = rotationStopThreshold,
+        scaleErrorThreshold = scaleErrorThreshold,
+        convergenceThreshold = convergenceThreshold,
+        successScoreThreshold = successScoreThreshold,
+        noActionScoreThreshold = noActionScoreThreshold,
+    )
+
+    fun createStabilizationScore(
+        value: Float = 5.0f,
+        leftEyeDistance: Float = 2.5f,
+        rightEyeDistance: Float = 2.5f,
+    ): StabilizationScore = StabilizationScore(
+        value = value,
+        leftEyeDistance = leftEyeDistance,
+        rightEyeDistance = rightEyeDistance,
+    )
+
+    fun createStabilizationPass(
+        passNumber: Int = 1,
+        stage: StabilizationStage = StabilizationStage.INITIAL,
+        scoreBefore: Float = 100f,
+        scoreAfter: Float = 10f,
+        converged: Boolean = false,
+        durationMs: Long = 50L,
+    ): StabilizationPass = StabilizationPass(
+        passNumber = passNumber,
+        stage = stage,
+        scoreBefore = scoreBefore,
+        scoreAfter = scoreAfter,
+        converged = converged,
+        durationMs = durationMs,
+    )
+
+    fun createStabilizationResult(
+        success: Boolean = true,
+        finalScore: StabilizationScore = createStabilizationScore(),
+        passesExecuted: Int = 3,
+        passes: List<StabilizationPass> = listOf(createStabilizationPass()),
+        mode: StabilizationMode = StabilizationMode.FAST,
+        earlyStopReason: EarlyStopReason? = EarlyStopReason.SCORE_BELOW_THRESHOLD,
+        totalDurationMs: Long = 150L,
+        initialScore: Float = 100f,
+        goalEyeDistance: Float = 150f,
+    ): StabilizationResult = StabilizationResult(
+        success = success,
+        finalScore = finalScore,
+        passesExecuted = passesExecuted,
+        passes = passes,
+        mode = mode,
+        earlyStopReason = earlyStopReason,
+        totalDurationMs = totalDurationMs,
+        initialScore = initialScore,
+        goalEyeDistance = goalEyeDistance,
+    )
+
+    fun createOvershootCorrection(
+        leftEyeOvershootX: Float = 5f,
+        leftEyeOvershootY: Float = 2f,
+        rightEyeOvershootX: Float = 5f,
+        rightEyeOvershootY: Float = 2f,
+        needsCorrection: Boolean = true,
+    ): OvershootCorrection = OvershootCorrection(
+        leftEyeOvershootX = leftEyeOvershootX,
+        leftEyeOvershootY = leftEyeOvershootY,
+        rightEyeOvershootX = rightEyeOvershootX,
+        rightEyeOvershootY = rightEyeOvershootY,
+        needsCorrection = needsCorrection,
+    )
+
+    /** Creates a frame with stabilization result */
+    fun createFrameWithStabilization(
+        id: String = "frame_${++frameIdCounter}",
+        projectId: String = "project_1",
+        confidence: Float = 0.95f,
+        stabilizationResult: StabilizationResult = createStabilizationResult(),
+    ): Frame = createFrame(
+        id = id,
+        projectId = projectId,
+        alignedPath = "/storage/aligned/$id.jpg",
+        confidence = confidence,
+        landmarks = createFaceLandmarks(),
+    ).copy(stabilizationResult = stabilizationResult)
 }

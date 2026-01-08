@@ -3,8 +3,9 @@ package com.po4yka.framelapse.data.repository
 import com.po4yka.framelapse.data.local.FrameLocalDataSource
 import com.po4yka.framelapse.data.mapper.FrameMapper
 import com.po4yka.framelapse.data.storage.ImageStorageManager
-import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.entity.Landmarks
+import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
@@ -83,9 +84,10 @@ class FrameRepositoryImpl(
         id: String,
         alignedPath: String,
         confidence: Float,
-        landmarks: FaceLandmarks,
+        landmarks: Landmarks,
+        stabilizationResult: StabilizationResult?,
     ): Result<Unit> = try {
-        val params = FrameMapper.toAlignedParams(id, alignedPath, confidence, landmarks)
+        val params = FrameMapper.toAlignedParams(id, alignedPath, confidence, landmarks, stabilizationResult)
         localDataSource.updateAligned(params)
         Result.Success(Unit)
     } catch (e: Exception) {
