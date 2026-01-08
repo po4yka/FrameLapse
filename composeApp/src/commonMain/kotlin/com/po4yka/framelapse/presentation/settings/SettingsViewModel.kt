@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.settings
 
+import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.data.storage.StorageCleanupManager
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Resolution

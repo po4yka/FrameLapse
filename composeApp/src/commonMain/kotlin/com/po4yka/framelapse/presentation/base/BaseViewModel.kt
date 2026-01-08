@@ -1,9 +1,7 @@
 package com.po4yka.framelapse.presentation.base
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,18 +12,14 @@ import kotlinx.coroutines.launch
 
 /**
  * Base ViewModel implementing Unidirectional Data Flow (UDF) pattern.
+ * Extends the multiplatform ViewModel for proper lifecycle integration.
  *
  * @param State The UI state type
  * @param Event The user event type
  * @param Effect The one-time side effect type
  * @param initialState The initial UI state
  */
-abstract class BaseViewModel<State : UiState, Event : UiEvent, Effect : UiEffect>(initialState: State) {
-    /**
-     * Coroutine scope for this ViewModel.
-     * Uses SupervisorJob to prevent child failures from canceling siblings.
-     */
-    protected val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+abstract class BaseViewModel<State : UiState, Event : UiEvent, Effect : UiEffect>(initialState: State) : ViewModel() {
 
     private val _state = MutableStateFlow(initialState)
 
@@ -72,14 +66,6 @@ abstract class BaseViewModel<State : UiState, Event : UiEvent, Effect : UiEffect
      * @param event The event to handle
      */
     abstract fun onEvent(event: Event)
-
-    /**
-     * Called when the ViewModel is being destroyed.
-     * Override to perform cleanup.
-     */
-    open fun onCleared() {
-        viewModelScope.cancel()
-    }
 }
 
 /**

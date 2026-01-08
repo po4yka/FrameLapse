@@ -11,7 +11,8 @@ import com.po4yka.framelapse.platform.currentTimeMillis
 /**
  * Error types specific to video compilation.
  */
-sealed class VideoCompilationError(message: String, val userMessage: String) : Exception(message) {
+sealed class VideoCompilationError(message: String, val userMessage: String, cause: Throwable? = null) :
+    Exception(message, cause) {
 
     /** No frames available to compile. */
     class NoFrames :
@@ -39,11 +40,8 @@ sealed class VideoCompilationError(message: String, val userMessage: String) : E
         VideoCompilationError(
             "Encoder failed: $reason",
             "Failed to create video: $reason",
-        ) {
-        init {
-            cause?.let { initCause(it) }
-        }
-    }
+            cause,
+        )
 
     /** Video compilation was cancelled. */
     class Cancelled :
@@ -71,11 +69,8 @@ sealed class VideoCompilationError(message: String, val userMessage: String) : E
         VideoCompilationError(
             cause.message ?: "Unknown error",
             "An unexpected error occurred. Please try again.",
-        ) {
-        init {
-            initCause(cause)
-        }
-    }
+            cause,
+        )
 }
 
 /**

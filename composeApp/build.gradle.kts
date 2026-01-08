@@ -58,6 +58,7 @@ kotlin {
 
             // Lifecycle
             implementation(libs.lifecycle.runtime.compose)
+            implementation(libs.lifecycle.viewmodel.compose)
         }
 
         androidMain.dependencies {
@@ -115,12 +116,12 @@ kotlin {
 
 android {
     namespace = "com.po4yka.framelapse"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.po4yka.framelapse"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = (properties["VERSION_CODE"] as? String)?.toIntOrNull() ?: 1
         versionName = properties["VERSION_NAME"] as? String ?: "1.0.0"
     }

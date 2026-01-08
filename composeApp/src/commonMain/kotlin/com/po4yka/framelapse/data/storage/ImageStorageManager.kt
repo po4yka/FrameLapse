@@ -25,10 +25,19 @@ sealed class StorageError(message: String) : Exception(message) {
                 "but only ${formatBytes(availableBytes)} available."
 
         private fun formatBytes(bytes: Long): String = when {
-            bytes >= 1_000_000_000 -> "%.1f GB".format(bytes / 1_000_000_000.0)
-            bytes >= 1_000_000 -> "%.1f MB".format(bytes / 1_000_000.0)
-            bytes >= 1_000 -> "%.1f KB".format(bytes / 1_000.0)
+            bytes >= 1_000_000_000 -> "${(bytes / 1_000_000_000.0).roundToOneDecimal()} GB"
+            bytes >= 1_000_000 -> "${(bytes / 1_000_000.0).roundToOneDecimal()} MB"
+            bytes >= 1_000 -> "${(bytes / 1_000.0).roundToOneDecimal()} KB"
             else -> "$bytes bytes"
+        }
+
+        private fun Double.roundToOneDecimal(): String {
+            val rounded = kotlin.math.round(this * 10) / 10
+            return if (rounded == rounded.toLong().toDouble()) {
+                "${rounded.toLong()}.0"
+            } else {
+                rounded.toString()
+            }
         }
     }
 

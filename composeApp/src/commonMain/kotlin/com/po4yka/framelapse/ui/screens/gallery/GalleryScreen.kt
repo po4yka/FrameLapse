@@ -65,7 +65,7 @@ fun GalleryScreen(
     onNavigateToExport: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GalleryViewModel = koinViewModel(),
+    viewModel: GalleryViewModel = koinViewModel<GalleryViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

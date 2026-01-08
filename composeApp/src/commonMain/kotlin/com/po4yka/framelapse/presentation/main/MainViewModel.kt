@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.main
 
+import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch

@@ -78,7 +78,7 @@ fun CaptureScreen(
     onNavigateToGallery: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CaptureViewModel = koinViewModel(),
+    viewModel: CaptureViewModel = koinViewModel<CaptureViewModel>(),
     soundPlayer: SoundPlayer = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

@@ -58,7 +58,7 @@ private const val FPS_STEPS = 59
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = koinViewModel(),
+    viewModel: SettingsViewModel = koinViewModel<SettingsViewModel>(),
     notificationScheduler: NotificationScheduler = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

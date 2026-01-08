@@ -64,7 +64,7 @@ allprojects {
 tasks.register("staticAnalysis") {
     group = "verification"
     description = "Runs all static analysis tools"
-    dependsOn("spotlessCheck", "detekt", ":composeApp:lintDebug")
+    dependsOn("spotlessCheck", ":composeApp:detekt", ":composeApp:lintDebug")
 }
 
 tasks.register("format") {
@@ -76,13 +76,11 @@ tasks.register("format") {
 // Version catalog update configuration
 versionCatalogUpdate {
     // Sort entries in the version catalog by key
-    sortByKey = true
+    sortByKey.set(true)
 
-    // Keep unused entries (don't remove them automatically)
+    // Keep unused version entries (versions without library/plugin references)
     keep {
-        keepUnusedVersions = true
-        keepUnusedLibraries = true
-        keepUnusedPlugins = true
+        keepUnusedVersions.set(true)
     }
 
     // Pin specific versions that should not be updated automatically

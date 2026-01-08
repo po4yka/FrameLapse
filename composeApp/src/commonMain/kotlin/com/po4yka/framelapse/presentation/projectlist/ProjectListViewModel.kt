@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.projectlist
 
+import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.usecase.project.CreateProjectUseCase

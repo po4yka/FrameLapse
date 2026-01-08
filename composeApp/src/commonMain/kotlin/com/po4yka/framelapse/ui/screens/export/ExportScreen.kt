@@ -59,7 +59,7 @@ fun ExportScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ExportViewModel = koinViewModel(),
+    viewModel: ExportViewModel = koinViewModel<ExportViewModel>(),
     shareHandler: ShareHandler = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

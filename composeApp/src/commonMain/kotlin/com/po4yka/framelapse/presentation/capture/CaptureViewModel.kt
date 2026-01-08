@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.capture
 
+import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.domain.entity.CameraFacing
 import com.po4yka.framelapse.domain.entity.FlashMode
 import com.po4yka.framelapse.domain.repository.SettingsRepository

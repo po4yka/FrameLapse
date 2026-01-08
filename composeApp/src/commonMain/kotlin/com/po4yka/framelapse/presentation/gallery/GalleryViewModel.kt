@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.presentation.gallery
 
+import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.usecase.frame.DeleteFrameUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetFramesUseCase

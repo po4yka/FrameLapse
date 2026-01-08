@@ -49,7 +49,7 @@ fun ProjectListScreen(
     onNavigateToGallery: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ProjectListViewModel = koinViewModel(),
+    viewModel: ProjectListViewModel = koinViewModel<ProjectListViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

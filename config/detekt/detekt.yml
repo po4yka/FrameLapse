@@ -476,8 +476,6 @@ Compose:
     active: false
   ModifierClickableOrder:
     active: true
-  ModifierComposable:
-    active: true
   ModifierMissing:
     active: true
   ModifierNaming:
@@ -497,8 +495,6 @@ Compose:
   PreviewPublic:
     active: true
   RememberMissing:
-    active: true
-  RememberStateMissing:
     active: true
   UnstableCollections:
     active: true

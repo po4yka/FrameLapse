@@ -44,9 +44,6 @@ class MainViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        if (::viewModel.isInitialized) {
-            viewModel.onCleared()
-        }
     }
 
     private fun createViewModel(): MainViewModel = MainViewModel(settingsRepository).also { viewModel = it }
