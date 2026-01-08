@@ -22,6 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_apply
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.export_frames_per_second
+import framelapse.composeapp.generated.resources.export_quality_percent
+import framelapse.composeapp.generated.resources.export_settings_title
+import framelapse.composeapp.generated.resources.fps_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Export settings configuration.
@@ -52,7 +60,7 @@ fun ExportSettingsSheetContent(
                 .padding(16.dp),
         ) {
             Text(
-                text = "Export Settings",
+                text = stringResource(Res.string.export_settings_title),
                 style = MaterialTheme.typography.titleLarge,
             )
 
@@ -64,9 +72,9 @@ fun ExportSettingsSheetContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Frames per second")
+                Text(stringResource(Res.string.export_frames_per_second))
                 Text(
-                    text = "$fps FPS",
+                    text = stringResource(Res.string.fps_label, fps),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -81,7 +89,7 @@ fun ExportSettingsSheetContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Quality setting
-            Text("Video quality: ${(quality * 100).toInt()}%")
+            Text(stringResource(Res.string.export_quality_percent, (quality * 100).toInt()))
             Slider(
                 value = quality,
                 onValueChange = { quality = it },
@@ -99,7 +107,7 @@ fun ExportSettingsSheetContent(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
                 Button(
                     onClick = {
@@ -107,7 +115,7 @@ fun ExportSettingsSheetContent(
                     },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("Apply")
+                    Text(stringResource(Res.string.action_apply))
                 }
             }
         }

@@ -5,6 +5,7 @@
 
     <!-- Common Actions -->
     <string name="action_back">Back</string>
+    <string name="action_confirm">Confirm</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_delete">Delete</string>
@@ -14,6 +15,19 @@
     <string name="action_done">Done</string>
     <string name="action_save">Save</string>
     <string name="action_clear">Clear</string>
+    <string name="action_apply">Apply</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+
+    <!-- Common States -->
+    <string name="state_enabled">enabled</string>
+    <string name="state_disabled">disabled</string>
+
+    <!-- Common Formatting -->
+    <string name="percentage_value">%d%%</string>
+    <string name="selection_count">%d selected</string>
+    <string name="frame_count">%d frames</string>
+    <string name="fps_label">%d FPS</string>
 
     <!-- Navigation -->
     <string name="nav_settings">Settings</string>
@@ -60,7 +74,10 @@
 
     <!-- Delete Confirmation Dialog -->
     <string name="delete_frames_title">Delete Frames</string>
-    <string name="delete_frames_message">Are you sure you want to delete %d frame(s)? This action cannot be undone.</string>
+    <string name="delete_frames_message_single">Are you sure you want to delete this frame? This action cannot be undone.</string>
+    <string name="delete_frames_message_plural">Are you sure you want to delete %d frames? This action cannot be undone.</string>
+    <string name="delete_project_title">Delete Project</string>
+    <string name="delete_project_message">Are you sure you want to delete "%s"? All frames will be permanently deleted. This action cannot be undone.</string>
 
     <!-- Export Screen -->
     <string name="export_title">Export Video</string>
@@ -73,11 +90,15 @@
     <string name="export_fps_label">%d FPS</string>
     <string name="export_duration">Estimated duration: %s</string>
     <string name="export_duration_at_fps">at %d FPS</string>
+    <string name="export_settings_title">Export Settings</string>
+    <string name="export_frames_per_second">Frames per second</string>
+    <string name="export_quality_percent">Video quality: %d%%</string>
 
     <!-- Export Progress -->
     <string name="export_progress_title">Exporting Video</string>
     <string name="export_progress_cancel">Cancel</string>
-    <string name="export_complete_title">Export Complete</string>
+    <string name="export_complete_title">Export Complete!</string>
+    <string name="export_complete_description">Your video is ready to share</string>
     <string name="export_complete_share">Share</string>
     <string name="export_complete_done">Done</string>
 
@@ -89,17 +110,22 @@
     <string name="settings_orientation">Orientation</string>
     <string name="settings_reminder_section">Daily Reminder</string>
     <string name="settings_reminder_enabled">Enable Reminder</string>
+    <string name="settings_reminder_description">Get notified daily to capture your photo</string>
     <string name="settings_reminder_time">Reminder time</string>
     <string name="settings_storage_section">Storage</string>
     <string name="settings_storage_management">Storage settings</string>
+    <string name="settings_storage_used">Used: %s</string>
     <string name="settings_clear_cache">Clear Cache</string>
     <string name="settings_about_section">About</string>
     <string name="settings_version">Version %s</string>
+    <string name="settings_app_version">%s v%s</string>
+    <string name="settings_about_description">Create beautiful face timelapse videos</string>
 
     <!-- Reminder Dialog -->
     <string name="reminder_dialog_title">Set Reminder Time</string>
     <string name="reminder_hour">Hour</string>
     <string name="reminder_minute">Minute</string>
+    <string name="reminder_selected_time">Selected: %s</string>
 
     <!-- Error Messages -->
     <string name="error_title">Something went wrong</string>
@@ -114,13 +140,42 @@
     <string name="cd_failed_thumbnail">Failed to load thumbnail</string>
     <string name="cd_frame">Frame</string>
     <string name="cd_frame_selected">Selected</string>
+    <string name="cd_frame_number">Frame %d</string>
     <string name="cd_image_unavailable">Image unavailable</string>
     <string name="cd_error_icon">Error</string>
     <string name="cd_camera_permission">Camera permission required</string>
     <string name="cd_capture_photo">Capture photo</string>
     <string name="cd_export_video">Export video</string>
+    <string name="cd_last_captured_frame">Last captured frame</string>
+    <string name="cd_import_photos">Import photos</string>
+    <string name="cd_toggle_ghost">Toggle ghost image</string>
+    <string name="cd_toggle_flash">Toggle flash</string>
+    <string name="cd_toggle_grid">Toggle grid</string>
+    <string name="cd_flip_camera">Flip camera</string>
+    <string name="cd_ghost_overlay">Ghost image overlay for alignment</string>
+    <string name="cd_previous_frame">Previous frame</string>
+    <string name="cd_next_frame">Next frame</string>
 
     <!-- Duration Formatting -->
     <string name="duration_minutes_seconds">%dm %ds</string>
     <string name="duration_seconds">%ds</string>
+    <string name="frame_slideshow_preview_duration">Preview duration: %s</string>
+    <string name="frame_slideshow_no_frames">No frames to preview</string>
+    <string name="frame_load_failed">Failed to load frame</string>
+    <string name="frame_slideshow_play">Play</string>
+    <string name="frame_slideshow_pause">Pause</string>
+    <string name="frame_slideshow_position">%d/%d</string>
+
+    <!-- Settings Components -->
+    <string name="settings_switch_content_description">%s, %s</string>
+    <string name="settings_slider_content_description">%s, %s</string>
+
+    <!-- Filter Sheets -->
+    <string name="frame_filter_title">Filter Frames</string>
+    <string name="frame_filter_date_range">Filter by date range</string>
+    <string name="frame_filter_min_confidence">Minimum face confidence: %d%%</string>
+
+    <!-- Storage Units -->
+    <string name="storage_size_gb">%s GB</string>
+    <string name="storage_size_mb">%s MB</string>
 </resources>

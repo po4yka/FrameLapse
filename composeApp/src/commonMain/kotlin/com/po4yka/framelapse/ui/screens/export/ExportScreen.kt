@@ -41,9 +41,24 @@ import com.po4yka.framelapse.ui.components.SettingsDropdown
 import com.po4yka.framelapse.ui.components.SettingsSection
 import com.po4yka.framelapse.ui.components.SettingsSlider
 import com.po4yka.framelapse.ui.util.HandleEffects
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.duration_minutes_seconds
+import framelapse.composeapp.generated.resources.duration_seconds
+import framelapse.composeapp.generated.resources.export_button
+import framelapse.composeapp.generated.resources.export_codec
+import framelapse.composeapp.generated.resources.export_duration
+import framelapse.composeapp.generated.resources.export_duration_at_fps
+import framelapse.composeapp.generated.resources.export_frame_rate
+import framelapse.composeapp.generated.resources.export_quality
+import framelapse.composeapp.generated.resources.export_resolution
+import framelapse.composeapp.generated.resources.export_title
+import framelapse.composeapp.generated.resources.export_video_settings
+import framelapse.composeapp.generated.resources.frame_count
+import framelapse.composeapp.generated.resources.fps_label
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
 
 private val CONTENT_PADDING = 16.dp
 private val SECTION_SPACING = 24.dp
@@ -109,7 +124,7 @@ private fun ExportContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             FrameLapseTopBar(
-                title = "Export Video",
+                title = stringResource(Res.string.export_title),
                 onBackClick = onNavigateBack,
             )
         },
@@ -177,9 +192,9 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
         )
 
         // Video settings
-        SettingsSection(title = "Video Settings") {
+        SettingsSection(title = stringResource(Res.string.export_video_settings)) {
             SettingsDropdown(
-                title = "Resolution",
+                title = stringResource(Res.string.export_resolution),
                 selectedValue = state.exportSettings.resolution,
                 options = Resolution.entries,
                 onSelect = { onEvent(ExportEvent.UpdateResolution(it)) },
@@ -187,16 +202,16 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
             )
 
             SettingsSlider(
-                title = "Frame Rate",
+                title = stringResource(Res.string.export_frame_rate),
                 value = state.exportSettings.fps.toFloat(),
                 onValueChange = { onEvent(ExportEvent.UpdateFps(it.toInt())) },
                 valueRange = MIN_FPS..MAX_FPS,
                 steps = FPS_STEPS,
-                valueLabel = { "${it.toInt()} FPS" },
+                valueLabel = { stringResource(Res.string.fps_label, it.toInt()) },
             )
 
             SettingsDropdown(
-                title = "Codec",
+                title = stringResource(Res.string.export_codec),
                 selectedValue = state.exportSettings.codec,
                 options = VideoCodec.entries,
                 onSelect = { onEvent(ExportEvent.UpdateCodec(it)) },
@@ -204,7 +219,7 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
             )
 
             SettingsDropdown(
-                title = "Quality",
+                title = stringResource(Res.string.export_quality),
                 selectedValue = state.exportSettings.quality,
                 options = ExportQuality.entries,
                 onSelect = { onEvent(ExportEvent.UpdateQuality(it)) },
@@ -220,7 +235,7 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
             enabled = state.canExport,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Export Video")
+            Text(stringResource(Res.string.export_button))
         }
     }
 }
@@ -237,20 +252,20 @@ private fun ExportPreviewCard(frameCount: Int, estimatedDuration: Float, fps: In
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "$frameCount frames",
+                text = stringResource(Res.string.frame_count, frameCount),
                 style = MaterialTheme.typography.headlineMedium,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Estimated duration: ${formatDuration(estimatedDuration)}",
+                text = stringResource(Res.string.export_duration, formatDuration(estimatedDuration)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Text(
-                text = "at $fps FPS",
+                text = stringResource(Res.string.export_duration_at_fps, fps),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -258,14 +273,15 @@ private fun ExportPreviewCard(frameCount: Int, estimatedDuration: Float, fps: In
     }
 }
 
+@Composable
 private fun formatDuration(seconds: Float): String {
     val totalSeconds = seconds.toInt()
     val minutes = totalSeconds / SECONDS_PER_MINUTE
     val remainingSeconds = totalSeconds % SECONDS_PER_MINUTE
     return if (minutes > 0) {
-        "${minutes}m ${remainingSeconds}s"
+        stringResource(Res.string.duration_minutes_seconds, minutes, remainingSeconds)
     } else {
-        "${remainingSeconds}s"
+        stringResource(Res.string.duration_seconds, remainingSeconds)
     }
 }
 

@@ -46,7 +46,18 @@ import com.po4yka.framelapse.ui.components.SelectionTopBar
 import com.po4yka.framelapse.ui.util.HandleEffects
 import com.po4yka.framelapse.ui.util.PhotoPickerResult
 import com.po4yka.framelapse.ui.util.rememberPhotoPickerLauncher
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.cd_capture_photo
+import framelapse.composeapp.generated.resources.cd_export_video
+import framelapse.composeapp.generated.resources.cd_import_photos
+import framelapse.composeapp.generated.resources.frame_count
+import framelapse.composeapp.generated.resources.gallery_capture_button
+import framelapse.composeapp.generated.resources.gallery_empty_description
+import framelapse.composeapp.generated.resources.gallery_empty_title
+import framelapse.composeapp.generated.resources.gallery_export_button
+import framelapse.composeapp.generated.resources.gallery_title
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
 
 private val GRID_SPACING = 4.dp
 private val CONTENT_PADDING = 8.dp
@@ -128,7 +139,7 @@ private fun GalleryContent(
                 )
             } else {
                 FrameLapseTopBar(
-                    title = state.project?.name ?: "Gallery",
+                    title = state.project?.name ?: stringResource(Res.string.gallery_title),
                     onBackClick = onNavigateBack,
                 )
             }
@@ -140,7 +151,7 @@ private fun GalleryContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Import photos",
+                        contentDescription = stringResource(Res.string.cd_import_photos),
                     )
                 }
             }
@@ -169,9 +180,9 @@ private fun GalleryContent(
                 state.frames.isEmpty() -> {
                     EmptyState(
                         icon = Icons.Default.PhotoLibrary,
-                        title = "No Frames Yet",
-                        description = "Capture your first photo or import existing images",
-                        actionLabel = "Capture",
+                        title = stringResource(Res.string.gallery_empty_title),
+                        description = stringResource(Res.string.gallery_empty_description),
+                        actionLabel = stringResource(Res.string.gallery_capture_button),
                         onAction = { onEvent(GalleryEvent.NavigateToCapture) },
                     )
                 }
@@ -221,7 +232,7 @@ private fun GalleryBottomBar(
             .padding(16.dp),
     ) {
         Text(
-            text = "$frameCount frames",
+            text = stringResource(Res.string.frame_count, frameCount),
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -235,10 +246,10 @@ private fun GalleryBottomBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = "Capture photo",
+                    contentDescription = stringResource(Res.string.cd_capture_photo),
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
-                Text("Capture")
+                Text(stringResource(Res.string.gallery_capture_button))
             }
             Button(
                 onClick = onExportClick,
@@ -246,10 +257,10 @@ private fun GalleryBottomBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Movie,
-                    contentDescription = "Export video",
+                    contentDescription = stringResource(Res.string.cd_export_video),
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
-                Text("Export")
+                Text(stringResource(Res.string.gallery_export_button))
             }
         }
     }

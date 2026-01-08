@@ -28,6 +28,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.settings_slider_content_description
+import framelapse.composeapp.generated.resources.settings_switch_content_description
+import framelapse.composeapp.generated.resources.state_disabled
+import framelapse.composeapp.generated.resources.state_enabled
+import org.jetbrains.compose.resources.stringResource
 
 private val SECTION_PADDING = 16.dp
 private val MIN_TOUCH_TARGET_HEIGHT = 48.dp
@@ -64,7 +70,11 @@ fun SettingsSwitch(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
 ) {
-    val switchState = if (checked) "enabled" else "disabled"
+    val switchState = if (checked) {
+        stringResource(Res.string.state_enabled)
+    } else {
+        stringResource(Res.string.state_disabled)
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -72,7 +82,11 @@ fun SettingsSwitch(
             .clickable { onCheckedChange(!checked) }
             .semantics {
                 role = Role.Switch
-                contentDescription = "$title, $switchState"
+                contentDescription = stringResource(
+                    Res.string.settings_switch_content_description,
+                    title,
+                    switchState,
+                )
             }
             .padding(
                 horizontal = ITEM_PADDING_HORIZONTAL,
@@ -123,7 +137,11 @@ fun <T> SettingsDropdown(
             .clickable { expanded = true }
             .semantics {
                 role = Role.DropdownList
-                contentDescription = "$title, ${valueLabel(selectedValue)}"
+                contentDescription = stringResource(
+                    Res.string.settings_slider_content_description,
+                    title,
+                    valueLabel(selectedValue),
+                )
             }
             .padding(
                 horizontal = ITEM_PADDING_HORIZONTAL,

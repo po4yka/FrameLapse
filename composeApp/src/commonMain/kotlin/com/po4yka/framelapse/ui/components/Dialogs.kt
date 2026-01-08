@@ -7,6 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.action_confirm
+import framelapse.composeapp.generated.resources.projects_create
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Confirmation dialog with confirm and cancel buttons.
@@ -18,9 +23,11 @@ fun ConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    confirmLabel: String = "Confirm",
-    dismissLabel: String = "Cancel",
+    confirmLabel: String? = null,
+    dismissLabel: String? = null,
 ) {
+    val confirmText = confirmLabel ?: stringResource(Res.string.action_confirm)
+    val dismissText = dismissLabel ?: stringResource(Res.string.action_cancel)
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -28,12 +35,12 @@ fun ConfirmationDialog(
         text = { Text(message) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(confirmLabel)
+                Text(confirmText)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(dismissLabel)
+                Text(dismissText)
             }
         },
     )
@@ -51,9 +58,11 @@ fun TextInputDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    confirmLabel: String = "Create",
-    dismissLabel: String = "Cancel",
+    confirmLabel: String? = null,
+    dismissLabel: String? = null,
 ) {
+    val confirmText = confirmLabel ?: stringResource(Res.string.projects_create)
+    val dismissText = dismissLabel ?: stringResource(Res.string.action_cancel)
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
@@ -72,12 +81,12 @@ fun TextInputDialog(
                 onClick = onConfirm,
                 enabled = value.isNotBlank(),
             ) {
-                Text(confirmLabel)
+                Text(confirmText)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(dismissLabel)
+                Text(dismissText)
             }
         },
     )

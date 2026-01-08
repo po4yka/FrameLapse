@@ -25,6 +25,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.export_complete_description
+import framelapse.composeapp.generated.resources.export_complete_done
+import framelapse.composeapp.generated.resources.export_complete_share
+import framelapse.composeapp.generated.resources.export_complete_title
+import framelapse.composeapp.generated.resources.export_progress_title
+import framelapse.composeapp.generated.resources.percentage_value
+import org.jetbrains.compose.resources.stringResource
 
 private val CARD_PADDING = 24.dp
 private val ICON_SIZE = 64.dp
@@ -47,7 +56,7 @@ fun ExportProgressCard(progress: Int, onCancel: () -> Unit, modifier: Modifier =
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Exporting Video",
+                text = stringResource(Res.string.export_progress_title),
                 style = MaterialTheme.typography.titleMedium,
             )
 
@@ -61,7 +70,7 @@ fun ExportProgressCard(progress: Int, onCancel: () -> Unit, modifier: Modifier =
             Spacer(modifier = Modifier.height(SPACING / 2))
 
             Text(
-                text = "$progress%",
+                text = stringResource(Res.string.percentage_value, progress),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -69,7 +78,7 @@ fun ExportProgressCard(progress: Int, onCancel: () -> Unit, modifier: Modifier =
             Spacer(modifier = Modifier.height(SPACING))
 
             TextButton(onClick = onCancel) {
-                Text("Cancel")
+                Text(stringResource(Res.string.action_cancel))
             }
         }
     }
@@ -100,14 +109,14 @@ fun ExportCompleteCard(onShare: () -> Unit, onDismiss: () -> Unit, modifier: Mod
             Spacer(modifier = Modifier.height(SPACING))
 
             Text(
-                text = "Export Complete!",
+                text = stringResource(Res.string.export_complete_title),
                 style = MaterialTheme.typography.titleMedium,
             )
 
             Spacer(modifier = Modifier.height(SPACING / 2))
 
             Text(
-                text = "Your video is ready to share",
+                text = stringResource(Res.string.export_complete_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -119,7 +128,7 @@ fun ExportCompleteCard(onShare: () -> Unit, onDismiss: () -> Unit, modifier: Mod
                 horizontalArrangement = Arrangement.Center,
             ) {
                 OutlinedButton(onClick = onDismiss) {
-                    Text("Done")
+                    Text(stringResource(Res.string.export_complete_done))
                 }
 
                 Spacer(modifier = Modifier.width(SPACING))
@@ -131,7 +140,7 @@ fun ExportCompleteCard(onShare: () -> Unit, onDismiss: () -> Unit, modifier: Mod
                         modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Share")
+                    Text(stringResource(Res.string.export_complete_share))
                 }
             }
         }

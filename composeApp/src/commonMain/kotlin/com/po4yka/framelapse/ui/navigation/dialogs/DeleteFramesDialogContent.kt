@@ -4,6 +4,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.action_delete
+import framelapse.composeapp.generated.resources.delete_frames_message_plural
+import framelapse.composeapp.generated.resources.delete_frames_message_single
+import framelapse.composeapp.generated.resources.delete_frames_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Content for delete frames confirmation dialog - rendered as Nav3 dialog scene.
@@ -12,24 +19,24 @@ import androidx.compose.runtime.Composable
 fun DeleteFramesDialogContent(count: Int, onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Delete Frames") },
+        title = { Text(stringResource(Res.string.delete_frames_title)) },
         text = {
             Text(
                 if (count == 1) {
-                    "Are you sure you want to delete this frame? This action cannot be undone."
+                    stringResource(Res.string.delete_frames_message_single)
                 } else {
-                    "Are you sure you want to delete $count frames? This action cannot be undone."
+                    stringResource(Res.string.delete_frames_message_plural, count)
                 },
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text(stringResource(Res.string.action_delete))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.action_cancel))
             }
         },
     )

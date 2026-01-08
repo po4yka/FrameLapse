@@ -49,7 +49,20 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.cd_frame_number
+import framelapse.composeapp.generated.resources.cd_next_frame
+import framelapse.composeapp.generated.resources.cd_previous_frame
+import framelapse.composeapp.generated.resources.duration_minutes_seconds
+import framelapse.composeapp.generated.resources.duration_seconds
+import framelapse.composeapp.generated.resources.frame_load_failed
+import framelapse.composeapp.generated.resources.frame_slideshow_no_frames
+import framelapse.composeapp.generated.resources.frame_slideshow_pause
+import framelapse.composeapp.generated.resources.frame_slideshow_play
+import framelapse.composeapp.generated.resources.frame_slideshow_position
+import framelapse.composeapp.generated.resources.frame_slideshow_preview_duration
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A slideshow component that previews frames as a simulated video.
@@ -112,7 +125,10 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
                         is ImageLoadResult.Success -> {
                             Image(
                                 bitmap = imageResult.image,
-                                contentDescription = "Frame ${currentFrameIndex + 1}",
+                                contentDescription = stringResource(
+                                    Res.string.cd_frame_number,
+                                    currentFrameIndex + 1,
+                                ),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
                             )
@@ -125,7 +141,7 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
                         }
                         is ImageLoadResult.Error -> {
                             Text(
-                                text = "Failed to load frame",
+                                text = stringResource(Res.string.frame_load_failed),
                                 color = Color.White,
                             )
                         }
@@ -141,7 +157,11 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
                     color = Color.Black.copy(alpha = 0.6f),
                 ) {
                     Text(
-                        text = "${currentFrameIndex + 1}/${frames.size}",
+                        text = stringResource(
+                            Res.string.frame_slideshow_position,
+                            currentFrameIndex + 1,
+                            frames.size,
+                        ),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         color = Color.White,
                         style = MaterialTheme.typography.labelSmall,
@@ -185,7 +205,7 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
             ) {
                 Icon(
                     imageVector = Icons.Default.SkipPrevious,
-                    contentDescription = "Previous frame",
+                    contentDescription = stringResource(Res.string.cd_previous_frame),
                 )
             }
 
@@ -199,7 +219,11 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                        contentDescription = if (isPlaying) "Pause" else "Play",
+                        contentDescription = if (isPlaying) {
+                            stringResource(Res.string.frame_slideshow_pause)
+                        } else {
+                            stringResource(Res.string.frame_slideshow_play)
+                        },
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp),
                     )
@@ -215,7 +239,7 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
             ) {
                 Icon(
                     imageVector = Icons.Default.SkipNext,
-                    contentDescription = "Next frame",
+                    contentDescription = stringResource(Res.string.cd_next_frame),
                 )
             }
         }
@@ -225,7 +249,7 @@ fun FrameSlideshow(frames: List<Frame>, fps: Int = 15, autoPlay: Boolean = false
         // Duration estimate
         val estimatedDuration = frames.size.toFloat() / fps
         Text(
-            text = "Preview duration: ${formatDuration(estimatedDuration)}",
+            text = stringResource(Res.string.frame_slideshow_preview_duration, formatDuration(estimatedDuration)),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -244,7 +268,7 @@ private fun EmptySlideshow(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "No frames to preview",
+            text = stringResource(Res.string.frame_slideshow_no_frames),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -254,14 +278,15 @@ private fun EmptySlideshow(modifier: Modifier = Modifier) {
 /**
  * Formats duration in seconds to a readable string (e.g., "1m 30s" or "45s").
  */
+@Composable
 private fun formatDuration(seconds: Float): String {
     val totalSeconds = seconds.toInt()
     val minutes = totalSeconds / 60
     val remainingSeconds = totalSeconds % 60
 
     return if (minutes > 0) {
-        "${minutes}m ${remainingSeconds}s"
+        stringResource(Res.string.duration_minutes_seconds, minutes, remainingSeconds)
     } else {
-        "${remainingSeconds}s"
+        stringResource(Res.string.duration_seconds, remainingSeconds)
     }
 }

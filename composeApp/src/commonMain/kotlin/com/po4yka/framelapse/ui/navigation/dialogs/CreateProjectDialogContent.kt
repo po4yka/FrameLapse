@@ -11,6 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.create_project_name_hint
+import framelapse.composeapp.generated.resources.create_project_title
+import framelapse.composeapp.generated.resources.projects_create
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Content for create project dialog - rendered as Nav3 dialog scene.
@@ -21,12 +27,12 @@ fun CreateProjectDialogContent(initialName: String, onDismiss: () -> Unit, onCon
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create Project") },
+        title = { Text(stringResource(Res.string.create_project_title)) },
         text = {
             OutlinedTextField(
                 value = projectName,
                 onValueChange = { projectName = it },
-                placeholder = { Text("Project name") },
+                placeholder = { Text(stringResource(Res.string.create_project_name_hint)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -36,12 +42,12 @@ fun CreateProjectDialogContent(initialName: String, onDismiss: () -> Unit, onCon
                 onClick = { onConfirm(projectName) },
                 enabled = projectName.isNotBlank(),
             ) {
-                Text("Create")
+                Text(stringResource(Res.string.projects_create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.action_cancel))
             }
         },
     )

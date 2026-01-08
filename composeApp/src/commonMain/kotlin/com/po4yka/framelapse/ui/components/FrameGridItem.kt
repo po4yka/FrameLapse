@@ -27,6 +27,11 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.cd_frame
+import framelapse.composeapp.generated.resources.cd_frame_selected
+import framelapse.composeapp.generated.resources.cd_image_unavailable
+import org.jetbrains.compose.resources.stringResource
 
 private val CORNER_RADIUS = 8.dp
 private val BORDER_WIDTH = 3.dp
@@ -80,7 +85,7 @@ fun FrameGridItem(
                 is ImageLoadResult.Success -> {
                     Image(
                         bitmap = imageResult.image,
-                        contentDescription = "Frame",
+                        contentDescription = stringResource(Res.string.cd_frame),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                     )
@@ -93,7 +98,7 @@ fun FrameGridItem(
                 is ImageLoadResult.Error -> {
                     Icon(
                         imageVector = Icons.Default.BrokenImage,
-                        contentDescription = "Image unavailable",
+                        contentDescription = stringResource(Res.string.cd_image_unavailable),
                         modifier = Modifier.size(ICON_SIZE),
                         tint = MaterialTheme.colorScheme.outline,
                     )
@@ -114,7 +119,7 @@ fun FrameGridItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
+                    contentDescription = stringResource(Res.string.cd_frame_selected),
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(CHECKBOX_SIZE - 8.dp),
                 )

@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.percentage_value
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Confidence indicator component for face detection.
@@ -70,7 +73,10 @@ fun ConfidenceIndicator(confidence: Float?, modifier: Modifier = Modifier, showP
         // Percentage text
         if (showPercentage) {
             Text(
-                text = "${(normalizedConfidence * 100).toInt()}%",
+                text = stringResource(
+                    Res.string.percentage_value,
+                    (normalizedConfidence * 100).toInt(),
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = indicatorColor,
             )

@@ -15,6 +15,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_back
+import framelapse.composeapp.generated.resources.gallery_clear_selection
+import framelapse.composeapp.generated.resources.gallery_delete_selected
+import framelapse.composeapp.generated.resources.gallery_select_all
+import framelapse.composeapp.generated.resources.selection_count
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Standard top app bar for the app.
@@ -35,7 +42,7 @@ fun FrameLapseTopBar(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(Res.string.action_back),
                     )
                 }
             }
@@ -57,13 +64,13 @@ fun SelectionTopBar(
     modifier: Modifier = Modifier,
 ) {
     TopAppBar(
-        title = { Text("$selectedCount selected") },
+        title = { Text(stringResource(Res.string.selection_count, selectedCount)) },
         modifier = modifier,
         navigationIcon = {
             IconButton(onClick = onClearSelection) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Clear selection",
+                    contentDescription = stringResource(Res.string.gallery_clear_selection),
                 )
             }
         },
@@ -71,13 +78,13 @@ fun SelectionTopBar(
             IconButton(onClick = onSelectAll) {
                 Icon(
                     imageVector = Icons.Default.SelectAll,
-                    contentDescription = "Select all",
+                    contentDescription = stringResource(Res.string.gallery_select_all),
                 )
             }
             IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete selected",
+                    contentDescription = stringResource(Res.string.gallery_delete_selected),
                 )
             }
         },

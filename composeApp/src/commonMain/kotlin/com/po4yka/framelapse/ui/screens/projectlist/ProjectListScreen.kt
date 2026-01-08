@@ -34,7 +34,14 @@ import com.po4yka.framelapse.ui.components.EmptyState
 import com.po4yka.framelapse.ui.components.LoadingIndicator
 import com.po4yka.framelapse.ui.components.ProjectCard
 import com.po4yka.framelapse.ui.util.HandleEffects
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.app_name
+import framelapse.composeapp.generated.resources.nav_settings
+import framelapse.composeapp.generated.resources.projects_create
+import framelapse.composeapp.generated.resources.projects_empty_description
+import framelapse.composeapp.generated.resources.projects_empty_title
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
 
 private val CONTENT_PADDING = 16.dp
 private val ITEM_SPACING = 12.dp
@@ -90,12 +97,12 @@ private fun ProjectListContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("FrameLapse") },
+                title = { Text(stringResource(Res.string.app_name)) },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(Res.string.nav_settings),
                         )
                     }
                 },
@@ -107,7 +114,7 @@ private fun ProjectListContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Create project",
+                    contentDescription = stringResource(Res.string.projects_create),
                 )
             }
         },
@@ -121,9 +128,9 @@ private fun ProjectListContent(
             state.projects.isEmpty() -> {
                 EmptyState(
                     icon = Icons.Default.CameraAlt,
-                    title = "No Projects Yet",
-                    description = "Create your first timelapse project to get started",
-                    actionLabel = "Create Project",
+                    title = stringResource(Res.string.projects_empty_title),
+                    description = stringResource(Res.string.projects_empty_description),
+                    actionLabel = stringResource(Res.string.projects_create),
                     onAction = onShowCreateDialog,
                     modifier = Modifier.padding(paddingValues),
                 )

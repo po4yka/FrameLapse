@@ -23,6 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_back
+import framelapse.composeapp.generated.resources.capture_grant_permission
+import framelapse.composeapp.generated.resources.cd_camera_permission
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Screen displayed when camera permission is denied.
@@ -46,7 +51,7 @@ fun PermissionDeniedScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.action_back),
                         )
                     }
                 },
@@ -63,7 +68,7 @@ fun PermissionDeniedScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.CameraAlt,
-                contentDescription = "Camera permission required",
+                contentDescription = stringResource(Res.string.cd_camera_permission),
                 modifier = Modifier.size(96.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
@@ -88,7 +93,7 @@ fun PermissionDeniedScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(onClick = onRequestPermission) {
-                Text("Grant Permission")
+                Text(stringResource(Res.string.capture_grant_permission))
             }
         }
     }

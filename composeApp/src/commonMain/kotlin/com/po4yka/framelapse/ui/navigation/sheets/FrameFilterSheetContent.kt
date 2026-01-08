@@ -23,6 +23,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_apply
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.frame_filter_date_range
+import framelapse.composeapp.generated.resources.frame_filter_min_confidence
+import framelapse.composeapp.generated.resources.frame_filter_title
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Frame filter settings for the gallery.
@@ -53,7 +60,7 @@ fun FrameFilterSheetContent(
                 .padding(16.dp),
         ) {
             Text(
-                text = "Filter Frames",
+                text = stringResource(Res.string.frame_filter_title),
                 style = MaterialTheme.typography.titleLarge,
             )
 
@@ -65,7 +72,7 @@ fun FrameFilterSheetContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Filter by date range")
+                Text(stringResource(Res.string.frame_filter_date_range))
                 Switch(
                     checked = dateRangeEnabled,
                     onCheckedChange = { dateRangeEnabled = it },
@@ -75,7 +82,7 @@ fun FrameFilterSheetContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Confidence threshold slider
-            Text("Minimum face confidence: ${(minConfidence * 100).toInt()}%")
+            Text(stringResource(Res.string.frame_filter_min_confidence, (minConfidence * 100).toInt()))
             Slider(
                 value = minConfidence,
                 onValueChange = { minConfidence = it },
@@ -93,7 +100,7 @@ fun FrameFilterSheetContent(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.action_cancel))
                 }
                 Button(
                     onClick = {
@@ -101,7 +108,7 @@ fun FrameFilterSheetContent(
                     },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text("Apply")
+                    Text(stringResource(Res.string.action_apply))
                 }
             }
         }

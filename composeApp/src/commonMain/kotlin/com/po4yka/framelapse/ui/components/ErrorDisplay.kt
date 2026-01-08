@@ -24,6 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_dismiss
+import framelapse.composeapp.generated.resources.action_retry
+import framelapse.composeapp.generated.resources.cd_error_icon
+import framelapse.composeapp.generated.resources.error_title
+import org.jetbrains.compose.resources.stringResource
 
 private val ICON_SIZE = 64.dp
 private val CONTENT_PADDING = 16.dp
@@ -58,7 +64,7 @@ fun ErrorBanner(message: String, onDismiss: () -> Unit, modifier: Modifier = Mod
             IconButton(onClick = onDismiss) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(Res.string.action_dismiss),
                     tint = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
@@ -80,7 +86,7 @@ fun ErrorScreen(message: String, onRetry: () -> Unit, modifier: Modifier = Modif
     ) {
         Icon(
             imageVector = Icons.Default.Warning,
-            contentDescription = "Error",
+            contentDescription = stringResource(Res.string.cd_error_icon),
             modifier = Modifier.size(ICON_SIZE),
             tint = MaterialTheme.colorScheme.error,
         )
@@ -88,7 +94,7 @@ fun ErrorScreen(message: String, onRetry: () -> Unit, modifier: Modifier = Modif
         Spacer(modifier = Modifier.height(SPACING))
 
         Text(
-            text = "Something went wrong",
+            text = stringResource(Res.string.error_title),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
@@ -105,7 +111,7 @@ fun ErrorScreen(message: String, onRetry: () -> Unit, modifier: Modifier = Modif
         Spacer(modifier = Modifier.height(SPACING))
 
         Button(onClick = onRetry) {
-            Text("Retry")
+            Text(stringResource(Res.string.action_retry))
         }
     }
 }

@@ -34,6 +34,13 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.cd_failed_thumbnail
+import framelapse.composeapp.generated.resources.cd_no_thumbnail
+import framelapse.composeapp.generated.resources.cd_project_thumbnail
+import framelapse.composeapp.generated.resources.frame_count
+import framelapse.composeapp.generated.resources.fps_label
+import org.jetbrains.compose.resources.stringResource
 
 private val CARD_CORNER_RADIUS = 12.dp
 private val CONTENT_PADDING = 12.dp
@@ -80,7 +87,7 @@ fun ProjectCard(
                         is ImageLoadResult.Success -> {
                             Image(
                                 bitmap = imageResult.image,
-                                contentDescription = "Project thumbnail",
+                                contentDescription = stringResource(Res.string.cd_project_thumbnail),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop,
                             )
@@ -93,7 +100,7 @@ fun ProjectCard(
                         is ImageLoadResult.Error -> {
                             Icon(
                                 imageVector = Icons.Default.CameraAlt,
-                                contentDescription = "Failed to load thumbnail",
+                                contentDescription = stringResource(Res.string.cd_failed_thumbnail),
                                 modifier = Modifier.size(ICON_SIZE),
                                 tint = MaterialTheme.colorScheme.outline,
                             )
@@ -102,7 +109,7 @@ fun ProjectCard(
                 } else {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "No thumbnail available",
+                        contentDescription = stringResource(Res.string.cd_no_thumbnail),
                         modifier = Modifier.size(ICON_SIZE),
                         tint = MaterialTheme.colorScheme.outline,
                     )
@@ -130,13 +137,13 @@ fun ProjectCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "$frameCount frames",
+                        text = stringResource(Res.string.frame_count, frameCount),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     Text(
-                        text = "${project.fps} FPS",
+                        text = stringResource(Res.string.fps_label, project.fps),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

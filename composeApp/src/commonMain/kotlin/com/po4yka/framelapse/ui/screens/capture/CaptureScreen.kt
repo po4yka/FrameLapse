@@ -62,8 +62,22 @@ import com.po4yka.framelapse.ui.components.PermissionDeniedScreen
 import com.po4yka.framelapse.ui.util.HandleEffects
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_back
+import framelapse.composeapp.generated.resources.capture_ghost_label
+import framelapse.composeapp.generated.resources.capture_permission_description
+import framelapse.composeapp.generated.resources.capture_permission_title
+import framelapse.composeapp.generated.resources.cd_flip_camera
+import framelapse.composeapp.generated.resources.cd_last_captured_frame
+import framelapse.composeapp.generated.resources.cd_toggle_flash
+import framelapse.composeapp.generated.resources.cd_toggle_ghost
+import framelapse.composeapp.generated.resources.cd_toggle_grid
+import framelapse.composeapp.generated.resources.frame_count
+import framelapse.composeapp.generated.resources.nav_gallery
+import framelapse.composeapp.generated.resources.percentage_value
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
 
 private val CONTROL_BUTTON_SIZE = 48.dp
 private val CAPTURE_BUTTON_SIZE = 72.dp
@@ -119,8 +133,8 @@ fun CaptureScreen(
         )
     } else {
         PermissionDeniedScreen(
-            title = "Camera Permission Required",
-            description = "FrameLapse needs camera access to capture your daily photos for the timelapse.",
+            title = stringResource(Res.string.capture_permission_title),
+            description = stringResource(Res.string.capture_permission_description),
             onRequestPermission = permissionState.requestPermission,
             onNavigateBack = onNavigateBack,
         )
@@ -186,7 +200,7 @@ private fun CaptureContent(
                 IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(Res.string.action_back),
                         tint = Color.White,
                     )
                 }
@@ -206,7 +220,7 @@ private fun CaptureContent(
                                 } else {
                                     Icons.Default.VisibilityOff
                                 },
-                                contentDescription = "Toggle ghost image",
+                                contentDescription = stringResource(Res.string.cd_toggle_ghost),
                                 tint = if (state.captureSettings.ghostOpacity > 0f) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
@@ -223,7 +237,7 @@ private fun CaptureContent(
                             } else {
                                 Icons.Default.FlashOff
                             },
-                            contentDescription = "Toggle flash",
+                            contentDescription = stringResource(Res.string.cd_toggle_flash),
                             tint = Color.White,
                         )
                     }
@@ -231,7 +245,7 @@ private fun CaptureContent(
                     IconButton(onClick = { onEvent(CaptureEvent.ToggleGrid) }) {
                         Icon(
                             imageVector = Icons.Default.GridOn,
-                            contentDescription = "Toggle grid",
+                            contentDescription = stringResource(Res.string.cd_toggle_grid),
                             tint = if (state.captureSettings.showGrid) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -258,7 +272,7 @@ private fun CaptureContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Ghost",
+                            text = stringResource(Res.string.capture_ghost_label),
                             color = Color.White,
                             style = MaterialTheme.typography.labelSmall,
                         )
@@ -276,7 +290,10 @@ private fun CaptureContent(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${(state.captureSettings.ghostOpacity * 100).toInt()}%",
+                            text = stringResource(
+                                Res.string.percentage_value,
+                                (state.captureSettings.ghostOpacity * 100).toInt(),
+                            ),
                             color = Color.White,
                             style = MaterialTheme.typography.labelSmall,
                         )
@@ -287,7 +304,7 @@ private fun CaptureContent(
                 // Frame count
                 if (state.frameCount > 0) {
                     Text(
-                        text = "${state.frameCount} frames",
+                        text = stringResource(Res.string.frame_count, state.frameCount),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -322,7 +339,7 @@ private fun CaptureContent(
                                     is ImageLoadResult.Success -> {
                                         Image(
                                             bitmap = imageResult.image,
-                                            contentDescription = "Last captured frame",
+                                            contentDescription = stringResource(Res.string.cd_last_captured_frame),
                                             modifier = Modifier
                                                 .size(CONTROL_BUTTON_SIZE)
                                                 .clip(CircleShape),
@@ -332,14 +349,14 @@ private fun CaptureContent(
                                     else -> {
                                         Icon(
                                             imageVector = Icons.Default.PhotoLibrary,
-                                            contentDescription = "Gallery",
+                                            contentDescription = stringResource(Res.string.nav_gallery),
                                         )
                                     }
                                 }
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.PhotoLibrary,
-                                    contentDescription = "Gallery",
+                                    contentDescription = stringResource(Res.string.nav_gallery),
                                 )
                             }
                         }
@@ -367,7 +384,7 @@ private fun CaptureContent(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Cameraswitch,
-                            contentDescription = "Flip camera",
+                            contentDescription = stringResource(Res.string.cd_flip_camera),
                         )
                     }
                 }

@@ -8,6 +8,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import com.po4yka.framelapse.ui.util.ImageLoadResult
 import com.po4yka.framelapse.ui.util.rememberImageFromPath
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.cd_ghost_overlay
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Overlay component that displays a ghost image from a previous capture.
@@ -29,7 +32,7 @@ fun GhostImageOverlay(imagePath: String?, opacity: Float, modifier: Modifier = M
         is ImageLoadResult.Success -> {
             Image(
                 bitmap = imageResult.image,
-                contentDescription = "Ghost image overlay for alignment",
+                contentDescription = stringResource(Res.string.cd_ghost_overlay),
                 modifier = modifier
                     .fillMaxSize()
                     .alpha(opacity.coerceIn(0f, 1f)),

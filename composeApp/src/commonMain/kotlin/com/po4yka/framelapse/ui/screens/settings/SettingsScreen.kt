@@ -42,9 +42,36 @@ import com.po4yka.framelapse.ui.components.SettingsSection
 import com.po4yka.framelapse.ui.components.SettingsSlider
 import com.po4yka.framelapse.ui.components.SettingsSwitch
 import com.po4yka.framelapse.ui.util.HandleEffects
+import framelapse.composeapp.generated.resources.Res
+import framelapse.composeapp.generated.resources.action_cancel
+import framelapse.composeapp.generated.resources.action_ok
+import framelapse.composeapp.generated.resources.app_name
+import framelapse.composeapp.generated.resources.fps_label
+import framelapse.composeapp.generated.resources.reminder_dialog_title
+import framelapse.composeapp.generated.resources.reminder_hour
+import framelapse.composeapp.generated.resources.reminder_minute
+import framelapse.composeapp.generated.resources.reminder_selected_time
+import framelapse.composeapp.generated.resources.settings_about_description
+import framelapse.composeapp.generated.resources.settings_about_section
+import framelapse.composeapp.generated.resources.settings_app_version
+import framelapse.composeapp.generated.resources.settings_capture_section
+import framelapse.composeapp.generated.resources.settings_clear_cache
+import framelapse.composeapp.generated.resources.settings_frame_rate
+import framelapse.composeapp.generated.resources.settings_orientation
+import framelapse.composeapp.generated.resources.settings_reminder_description
+import framelapse.composeapp.generated.resources.settings_reminder_enabled
+import framelapse.composeapp.generated.resources.settings_reminder_section
+import framelapse.composeapp.generated.resources.settings_reminder_time
+import framelapse.composeapp.generated.resources.settings_resolution
+import framelapse.composeapp.generated.resources.settings_storage_section
+import framelapse.composeapp.generated.resources.settings_storage_used
+import framelapse.composeapp.generated.resources.settings_title
+import framelapse.composeapp.generated.resources.storage_size_gb
+import framelapse.composeapp.generated.resources.storage_size_mb
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.stringResource
 
 private val CONTENT_PADDING = 16.dp
 private const val MIN_FPS = 1f
@@ -108,7 +135,7 @@ private fun SettingsContent(
         modifier = modifier.fillMaxSize(),
         topBar = {
             FrameLapseTopBar(
-                title = "Settings",
+                title = stringResource(Res.string.settings_title),
                 onBackClick = onNavigateBack,
             )
         },
@@ -121,9 +148,9 @@ private fun SettingsContent(
                 .verticalScroll(rememberScrollState()),
         ) {
             // Default capture settings
-            SettingsSection(title = "Default Capture Settings") {
+            SettingsSection(title = stringResource(Res.string.settings_capture_section)) {
                 SettingsDropdown(
-                    title = "Resolution",
+                    title = stringResource(Res.string.settings_resolution),
                     selectedValue = state.defaultResolution,
                     options = Resolution.entries,
                     onSelect = { onEvent(SettingsEvent.UpdateDefaultResolution(it)) },
@@ -131,16 +158,16 @@ private fun SettingsContent(
                 )
 
                 SettingsSlider(
-                    title = "Frame Rate",
+                    title = stringResource(Res.string.settings_frame_rate),
                     value = state.defaultFps.toFloat(),
                     onValueChange = { onEvent(SettingsEvent.UpdateDefaultFps(it.toInt())) },
                     valueRange = MIN_FPS..MAX_FPS,
                     steps = FPS_STEPS,
-                    valueLabel = { "${it.toInt()} FPS" },
+                    valueLabel = { stringResource(Res.string.fps_label, it.toInt()) },
                 )
 
                 SettingsDropdown(
-                    title = "Orientation",
+                    title = stringResource(Res.string.settings_orientation),
                     selectedValue = state.defaultOrientation,
                     options = Orientation.entries,
                     onSelect = { onEvent(SettingsEvent.UpdateDefaultOrientation(it)) },
@@ -151,10 +178,10 @@ private fun SettingsContent(
             HorizontalDivider()
 
             // Reminder settings
-            SettingsSection(title = "Daily Reminder") {
+            SettingsSection(title = stringResource(Res.string.settings_reminder_section)) {
                 SettingsSwitch(
-                    title = "Enable Reminder",
-                    subtitle = "Get notified daily to capture your photo",
+                    title = stringResource(Res.string.settings_reminder_enabled),
+                    subtitle = stringResource(Res.string.settings_reminder_description),
                     checked = state.reminderEnabled,
                     onCheckedChange = { onEvent(SettingsEvent.UpdateReminderEnabled(it)) },
                 )
@@ -170,7 +197,7 @@ private fun SettingsContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Reminder time",
+                            text = stringResource(Res.string.settings_reminder_time),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                         Spacer(modifier = Modifier.weight(1f))
@@ -197,9 +224,12 @@ private fun SettingsContent(
             HorizontalDivider()
 
             // Storage settings
-            SettingsSection(title = "Storage") {
+            SettingsSection(title = stringResource(Res.string.settings_storage_section)) {
                 Text(
-                    text = "Used: ${formatStorageSize(state.storageUsedMb)} MB",
+                    text = stringResource(
+                        Res.string.settings_storage_used,
+                        formatStorageSize(state.storageUsedMb),
+                    ),
                     modifier = Modifier.padding(horizontal = CONTENT_PADDING, vertical = 8.dp),
                 )
 
@@ -209,20 +239,24 @@ private fun SettingsContent(
                         .fillMaxWidth()
                         .padding(horizontal = CONTENT_PADDING),
                 ) {
-                    Text("Clear Cache")
+                    Text(stringResource(Res.string.settings_clear_cache))
                 }
             }
 
             HorizontalDivider()
 
             // About section
-            SettingsSection(title = "About") {
+            SettingsSection(title = stringResource(Res.string.settings_about_section)) {
                 Text(
-                    text = "FrameLapse v1.0.0",
+                    text = stringResource(
+                        Res.string.settings_app_version,
+                        stringResource(Res.string.app_name),
+                        APP_VERSION_NAME,
+                    ),
                     modifier = Modifier.padding(horizontal = CONTENT_PADDING, vertical = 8.dp),
                 )
                 Text(
-                    text = "Create beautiful face timelapse videos",
+                    text = stringResource(Res.string.settings_about_description),
                     modifier = Modifier.padding(horizontal = CONTENT_PADDING, vertical = 4.dp),
                 )
             }
@@ -230,11 +264,12 @@ private fun SettingsContent(
     }
 }
 
+@Composable
 private fun formatStorageSize(sizeInMb: Float): String = if (sizeInMb >= BYTES_THRESHOLD) {
     val gb = sizeInMb / BYTES_THRESHOLD
-    "${(gb * 10).toInt() / 10.0} GB"
+    stringResource(Res.string.storage_size_gb, (gb * 10).toInt() / 10.0)
 } else {
-    "${(sizeInMb * 10).toInt() / 10.0} MB"
+    stringResource(Res.string.storage_size_mb, (sizeInMb * 10).toInt() / 10.0)
 }
 
 /**
@@ -248,12 +283,12 @@ private fun TimePickerDialog(currentTime: String, onTimeSelected: (String) -> Un
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Set Reminder Time") },
+        title = { Text(stringResource(Res.string.reminder_dialog_title)) },
         text = {
             Column {
                 // Hour selection
                 SettingsSlider(
-                    title = "Hour",
+                    title = stringResource(Res.string.reminder_hour),
                     value = selectedHour.toFloat(),
                     onValueChange = { selectedHour = it.toInt() },
                     valueRange = 0f..23f,
@@ -263,7 +298,7 @@ private fun TimePickerDialog(currentTime: String, onTimeSelected: (String) -> Un
 
                 // Minute selection
                 SettingsSlider(
-                    title = "Minute",
+                    title = stringResource(Res.string.reminder_minute),
                     value = selectedMinute.toFloat(),
                     onValueChange = { selectedMinute = it.toInt() },
                     valueRange = 0f..59f,
@@ -272,7 +307,10 @@ private fun TimePickerDialog(currentTime: String, onTimeSelected: (String) -> Un
                 )
 
                 Text(
-                    text = "Selected: ${formatTime(selectedHour, selectedMinute)}",
+                    text = stringResource(
+                        Res.string.reminder_selected_time,
+                        formatTime(selectedHour, selectedMinute),
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(top = 16.dp),
                 )
@@ -285,12 +323,12 @@ private fun TimePickerDialog(currentTime: String, onTimeSelected: (String) -> Un
                     onTimeSelected(formattedTime)
                 },
             ) {
-                Text("OK")
+                Text(stringResource(Res.string.action_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(Res.string.action_cancel))
             }
         },
     )
@@ -323,3 +361,4 @@ private fun formatTime(hour: Int, minute: Int): String = "${formatTwoDigits(hour
 private const val BYTES_THRESHOLD = 1024f
 private const val DEFAULT_HOUR = 9
 private const val DEFAULT_MINUTE = 0
+private const val APP_VERSION_NAME = "1.0.0"
