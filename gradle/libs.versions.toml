@@ -9,7 +9,10 @@ lifecycle-compose = "2.9.6"
 androidx-activityCompose = "1.12.2"
 androidx-core = "1.17.0"
 androidx-lifecycle = "2.10.0"
-navigation3 = "1.0.0"
+
+# Navigation 3 (JetBrains Multiplatform)
+navigation3-multiplatform = "1.0.0-alpha06"
+lifecycle-navigation3 = "2.10.0-alpha06"
 
 # CameraX
 camerax = "1.5.2"
@@ -75,10 +78,9 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-compose" }
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-compose" }
 
-# Navigation 3
-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
+# Navigation 3 (JetBrains Multiplatform)
+navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3-multiplatform" }
+lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-navigation3" }
 
 # CameraX
 camerax-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }

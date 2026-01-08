@@ -64,6 +64,10 @@ kotlin {
             // Lifecycle
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.lifecycle.viewmodel.compose)
+
+            // Navigation 3 (Multiplatform)
+            implementation(libs.navigation3.ui)
+            implementation(libs.lifecycle.viewmodel.navigation3)
         }
 
         androidMain.dependencies {
@@ -79,11 +83,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-            // Navigation 3
-            implementation(libs.navigation3.runtime)
-            implementation(libs.navigation3.ui)
-            implementation(libs.lifecycle.viewmodel.navigation3)
 
             // Dependency Injection
             implementation(libs.koin.android)

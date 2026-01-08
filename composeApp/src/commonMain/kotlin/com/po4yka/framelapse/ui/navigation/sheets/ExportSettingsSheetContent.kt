@@ -31,6 +31,7 @@ data class ExportSettings(val fps: Int = 30, val quality: Float = 0.8f)
 /**
  * Content for export settings bottom sheet - rendered as Nav3 bottom sheet scene.
  */
+@Suppress("UnusedParameter")
 @Composable
 fun ExportSettingsSheetContent(
     projectId: String,

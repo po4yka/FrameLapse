@@ -32,6 +32,7 @@ data class FrameFilters(val dateRangeEnabled: Boolean = false, val minConfidence
 /**
  * Content for frame filter bottom sheet - rendered as Nav3 bottom sheet scene.
  */
+@Suppress("UnusedParameter")
 @Composable
 fun FrameFilterSheetContent(
     projectId: String,
