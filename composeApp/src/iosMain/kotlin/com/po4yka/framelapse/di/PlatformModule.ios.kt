@@ -1,13 +1,11 @@
 package com.po4yka.framelapse.di
 
-import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.NotificationScheduler
 import com.po4yka.framelapse.domain.service.ShareHandler
 import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.domain.service.VideoEncoder
-import com.po4yka.framelapse.platform.CameraControllerImpl
 import com.po4yka.framelapse.platform.DatabaseDriverFactory
 import com.po4yka.framelapse.platform.FaceDetectorImpl
 import com.po4yka.framelapse.platform.FileManager
@@ -25,7 +23,6 @@ actual val platformModule: Module = module {
     single<ImageProcessor> { ImageProcessorImpl() }
     single<FaceDetector> { FaceDetectorImpl() }
     single<VideoEncoder> { VideoEncoderImpl() }
-    single<CameraController> { CameraControllerImpl() }
     single<NotificationScheduler> { NotificationSchedulerImpl() }
     single<ShareHandler> { ShareHandlerImpl() }
     single<SoundPlayer> { SoundPlayerImpl() }
