@@ -33,7 +33,6 @@ import com.po4yka.framelapse.presentation.projectlist.ProjectListViewModel
 import com.po4yka.framelapse.ui.components.EmptyState
 import com.po4yka.framelapse.ui.components.LoadingIndicator
 import com.po4yka.framelapse.ui.components.ProjectCard
-import com.po4yka.framelapse.ui.components.TextInputDialog
 import com.po4yka.framelapse.ui.util.HandleEffects
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -48,6 +47,7 @@ fun ProjectListScreen(
     onNavigateToCapture: (String) -> Unit,
     onNavigateToGallery: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onShowCreateDialog: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ProjectListViewModel = koinViewModel<ProjectListViewModel>(),
 ) {
@@ -71,6 +71,7 @@ fun ProjectListScreen(
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
         onNavigateToSettings = onNavigateToSettings,
+        onShowCreateDialog = onShowCreateDialog,
         modifier = modifier,
     )
 }
@@ -82,6 +83,7 @@ private fun ProjectListContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (ProjectListEvent) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onShowCreateDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -101,7 +103,7 @@ private fun ProjectListContent(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onEvent(ProjectListEvent.ShowCreateDialog) },
+                onClick = onShowCreateDialog,
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -122,7 +124,7 @@ private fun ProjectListContent(
                     title = "No Projects Yet",
                     description = "Create your first timelapse project to get started",
                     actionLabel = "Create Project",
-                    onAction = { onEvent(ProjectListEvent.ShowCreateDialog) },
+                    onAction = onShowCreateDialog,
                     modifier = Modifier.padding(paddingValues),
                 )
             }
@@ -150,17 +152,5 @@ private fun ProjectListContent(
                 }
             }
         }
-    }
-
-    // Create project dialog
-    if (state.showCreateDialog) {
-        TextInputDialog(
-            title = "Create Project",
-            placeholder = "Project name",
-            value = state.newProjectName,
-            onValueChange = { onEvent(ProjectListEvent.UpdateNewProjectName(it)) },
-            onConfirm = { onEvent(ProjectListEvent.CreateProject) },
-            onDismiss = { onEvent(ProjectListEvent.DismissCreateDialog) },
-        )
     }
 }

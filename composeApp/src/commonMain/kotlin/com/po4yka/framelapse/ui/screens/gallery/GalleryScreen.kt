@@ -29,9 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,7 +38,6 @@ import com.po4yka.framelapse.presentation.gallery.GalleryEffect
 import com.po4yka.framelapse.presentation.gallery.GalleryEvent
 import com.po4yka.framelapse.presentation.gallery.GalleryState
 import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
-import com.po4yka.framelapse.ui.components.ConfirmationDialog
 import com.po4yka.framelapse.ui.components.EmptyState
 import com.po4yka.framelapse.ui.components.FrameGridItem
 import com.po4yka.framelapse.ui.components.FrameLapseTopBar
@@ -64,13 +61,13 @@ fun GalleryScreen(
     onNavigateToCapture: () -> Unit,
     onNavigateToExport: () -> Unit,
     onNavigateBack: () -> Unit,
+    onShowDeleteDialog: (Int) -> Unit = {},
+    onShowFilterSheet: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GalleryViewModel = koinViewModel<GalleryViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var deleteCount by remember { mutableStateOf(0) }
 
     // Photo picker launcher
     val photoPickerLauncher = rememberPhotoPickerLauncher { result ->
@@ -94,10 +91,7 @@ fun GalleryScreen(
             is GalleryEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
             is GalleryEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
             is GalleryEffect.OpenPhotoPicker -> photoPickerLauncher.launch(maxItems = 0)
-            is GalleryEffect.ShowDeleteConfirmation -> {
-                deleteCount = effect.count
-                showDeleteDialog = true
-            }
+            is GalleryEffect.ShowDeleteConfirmation -> onShowDeleteDialog(effect.count)
         }
     }
 
@@ -112,20 +106,6 @@ fun GalleryScreen(
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
-
-    // Delete confirmation dialog
-    if (showDeleteDialog) {
-        ConfirmationDialog(
-            title = "Delete Frames",
-            message = "Are you sure you want to delete $deleteCount frame(s)? This action cannot be undone.",
-            confirmLabel = "Delete",
-            onConfirm = {
-                viewModel.onEvent(GalleryEvent.ConfirmDeleteSelected)
-                showDeleteDialog = false
-            },
-            onDismiss = { showDeleteDialog = false },
-        )
-    }
 }
 
 @Composable
