@@ -17,7 +17,12 @@ actual class FileManager(private val context: Context) {
     }
 
     actual fun deleteFile(path: String): Boolean = try {
-        File(path).delete()
+        val file = File(path)
+        if (file.isDirectory) {
+            file.deleteRecursively()
+        } else {
+            file.delete()
+        }
     } catch (e: Exception) {
         false
     }

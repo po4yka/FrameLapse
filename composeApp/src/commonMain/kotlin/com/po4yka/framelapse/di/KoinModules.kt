@@ -91,7 +91,7 @@ val domainModule = module {
     factory { AddFrameUseCase(get(), get(), get()) }
     factory { GetFramesUseCase(get()) }
     factory { GetLatestFrameUseCase(get()) }
-    factory { DeleteFrameUseCase(get(), get()) }
+    factory { DeleteFrameUseCase(get()) }
     factory { ImportPhotosUseCase(get(), get()) }
 
     // Face Processing Use Cases

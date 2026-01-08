@@ -101,12 +101,11 @@ class FrameRepositoryImpl(
 
     override suspend fun deleteFrame(id: String): Result<Unit> = try {
         val frame = localDataSource.getById(id)
+        localDataSource.delete(id)
         if (frame != null) {
             imageStorageManager.deleteImage(frame.originalPath)
             frame.alignedPath?.let { imageStorageManager.deleteImage(it) }
         }
-
-        localDataSource.delete(id)
         Result.Success(Unit)
     } catch (e: Exception) {
         Result.Error(e, "Failed to delete frame: ${e.message}")

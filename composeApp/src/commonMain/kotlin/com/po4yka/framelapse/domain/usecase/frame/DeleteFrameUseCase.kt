@@ -2,12 +2,11 @@ package com.po4yka.framelapse.domain.usecase.frame
 
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 
 /**
  * Deletes a frame and its associated files.
  */
-class DeleteFrameUseCase(private val frameRepository: FrameRepository, private val fileManager: FileManager) {
+class DeleteFrameUseCase(private val frameRepository: FrameRepository) {
     /**
      * Deletes a frame, including its image files.
      *
@@ -32,18 +31,6 @@ class DeleteFrameUseCase(private val frameRepository: FrameRepository, private v
         }
 
         val frame = frameResult.getOrNull()!!
-
-        // Delete original image file
-        if (fileManager.fileExists(frame.originalPath)) {
-            fileManager.deleteFile(frame.originalPath)
-        }
-
-        // Delete aligned image file if exists
-        frame.alignedPath?.let { alignedPath ->
-            if (fileManager.fileExists(alignedPath)) {
-                fileManager.deleteFile(alignedPath)
-            }
-        }
 
         // Delete frame from database
         return frameRepository.deleteFrame(frameId)
