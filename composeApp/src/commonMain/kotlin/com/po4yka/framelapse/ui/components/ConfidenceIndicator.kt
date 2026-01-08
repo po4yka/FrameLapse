@@ -80,14 +80,15 @@ fun ConfidenceIndicator(confidence: Float?, modifier: Modifier = Modifier, showP
 
 /**
  * Returns the appropriate color based on confidence level.
+ * Colors are chosen for WCAG AA compliance on dark backgrounds.
  * - Red: < 50% (poor alignment)
- * - Yellow: 50-70% (acceptable alignment)
+ * - Amber: 50-70% (acceptable alignment)
  * - Green: > 70% (good alignment)
  */
 private fun getConfidenceColor(confidence: Float): Color = when {
-    confidence < LOW_CONFIDENCE_THRESHOLD -> Color(0xFFEF5350) // Red
-    confidence < HIGH_CONFIDENCE_THRESHOLD -> Color(0xFFFFCA28) // Yellow/Amber
-    else -> Color(0xFF66BB6A) // Green
+    confidence < LOW_CONFIDENCE_THRESHOLD -> Color(0xFFFF6B6B) // Red (lightened for contrast)
+    confidence < HIGH_CONFIDENCE_THRESHOLD -> Color(0xFFFFB300) // Amber (darkened for contrast)
+    else -> Color(0xFF81C784) // Green (lightened for contrast)
 }
 
 private const val LOW_CONFIDENCE_THRESHOLD = 0.5f

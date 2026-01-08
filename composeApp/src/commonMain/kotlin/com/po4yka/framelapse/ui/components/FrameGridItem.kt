@@ -93,7 +93,7 @@ fun FrameGridItem(
                 is ImageLoadResult.Error -> {
                     Icon(
                         imageVector = Icons.Default.BrokenImage,
-                        contentDescription = null,
+                        contentDescription = "Image unavailable",
                         modifier = Modifier.size(ICON_SIZE),
                         tint = MaterialTheme.colorScheme.outline,
                     )

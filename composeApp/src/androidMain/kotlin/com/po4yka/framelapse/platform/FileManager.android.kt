@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.platform
 
 import android.content.Context
+import android.os.StatFs
 import java.io.File
 
 actual class FileManager(private val context: Context) {
@@ -27,5 +28,12 @@ actual class FileManager(private val context: Context) {
         File(path).mkdirs()
     } catch (e: Exception) {
         false
+    }
+
+    actual fun getAvailableStorageBytes(): Long = try {
+        val stat = StatFs(getAppDirectory())
+        stat.availableBlocksLong * stat.blockSizeLong
+    } catch (e: Exception) {
+        0L
     }
 }

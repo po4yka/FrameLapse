@@ -15,7 +15,7 @@
         errorLine2="        ~~~~~~~~~~~~~~">
         <location
             file="build.gradle.kts"
-            line="110"
+            line="123"
             column="9"/>
     </issue>
 
@@ -109,6 +109,72 @@
 
     <issue
         id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test-junit than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test-junit than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.jetbrains.kotlin:kotlin-test-junit than 2.1.0 is available: 2.2.21"
+        errorLine1="kotlin = &quot;2.1.0&quot;"
+        errorLine2="         ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="3"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
         message="A newer version of androidx.activity:activity-compose than 1.9.3 is available: 1.12.2"
         errorLine1="androidx-activityCompose = &quot;1.9.3&quot;"
         errorLine2="                           ~~~~~~~">
@@ -538,68 +604,35 @@
 
     <issue
         id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-android than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
+        message="A newer version of app.cash.turbine:turbine than 1.2.0 is available: 1.2.1"
+        errorLine1="turbine = &quot;1.2.0&quot;"
+        errorLine2="          ~~~~~~~">
         <location
             file="../gradle/libs.versions.toml"
-            line="24"
-            column="8"/>
+            line="43"
+            column="11"/>
     </issue>
 
     <issue
         id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
+        message="A newer version of app.cash.turbine:turbine than 1.2.0 is available: 1.2.1"
+        errorLine1="turbine = &quot;1.2.0&quot;"
+        errorLine2="          ~~~~~~~">
         <location
             file="../gradle/libs.versions.toml"
-            line="24"
-            column="8"/>
+            line="43"
+            column="11"/>
     </issue>
 
     <issue
         id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
+        message="A newer version of app.cash.turbine:turbine than 1.2.0 is available: 1.2.1"
+        errorLine1="turbine = &quot;1.2.0&quot;"
+        errorLine2="          ~~~~~~~">
         <location
             file="../gradle/libs.versions.toml"
-            line="24"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
-        errorLine1="koin = &quot;4.0.0&quot;"
-        errorLine2="       ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="24"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of app.cash.sqldelight:android-driver than 2.0.2 is available: 2.2.1"
-        errorLine1="sqldelight = &quot;2.0.2&quot;"
-        errorLine2="             ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="27"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.9.0 is available: 1.10.2"
-        errorLine1="coroutines = &quot;1.9.0&quot;"
-        errorLine2="             ~~~~~~~">
-        <location
-            file="../gradle/libs.versions.toml"
-            line="30"
-            column="14"/>
+            line="43"
+            column="11"/>
     </issue>
 
     <issue
@@ -791,6 +824,28 @@
 
     <issue
         id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-android than 4.0.0 is available: 4.1.1"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="24"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="24"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
         message="A newer version of io.insert-koin:koin-compose than 4.0.0 is available: 4.1.1"
         errorLine1="koin = &quot;4.0.0&quot;"
         errorLine2="       ~~~~~~~">
@@ -836,6 +891,28 @@
     <issue
         id="NewerVersionAvailable"
         message="A newer version of io.insert-koin:koin-compose-viewmodel than 4.0.0 is available: 4.1.0"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="24"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
+        errorLine1="koin = &quot;4.0.0&quot;"
+        errorLine2="       ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="24"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.insert-koin:koin-core than 4.0.0 is available: 4.1.1"
         errorLine1="koin = &quot;4.0.0&quot;"
         errorLine2="       ~~~~~~~">
         <location
@@ -912,6 +989,17 @@
 
     <issue
         id="NewerVersionAvailable"
+        message="A newer version of app.cash.sqldelight:android-driver than 2.0.2 is available: 2.2.1"
+        errorLine1="sqldelight = &quot;2.0.2&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="27"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
         message="A newer version of app.cash.sqldelight:coroutines-extensions than 2.0.2 is available: 2.2.1"
         errorLine1="sqldelight = &quot;2.0.2&quot;"
         errorLine2="             ~~~~~~~">
@@ -1000,7 +1088,7 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.9.0 is available: 1.10.2"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.9.0 is available: 1.10.2"
         errorLine1="coroutines = &quot;1.9.0&quot;"
         errorLine2="             ~~~~~~~">
         <location
@@ -1023,6 +1111,50 @@
     <issue
         id="NewerVersionAvailable"
         message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.9.0 is available: 1.10.2"
+        errorLine1="coroutines = &quot;1.9.0&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="30"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-core than 1.9.0 is available: 1.10.2"
+        errorLine1="coroutines = &quot;1.9.0&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="30"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.9.0 is available: 1.10.2"
+        errorLine1="coroutines = &quot;1.9.0&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="30"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.9.0 is available: 1.10.2"
+        errorLine1="coroutines = &quot;1.9.0&quot;"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="30"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.9.0 is available: 1.10.2"
         errorLine1="coroutines = &quot;1.9.0&quot;"
         errorLine2="             ~~~~~~~">
         <location
@@ -1193,6 +1325,39 @@
         <location
             file="../gradle/libs.versions.toml"
             line="39"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.mockk:mockk than 1.13.13 is available: 1.14.7"
+        errorLine1="mockk = &quot;1.13.13&quot;"
+        errorLine2="        ~~~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="44"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.mockk:mockk than 1.13.13 is available: 1.14.7"
+        errorLine1="mockk = &quot;1.13.13&quot;"
+        errorLine2="        ~~~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="44"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of io.mockk:mockk than 1.13.13 is available: 1.14.7"
+        errorLine1="mockk = &quot;1.13.13&quot;"
+        errorLine2="        ~~~~~~~~~">
+        <location
+            file="../gradle/libs.versions.toml"
+            line="44"
             column="9"/>
     </issue>
 
@@ -1201,6 +1366,28 @@
         message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 29. Merge all the resources in this folder into `mipmap-anydpi`.">
         <location
             file="src/androidMain/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.splash_background` appears to be unused"
+        errorLine1="    &lt;color name=&quot;splash_background&quot;>#6650A4&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/res/values/colors.xml"
+            line="4"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.style.Theme_FrameLapse_Splash` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Theme.FrameLapse.Splash&quot; parent=&quot;Theme.FrameLapse&quot;>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/res/values/themes.xml"
+            line="10"
+            column="12"/>
     </issue>
 
     <issue

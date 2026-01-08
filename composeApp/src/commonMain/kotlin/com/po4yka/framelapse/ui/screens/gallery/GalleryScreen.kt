@@ -255,7 +255,7 @@ private fun GalleryBottomBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = null,
+                    contentDescription = "Capture photo",
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text("Capture")
@@ -266,7 +266,7 @@ private fun GalleryBottomBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Movie,
-                    contentDescription = null,
+                    contentDescription = "Export video",
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text("Export")

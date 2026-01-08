@@ -59,7 +59,8 @@ private val DarkColorScheme = darkColorScheme(
     surface = Color(0xFF1C1B1F),
     onSurface = Color(0xFFE6E1E5),
     surfaceVariant = Color(0xFF49454F),
-    onSurfaceVariant = Color(0xFFCAC4D0),
+    // Lightened for WCAG AA compliance (4.5:1 contrast ratio)
+    onSurfaceVariant = Color(0xFFE0DBE6),
     outline = Color(0xFF938F99),
     error = Color(0xFFF2B8B5),
     onError = Color(0xFF601410),

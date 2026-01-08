@@ -93,7 +93,7 @@ fun ProjectCard(
                         is ImageLoadResult.Error -> {
                             Icon(
                                 imageVector = Icons.Default.CameraAlt,
-                                contentDescription = null,
+                                contentDescription = "Failed to load thumbnail",
                                 modifier = Modifier.size(ICON_SIZE),
                                 tint = MaterialTheme.colorScheme.outline,
                             )
@@ -102,7 +102,7 @@ fun ProjectCard(
                 } else {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = null,
+                        contentDescription = "No thumbnail available",
                         modifier = Modifier.size(ICON_SIZE),
                         tint = MaterialTheme.colorScheme.outline,
                     )

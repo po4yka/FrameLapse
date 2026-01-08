@@ -3,7 +3,10 @@ package com.po4yka.framelapse.platform
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSFileSystemFreeSize
+import platform.Foundation.NSNumber
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
 @OptIn(ExperimentalForeignApi::class)
@@ -45,5 +48,15 @@ actual class FileManager {
         )
     } catch (e: Exception) {
         false
+    }
+
+    actual fun getAvailableStorageBytes(): Long = try {
+        val appDir = getAppDirectory()
+        val url = NSURL.fileURLWithPath(appDir)
+        val attributes = fileManager.attributesOfFileSystemForPath(appDir, null)
+        val freeSize = attributes?.get(NSFileSystemFreeSize) as? NSNumber
+        freeSize?.longLongValue ?: 0L
+    } catch (e: Exception) {
+        0L
     }
 }

@@ -5,4 +5,9 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+
+    <!-- Base Splash Theme for pre-API 31 (no splash screen API) -->
+    <style name="Theme.FrameLapse.Splash" parent="Theme.FrameLapse">
+        <!-- Uses standard theme on older devices -->
+    </style>
 </resources>

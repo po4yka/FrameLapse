@@ -80,7 +80,7 @@ fun ErrorScreen(message: String, onRetry: () -> Unit, modifier: Modifier = Modif
     ) {
         Icon(
             imageVector = Icons.Default.Warning,
-            contentDescription = null,
+            contentDescription = "Error",
             modifier = Modifier.size(ICON_SIZE),
             tint = MaterialTheme.colorScheme.error,
         )

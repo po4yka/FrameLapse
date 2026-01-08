@@ -7,6 +7,54 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 /**
+ * Error types for storage operations.
+ */
+sealed class StorageError(message: String) : Exception(message) {
+    /**
+     * Insufficient storage space available.
+     */
+    class InsufficientStorage(val requiredBytes: Long, val availableBytes: Long) :
+        StorageError(
+            "Insufficient storage: requires $requiredBytes bytes, but only $availableBytes available",
+        ) {
+        /**
+         * User-friendly error message.
+         */
+        val userMessage: String
+            get() = "Not enough storage space. Need ${formatBytes(requiredBytes)}, " +
+                "but only ${formatBytes(availableBytes)} available."
+
+        private fun formatBytes(bytes: Long): String = when {
+            bytes >= 1_000_000_000 -> "%.1f GB".format(bytes / 1_000_000_000.0)
+            bytes >= 1_000_000 -> "%.1f MB".format(bytes / 1_000_000.0)
+            bytes >= 1_000 -> "%.1f KB".format(bytes / 1_000.0)
+            else -> "$bytes bytes"
+        }
+    }
+
+    /**
+     * Failed to write file to storage.
+     */
+    class WriteFailure(val path: String, cause: Throwable? = null) :
+        StorageError(
+            "Failed to write file: $path${cause?.message?.let { " - $it" } ?: ""}",
+        )
+
+    /**
+     * Failed to read file from storage.
+     */
+    class ReadFailure(val path: String, cause: Throwable? = null) :
+        StorageError(
+            "Failed to read file: $path${cause?.message?.let { " - $it" } ?: ""}",
+        )
+
+    /**
+     * File or directory not found.
+     */
+    class NotFound(val path: String) : StorageError("File not found: $path")
+}
+
+/**
  * Manages image file storage for projects.
  * Handles saving, retrieving, and deleting frame images.
  */
@@ -134,10 +182,64 @@ class ImageStorageManager(private val fileManager: FileManager) {
         }
     }
 
+    /**
+     * Gets the available storage space in bytes.
+     *
+     * @return Available bytes on the storage device.
+     */
+    fun getAvailableStorageBytes(): Long = fileManager.getAvailableStorageBytes()
+
+    /**
+     * Checks if there is sufficient storage space for an operation.
+     *
+     * @param requiredBytes The number of bytes needed.
+     * @return Result.Success if sufficient space, Result.Error with InsufficientStorage otherwise.
+     */
+    fun checkStorageAvailable(requiredBytes: Long): Result<Unit> {
+        val availableBytes = getAvailableStorageBytes()
+        return if (availableBytes >= requiredBytes) {
+            Result.Success(Unit)
+        } else {
+            Result.Error(
+                StorageError.InsufficientStorage(requiredBytes, availableBytes),
+                "Not enough storage space",
+            )
+        }
+    }
+
+    /**
+     * Checks if there is sufficient storage space with a safety margin.
+     * Adds a buffer to account for filesystem overhead.
+     *
+     * @param requiredBytes The number of bytes needed.
+     * @param marginPercent Additional margin percentage (default 10%).
+     * @return Result.Success if sufficient space, Result.Error with InsufficientStorage otherwise.
+     */
+    fun checkStorageAvailableWithMargin(
+        requiredBytes: Long,
+        marginPercent: Int = DEFAULT_STORAGE_MARGIN_PERCENT,
+    ): Result<Unit> {
+        val requiredWithMargin = requiredBytes + (requiredBytes * marginPercent / 100)
+        return checkStorageAvailable(requiredWithMargin)
+    }
+
+    /**
+     * Checks if storage is critically low (below minimum threshold).
+     *
+     * @return True if available storage is below the minimum threshold.
+     */
+    fun isStorageCriticallyLow(): Boolean = getAvailableStorageBytes() < MIN_STORAGE_THRESHOLD_BYTES
+
     companion object {
         const val FRAMES_DIR = "frames"
         const val ALIGNED_DIR = "aligned"
         const val THUMBNAILS_DIR = "thumbnails"
         const val DEFAULT_THUMBNAIL_NAME = "thumbnail.jpg"
+
+        /** Minimum storage threshold (50 MB) below which operations should be blocked. */
+        const val MIN_STORAGE_THRESHOLD_BYTES = 50L * 1024 * 1024
+
+        /** Default safety margin percentage for storage checks. */
+        const val DEFAULT_STORAGE_MARGIN_PERCENT = 10
     }
 }

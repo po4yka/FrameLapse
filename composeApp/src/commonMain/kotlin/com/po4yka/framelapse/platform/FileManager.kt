@@ -42,4 +42,11 @@ expect class FileManager {
      * @return True if creation was successful
      */
     fun createDirectory(path: String): Boolean
+
+    /**
+     * Returns the available storage space in bytes.
+     *
+     * @return Available bytes on the storage device
+     */
+    fun getAvailableStorageBytes(): Long
 }

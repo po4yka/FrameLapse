@@ -63,7 +63,7 @@ fun PermissionDeniedScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.CameraAlt,
-                contentDescription = null,
+                contentDescription = "Camera permission required",
                 modifier = Modifier.size(96.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
