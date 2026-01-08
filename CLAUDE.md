@@ -4,13 +4,15 @@
 
 **FrameLapse** is a Kotlin Multiplatform (KMP) application for creating stabilized daily self-portrait timelapse videos. It automatically aligns facial photographs using ML-based landmark detection and compiles them into smooth timelapse videos.
 
+**Status:** Production-ready (all core features implemented)
+
 ## Quick Commands
 
 ```shell
 # Build Android debug APK
 ./gradlew :composeApp:assembleDebug
 
-# Build Android release APK
+# Build Android release APK (requires signing config)
 ./gradlew :composeApp:assembleRelease
 
 # Run all tests
@@ -19,11 +21,9 @@
 # Run Android unit tests
 ./gradlew :composeApp:testDebugUnitTest
 
-# Static analysis (run after every change)
-./gradlew staticAnalysis          # Run all checks (Spotless + Detekt + Lint)
+# Static analysis
 ./gradlew spotlessCheck           # Check code formatting
 ./gradlew spotlessApply           # Auto-fix formatting issues
-./gradlew detekt                  # Run Detekt static analysis
 ./gradlew :composeApp:lintDebug   # Run Android Lint
 
 # Clean build
@@ -50,11 +50,23 @@ Platform Layer (expect/actual native implementations)
 
 ```
 /composeApp/src/
-├── commonMain/kotlin/     # Shared business logic, UI, ViewModels
-├── androidMain/kotlin/    # Android implementations (CameraX, MediaPipe, MediaCodec)
-└── iosMain/kotlin/        # iOS implementations (AVFoundation, Vision, AVAssetWriter)
+├── commonMain/kotlin/           # Shared business logic, UI, ViewModels
+│   └── com/po4yka/framelapse/
+│       ├── data/                # Repositories, local data sources, storage
+│       ├── di/                  # Koin dependency injection modules
+│       ├── domain/              # Entities, use cases, repository interfaces
+│       ├── navigation/          # Navigation routes and controller
+│       ├── platform/            # expect declarations for platform code
+│       ├── presentation/        # ViewModels with State/Event/Effect pattern
+│       └── ui/                  # Compose UI (screens, components, theme)
+├── commonMain/composeResources/ # Localized string resources
+├── commonMain/sqldelight/       # Database schema
+├── commonTest/kotlin/           # Shared unit tests
+├── androidMain/kotlin/          # Android implementations (CameraX, MediaPipe)
+├── androidUnitTest/kotlin/      # Android-specific tests with MockK
+└── iosMain/kotlin/              # iOS implementations (AVFoundation, Vision)
 
-/iosApp/                   # iOS app entry point and SwiftUI code
+/iosApp/                         # iOS app entry point
 ```
 
 ## Key Patterns
@@ -62,36 +74,41 @@ Platform Layer (expect/actual native implementations)
 ### expect/actual for Platform Code
 ```kotlin
 // In commonMain
-expect class ImageProcessor {
-    fun detectFace(image: ByteArray): FaceLandmarks?
+expect class FaceDetector {
+    suspend fun detect(imageBytes: ByteArray): FaceLandmarks?
 }
 
-// In androidMain
-actual class ImageProcessor {
-    actual fun detectFace(image: ByteArray): FaceLandmarks? {
-        // MediaPipe/ML Kit implementation
-    }
-}
-
-// In iosMain
-actual class ImageProcessor {
-    actual fun detectFace(image: ByteArray): FaceLandmarks? {
-        // Vision Framework implementation
-    }
-}
+// In androidMain - MediaPipe implementation
+// In iosMain - Vision Framework implementation
 ```
 
-### ViewModel State Pattern
+### ViewModel State Pattern (UDF)
 ```kotlin
 data class CaptureState(
     val isProcessing: Boolean = false,
-    val currentFrame: Frame? = null,
-    val ghostImage: ImageBitmap? = null
+    val frameCount: Int = 0,
+    val ghostImagePath: String? = null,
+    val faceDetectionConfidence: Float? = null
 )
 
-class CaptureViewModel : ViewModel() {
-    private val _state = MutableStateFlow(CaptureState())
-    val state: StateFlow<CaptureState> = _state.asStateFlow()
+sealed class CaptureEvent {
+    data class Initialize(val projectId: String) : CaptureEvent()
+    object CaptureImage : CaptureEvent()
+    object ToggleFlash : CaptureEvent()
+}
+
+sealed class CaptureEffect {
+    data class ShowError(val message: String) : CaptureEffect()
+    object PlayCaptureSound : CaptureEffect()
+}
+```
+
+### Result<T> Error Handling
+```kotlin
+sealed class Result<out T> {
+    data class Success<T>(val data: T) : Result<T>()
+    data class Error(val exception: Throwable, val message: String? = null) : Result<Nothing>()
+    object Loading : Result<Nothing>()
 }
 ```
 
@@ -109,6 +126,7 @@ class CaptureViewModel : ViewModel() {
 | Face Detection (iOS) | Vision Framework |
 | Video Encoding (Android) | MediaCodec |
 | Video Encoding (iOS) | AVAssetWriter |
+| Testing | kotlin-test, Turbine, MockK |
 
 ## Core Domain Entities
 
@@ -116,6 +134,7 @@ class CaptureViewModel : ViewModel() {
 - `Frame` - Individual photo with metadata (timestamp, alignment data, confidence)
 - `AlignmentSettings` - Configuration for face alignment algorithm
 - `FaceLandmarks` - 478 3D facial landmark points
+- `ExportSettings` - Video export configuration (resolution, FPS, codec, quality)
 
 ## Key Use Cases
 
@@ -123,37 +142,70 @@ class CaptureViewModel : ViewModel() {
 - `AlignFaceUseCase` - Aligns face to reference coordinates
 - `CompileVideoUseCase` - Generates timelapse video from frames
 - `ImportPhotosUseCase` - Batch imports photos from gallery
+- `ValidateAlignmentUseCase` - Validates face detection quality
+- `CalculateAlignmentMatrixUseCase` - Computes affine transformation
 
 ## Static Analysis
 
-The project uses strict static analysis with warnings treated as errors:
+The project uses strict static analysis:
 
 | Tool | Purpose | Config File |
 |------|---------|-------------|
 | Spotless | Code formatting (ktlint backend) | `.editorconfig` |
-| Detekt | Kotlin static analysis + Compose rules | `config/detekt/detekt.yml` |
 | Android Lint | Android-specific checks | `composeApp/build.gradle.kts` |
 
-**Always run `./gradlew staticAnalysis` after making changes.** This runs all checks and will fail on any violations.
-
-To auto-fix formatting issues: `./gradlew spotlessApply`
+**Always run `./gradlew spotlessApply` after making changes.**
 
 ## Coding Conventions
 
 - Use Kotlin 2.x features
 - Prefer immutable data classes for state
-- Use StateFlow for UI state, SharedFlow for events
+- Use StateFlow for UI state, SharedFlow for one-time effects
 - Keep platform code minimal - maximize shared logic
 - Follow Material 3 design guidelines for UI
 - Use suspend functions for async operations
-- Handle errors with Result<T> or sealed classes
+- Handle errors with Result<T> sealed class
+- All UI strings should be in composeResources for localization
 
 ## Testing Strategy
 
-- Unit tests in `commonTest` for shared logic
-- Platform-specific tests in `androidTest`/`iosTest`
-- UI tests using Compose testing APIs
-- Integration tests for database operations
+The project has comprehensive test coverage:
+
+- **commonTest**: Pure Kotlin tests for domain logic and use cases
+- **androidUnitTest**: Android-specific tests with MockK for mocking
+- **Test Utilities**: FakeRepositories, TestFixtures for test data
+
+Key testing patterns:
+```kotlin
+@Test
+fun `invoke returns error when projectId is blank`() = runTest {
+    val result = useCase("")
+    assertTrue(result is Result.Error)
+}
+
+// Flow testing with Turbine
+viewModel.state.test {
+    viewModel.onEvent(LoadProjects)
+    assertEquals(expectedProjects, awaitItem().projects)
+}
+```
+
+## Release Configuration
+
+### Android Signing (Environment Variables)
+```shell
+KEYSTORE_FILE=/path/to/keystore
+KEYSTORE_PASSWORD=password
+KEY_ALIAS=framelapse
+KEY_PASSWORD=password
+```
+
+### Version Management
+Versions are managed in `gradle.properties`:
+```properties
+VERSION_NAME=1.0.0
+VERSION_CODE=1
+```
 
 ## Important Notes
 
@@ -162,3 +214,6 @@ To auto-fix formatting issues: `./gradlew spotlessApply`
 - Video encoding uses hardware acceleration (no FFmpeg bundled)
 - Images stored in app sandbox, not public gallery
 - Minimum face confidence threshold: 0.7
+- Storage availability is checked before write operations
+- Accessibility: All interactive elements have content descriptions
+- Colors comply with WCAG AA contrast requirements

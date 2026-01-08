@@ -10,26 +10,36 @@ A Kotlin Multiplatform application for creating stabilized daily self-portrait t
 ### Photo Capture & Import
 - Built-in camera with ghost/guide photo overlay for consistent positioning
 - Grid overlay for manual frame alignment
+- Adjustable ghost image opacity
 - Batch import from device gallery
-- Photo sorting by date, filename, or custom order
+- Front/back camera switching with flash control
 
 ### Automatic Face Alignment
 - Facial landmark detection (478 3D landmarks)
 - Affine transformation for eye position standardization
 - Automatic scaling and rotation correction
 - Confidence thresholds for quality assurance
+- Real-time face detection feedback
 
 ### Video Compilation
-- Adjustable frame rate (24, 30, 60 FPS)
+- Adjustable frame rate (1-60 FPS)
 - Multiple resolution options (480p to 4K)
 - Hardware-accelerated encoding (H.264/HEVC)
-- Export to MP4/MOV formats
+- Quality presets (Low, Medium, High, Ultra)
+- Export progress tracking with cancellation support
 
 ### Project Management
-- Multi-project support
-- Frame reordering and deletion
-- Color grading and filters
+- Multi-project support with thumbnails
+- Frame selection, reordering, and deletion
+- Date-based frame organization
+- Daily reminder notifications
 - Local-first storage (no cloud required)
+
+### Accessibility & Localization
+- Full screen reader support with content descriptions
+- WCAG AA color contrast compliance
+- Touch target size optimization (48dp minimum)
+- Localization-ready string resources
 
 ## Architecture
 
@@ -53,7 +63,7 @@ FrameLapse follows **Clean Architecture** with **Unidirectional Data Flow (UDF)*
                   │
 ┌─────────────────▼───────────────────────┐
 │          Data Layer                     │
-│    (Repositories, SQLDelight, Okio)     │
+│    (Repositories, SQLDelight)           │
 └─────────────────┬───────────────────────┘
                   │
 ┌─────────────────▼───────────────────────┐
@@ -80,10 +90,14 @@ FrameLapse follows **Clean Architecture** with **Unidirectional Data Flow (UDF)*
 ```
 /composeApp
 ├── /src
-│   ├── /commonMain     # Shared code for all platforms
-│   ├── /androidMain    # Android-specific implementations
-│   └── /iosMain        # iOS-specific implementations
-/iosApp                 # iOS application entry point
+│   ├── /commonMain      # Shared code for all platforms
+│   │   ├── /kotlin      # Business logic, UI, ViewModels
+│   │   ├── /sqldelight  # Database schema
+│   │   └── /composeResources  # Localized strings
+│   ├── /commonTest      # Shared unit tests
+│   ├── /androidMain     # Android-specific implementations
+│   └── /iosMain         # iOS-specific implementations
+/iosApp                  # iOS application entry point
 ```
 
 ## Building
@@ -96,14 +110,18 @@ FrameLapse follows **Clean Architecture** with **Unidirectional Data Flow (UDF)*
 ### Android
 
 ```shell
-# macOS/Linux
+# Debug build
 ./gradlew :composeApp:assembleDebug
 
-# Windows
-.\gradlew.bat :composeApp:assembleDebug
-```
+# Release build (requires signing configuration)
+./gradlew :composeApp:assembleRelease
 
-Or use the run configuration in Android Studio.
+# Run tests
+./gradlew :composeApp:testDebugUnitTest
+
+# Static analysis
+./gradlew spotlessCheck :composeApp:lintDebug
+```
 
 ### iOS
 
@@ -113,15 +131,55 @@ Open the `/iosApp` directory in Xcode and run, or use the run configuration in y
 
 1. **Capture** - Camera captures photo or imports from gallery
 2. **Detection** - ML model detects face and extracts 478 landmarks
-3. **Alignment** - Calculates affine transformation matrix
-4. **Transform** - Warps and crops image to standardized position
-5. **Storage** - Saves aligned image and metadata to database
-6. **Compilation** - Hardware encoder assembles frames into video
+3. **Validation** - Confidence check ensures face quality
+4. **Alignment** - Calculates affine transformation matrix
+5. **Transform** - Warps and crops image to standardized position
+6. **Storage** - Saves aligned image and metadata to database
+7. **Compilation** - Hardware encoder assembles frames into video
+
+## Testing
+
+The project includes comprehensive test coverage:
+
+- **Unit Tests**: Domain layer use cases, alignment algorithms
+- **Integration Tests**: Repository implementations, database operations
+- **ViewModel Tests**: State management, event/effect handling
+
+```shell
+# Run all tests
+./gradlew test
+
+# Run Android unit tests
+./gradlew :composeApp:testDebugUnitTest
+```
+
+## Release Configuration
+
+### Android Signing
+
+Release builds require signing configuration via environment variables:
+
+```shell
+export KEYSTORE_FILE=/path/to/release.keystore
+export KEYSTORE_PASSWORD=your_keystore_password
+export KEY_ALIAS=framelapse
+export KEY_PASSWORD=your_key_password
+```
+
+### Version Management
+
+Version information is managed in `gradle.properties`:
+
+```properties
+VERSION_NAME=1.0.0
+VERSION_CODE=1
+```
 
 ## Documentation
 
 - [Architecture Details](./Architecture.md) - Technical implementation details
 - [Feature Research](./Daily_Selfie_Timelapse_Apps.md) - Comprehensive feature and technology analysis
+- [Agent Definitions](./AGENTS.md) - Specialized AI agents for development tasks
 
 ## License
 
