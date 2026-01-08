@@ -27,10 +27,17 @@ actual fun rememberPhotoPickerLauncher(onResult: (PhotoPickerResult) -> Unit): P
     val multiplePhotoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
     ) { uris: List<Uri> ->
-        if (uris.isEmpty()) {
+        val limit = pendingMaxItems
+        val limitedUris = if (limit > 0 && uris.size > limit) {
+            uris.take(limit)
+        } else {
+            uris
+        }
+
+        if (limitedUris.isEmpty()) {
             onResult(PhotoPickerResult.Cancelled)
         } else {
-            val paths = uris.mapNotNull { uri ->
+            val paths = limitedUris.mapNotNull { uri ->
                 copyUriToInternalStorage(context, uri)
             }
             if (paths.isEmpty()) {

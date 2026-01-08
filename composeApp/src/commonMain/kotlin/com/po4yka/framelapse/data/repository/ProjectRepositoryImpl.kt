@@ -71,7 +71,10 @@ class ProjectRepositoryImpl(
     }
 
     override suspend fun deleteProject(id: String): Result<Unit> = try {
-        cleanupManager.cleanupProject(id)
+        val cleanupResult = cleanupManager.cleanupProject(id)
+        if (cleanupResult is Result.Error) {
+            return cleanupResult
+        }
         localDataSource.delete(id)
         Result.Success(Unit)
     } catch (e: Exception) {

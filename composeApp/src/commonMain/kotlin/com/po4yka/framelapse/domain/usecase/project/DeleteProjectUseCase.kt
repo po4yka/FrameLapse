@@ -36,19 +36,43 @@ class DeleteProjectUseCase(
             )
         }
 
+        // Delete frame files (including imported photos outside project directory)
+        val framesResult = frameRepository.getFramesByProject(projectId)
+        if (framesResult.isError) {
+            return Result.Error(
+                framesResult.exceptionOrNull()!!,
+                "Failed to retrieve project frames",
+            )
+        }
+
+        val frames = framesResult.getOrNull()!!
+        val deleteErrors = mutableListOf<String>()
+
+        fun deleteIfExists(path: String) {
+            if (fileManager.fileExists(path) && !fileManager.deleteFile(path)) {
+                deleteErrors.add(path)
+            }
+        }
+
+        for (frame in frames) {
+            deleteIfExists(frame.originalPath)
+            frame.alignedPath?.let { deleteIfExists(it) }
+        }
+
+        if (deleteErrors.isNotEmpty()) {
+            return Result.Error(
+                IllegalStateException("Failed to delete frame files: ${deleteErrors.joinToString()}"),
+                "Failed to delete some project files",
+            )
+        }
+
         // Delete all frames from database (cascade should handle this, but be explicit)
         val deleteFramesResult = frameRepository.deleteFramesByProject(projectId)
         if (deleteFramesResult.isError) {
             return deleteFramesResult
         }
 
-        // Delete project directory and all files
-        val projectDir = fileManager.getProjectDirectory(projectId)
-        if (fileManager.fileExists(projectDir)) {
-            fileManager.deleteFile(projectDir)
-        }
-
-        // Delete project from database
+        // Delete project and cleanup remaining files
         return projectRepository.deleteProject(projectId)
     }
 }

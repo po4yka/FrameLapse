@@ -50,7 +50,6 @@ allprojects {
                     ),
                 )
             trimTrailingWhitespace()
-            indentWithSpaces(4)
             endWithNewline()
         }
         kotlinGradle {
