@@ -189,4 +189,4 @@ VERSION_CODE=1
 
 ## License
 
-[Add license information]
+All rights reserved. See `LICENSE` for details.
