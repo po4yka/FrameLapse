@@ -97,7 +97,16 @@ class ValidateAlignmentUseCase {
     data class ValidationResult(val isValid: Boolean, val issues: List<String>)
 
     companion object {
-        private const val MIN_EYE_DISTANCE = 10f
-        private const val MIN_FACE_SIZE = 50f
+        /**
+         * Minimum eye distance in normalized coordinates (0-1).
+         * ~2% of image width is a reasonable minimum for valid eye detection.
+         */
+        private const val MIN_EYE_DISTANCE = 0.02f
+
+        /**
+         * Minimum face size in normalized coordinates (0-1).
+         * ~10% of image width/height is a reasonable minimum for a detectable face.
+         */
+        private const val MIN_FACE_SIZE = 0.1f
     }
 }

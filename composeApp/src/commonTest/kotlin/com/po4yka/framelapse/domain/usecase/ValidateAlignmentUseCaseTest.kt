@@ -150,10 +150,10 @@ class ValidateAlignmentUseCaseTest {
 
     @Test
     fun `validateEyeDistance returns false for very close eyes`() {
-        // Given: Eyes barely separated (less than MIN_EYE_DISTANCE = 10f)
+        // Given: Eyes barely separated (less than MIN_EYE_DISTANCE = 0.02 normalized)
         val landmarks = TestFixtures.createFaceLandmarks(
-            leftEyeCenter = LandmarkPoint(100f, 100f, 0f),
-            rightEyeCenter = LandmarkPoint(105f, 100f, 0f),
+            leftEyeCenter = LandmarkPoint(0.50f, 0.40f, 0f),
+            rightEyeCenter = LandmarkPoint(0.51f, 0.40f, 0f), // Only 0.01 distance
         )
 
         // When
@@ -179,9 +179,9 @@ class ValidateAlignmentUseCaseTest {
 
     @Test
     fun `validateBoundingBox returns true for valid box`() {
-        // Given
+        // Given: Box with width and height > MIN_FACE_SIZE (0.1 normalized)
         val landmarks = TestFixtures.createFaceLandmarks(
-            boundingBox = BoundingBox(100f, 100f, 400f, 500f),
+            boundingBox = BoundingBox(0.1f, 0.1f, 0.8f, 0.9f), // width=0.7, height=0.8
         )
 
         // When
@@ -193,9 +193,9 @@ class ValidateAlignmentUseCaseTest {
 
     @Test
     fun `validateBoundingBox returns false for narrow box`() {
-        // Given: Box width less than MIN_FACE_SIZE (50f)
+        // Given: Box width less than MIN_FACE_SIZE (0.1 normalized)
         val landmarks = TestFixtures.createFaceLandmarks(
-            boundingBox = BoundingBox(100f, 100f, 130f, 400f), // width = 30
+            boundingBox = BoundingBox(0.4f, 0.1f, 0.45f, 0.8f), // width = 0.05
         )
 
         // When
@@ -207,9 +207,9 @@ class ValidateAlignmentUseCaseTest {
 
     @Test
     fun `validateBoundingBox returns false for short box`() {
-        // Given: Box height less than MIN_FACE_SIZE (50f)
+        // Given: Box height less than MIN_FACE_SIZE (0.1 normalized)
         val landmarks = TestFixtures.createFaceLandmarks(
-            boundingBox = BoundingBox(100f, 100f, 400f, 130f), // height = 30
+            boundingBox = BoundingBox(0.1f, 0.4f, 0.8f, 0.45f), // height = 0.05
         )
 
         // When
@@ -223,7 +223,7 @@ class ValidateAlignmentUseCaseTest {
     fun `validateBoundingBox returns false for negative coordinates`() {
         // Given: Box with negative left coordinate
         val landmarks = TestFixtures.createFaceLandmarks(
-            boundingBox = BoundingBox(-10f, 100f, 400f, 500f),
+            boundingBox = BoundingBox(-0.1f, 0.1f, 0.8f, 0.9f),
         )
 
         // When
@@ -302,9 +302,9 @@ class ValidateAlignmentUseCaseTest {
 
     @Test
     fun `getDetailedValidation reports face size issue`() {
-        // Given
+        // Given: Box with width and height < MIN_FACE_SIZE (0.1 normalized)
         val landmarks = TestFixtures.createFaceLandmarks(
-            boundingBox = BoundingBox(100f, 100f, 120f, 120f),
+            boundingBox = BoundingBox(0.4f, 0.4f, 0.45f, 0.45f), // width=0.05, height=0.05
         )
 
         // When

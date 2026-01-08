@@ -14,9 +14,7 @@ import com.po4yka.framelapse.domain.util.Result
  * The matched keypoint pairs can then be used to compute a homography
  * matrix for perspective-corrected alignment.
  */
-class MatchLandscapeFeaturesUseCase(
-    private val featureMatcher: FeatureMatcher,
-) {
+class MatchLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Matches features between source and reference landmarks.
      *

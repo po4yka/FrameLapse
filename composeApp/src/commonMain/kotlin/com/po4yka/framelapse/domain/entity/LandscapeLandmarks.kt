@@ -82,8 +82,7 @@ data class LandscapeLandmarks(
      * Returns the top N keypoints by response strength.
      * Useful for matching only the most distinctive features.
      */
-    fun getTopKeypoints(n: Int): List<FeatureKeypoint> =
-        keypoints.sortedByDescending { it.response }.take(n)
+    fun getTopKeypoints(n: Int): List<FeatureKeypoint> = keypoints.sortedByDescending { it.response }.take(n)
 
     /**
      * Returns keypoints within a specific region of the image.
@@ -93,14 +92,10 @@ data class LandscapeLandmarks(
      * @param right Right boundary (0-1 normalized).
      * @param bottom Bottom boundary (0-1 normalized).
      */
-    fun getKeypointsInRegion(
-        left: Float,
-        top: Float,
-        right: Float,
-        bottom: Float,
-    ): List<FeatureKeypoint> = keypoints.filter { kp ->
-        kp.position.x in left..right && kp.position.y in top..bottom
-    }
+    fun getKeypointsInRegion(left: Float, top: Float, right: Float, bottom: Float): List<FeatureKeypoint> =
+        keypoints.filter { kp ->
+            kp.position.x in left..right && kp.position.y in top..bottom
+        }
 
     /**
      * Checks if there are enough keypoints for reliable matching.

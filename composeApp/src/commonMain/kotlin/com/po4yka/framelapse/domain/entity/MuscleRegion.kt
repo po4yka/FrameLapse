@@ -7,10 +7,7 @@ import kotlinx.serialization.Serializable
  * Each region uses different body keypoints to determine crop bounds.
  */
 @Serializable
-enum class MuscleRegion(
-    val displayName: String,
-    val description: String,
-) {
+enum class MuscleRegion(val displayName: String, val description: String) {
     /**
      * Full body crop from head to feet.
      * Uses: nose (top), ankles (bottom), shoulders/hips (sides).
@@ -48,7 +45,6 @@ enum class MuscleRegion(
          * Parse region from string name.
          * Returns FULL_BODY as default for unknown values.
          */
-        fun fromString(value: String): MuscleRegion =
-            entries.find { it.name == value } ?: FULL_BODY
+        fun fromString(value: String): MuscleRegion = entries.find { it.name == value } ?: FULL_BODY
     }
 }

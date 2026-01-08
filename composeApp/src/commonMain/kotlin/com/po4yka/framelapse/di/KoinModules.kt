@@ -14,23 +14,16 @@ import com.po4yka.framelapse.data.storage.VideoStorageManager
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
-import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
-import com.po4yka.framelapse.domain.usecase.export.CompileVideoUseCase
-import com.po4yka.framelapse.domain.usecase.export.ExportGifUseCase
 import com.po4yka.framelapse.domain.usecase.alignment.AlignContentUseCase
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.body.DetectBodyPoseUseCase
 import com.po4yka.framelapse.domain.usecase.body.MultiPassBodyStabilizationUseCase
 import com.po4yka.framelapse.domain.usecase.body.ValidateBodyAlignmentUseCase
+import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
+import com.po4yka.framelapse.domain.usecase.export.CompileVideoUseCase
+import com.po4yka.framelapse.domain.usecase.export.ExportGifUseCase
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
-import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
-import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
-import com.po4yka.framelapse.domain.usecase.landscape.DetectLandscapeFeaturesUseCase
-import com.po4yka.framelapse.domain.usecase.landscape.MatchLandscapeFeaturesUseCase
-import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
-import com.po4yka.framelapse.domain.usecase.muscle.CalculateMuscleRegionBoundsUseCase
-import com.po4yka.framelapse.domain.usecase.muscle.CropToMuscleRegionUseCase
 import com.po4yka.framelapse.domain.usecase.face.CalculateAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.face.CalculateStabilizationScoreUseCase
 import com.po4yka.framelapse.domain.usecase.face.DetectFaceUseCase
@@ -45,6 +38,13 @@ import com.po4yka.framelapse.domain.usecase.frame.DeleteFrameUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetFramesUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetLatestFrameUseCase
 import com.po4yka.framelapse.domain.usecase.frame.ImportPhotosUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.DetectLandscapeFeaturesUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.MatchLandscapeFeaturesUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.CalculateMuscleRegionBoundsUseCase
+import com.po4yka.framelapse.domain.usecase.muscle.CropToMuscleRegionUseCase
 import com.po4yka.framelapse.domain.usecase.project.CreateProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.DeleteProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
@@ -200,6 +200,9 @@ val domainModule = module {
             imageProcessor = get(),
             frameRepository = get(),
             fileManager = get(),
+            detectFeatures = get(),
+            matchFeatures = get(),
+            calculateHomography = get(),
         )
     }
 
@@ -215,7 +218,7 @@ val domainModule = module {
 
     // Export Use Cases
     factory { CompileVideoUseCase(get(), get(), get()) }
-    factory { ExportGifUseCase(get(), get(), get()) }
+    factory { ExportGifUseCase(get(), get(), get(), get()) }
 
     // Capture Use Cases (CameraController passed at runtime from UI layer)
     factory { CaptureImageUseCase(get(), get(), get()) }

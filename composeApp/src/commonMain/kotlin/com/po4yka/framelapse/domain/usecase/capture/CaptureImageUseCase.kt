@@ -75,7 +75,11 @@ class CaptureImageUseCase(
 
         // Perform face alignment if requested
         if (alignFace) {
-            val alignResult = alignFaceUseCase(frame, alignmentSettings)
+            val alignResult = alignFaceUseCase(
+                frame = frame,
+                referenceFrame = null,
+                settings = alignmentSettings,
+            )
             if (alignResult.isSuccess) {
                 frame = alignResult.getOrNull()!!
             }

@@ -75,9 +75,9 @@ import framelapse.composeapp.generated.resources.cd_toggle_grid
 import framelapse.composeapp.generated.resources.frame_count
 import framelapse.composeapp.generated.resources.nav_gallery
 import framelapse.composeapp.generated.resources.percentage_value
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.jetbrains.compose.resources.stringResource
 
 private val CONTROL_BUTTON_SIZE = 48.dp
 private val CAPTURE_BUTTON_SIZE = 72.dp

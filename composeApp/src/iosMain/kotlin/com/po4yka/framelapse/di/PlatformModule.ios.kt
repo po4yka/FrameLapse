@@ -3,6 +3,7 @@ package com.po4yka.framelapse.di
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.FeatureMatcher
+import com.po4yka.framelapse.domain.service.GifEncoder
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.NotificationScheduler
 import com.po4yka.framelapse.domain.service.ShareHandler
@@ -13,6 +14,7 @@ import com.po4yka.framelapse.platform.DatabaseDriverFactory
 import com.po4yka.framelapse.platform.FaceDetectorImpl
 import com.po4yka.framelapse.platform.FeatureMatcherImpl
 import com.po4yka.framelapse.platform.FileManager
+import com.po4yka.framelapse.platform.GifEncoderImpl
 import com.po4yka.framelapse.platform.ImageProcessorImpl
 import com.po4yka.framelapse.platform.NotificationSchedulerImpl
 import com.po4yka.framelapse.platform.ShareHandlerImpl
@@ -29,6 +31,7 @@ actual val platformModule: Module = module {
     single<BodyPoseDetector> { BodyPoseDetectorImpl() }
     single<FeatureMatcher> { FeatureMatcherImpl() }
     single<VideoEncoder> { VideoEncoderImpl() }
+    single<GifEncoder> { GifEncoderImpl() }
     single<NotificationScheduler> { NotificationSchedulerImpl() }
     single<ShareHandler> { ShareHandlerImpl() }
     single<SoundPlayer> { SoundPlayerImpl() }

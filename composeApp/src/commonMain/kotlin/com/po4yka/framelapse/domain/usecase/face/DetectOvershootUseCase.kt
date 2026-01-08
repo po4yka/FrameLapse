@@ -60,7 +60,7 @@ class DetectOvershootUseCase {
      * @param currentScore Current alignment score value.
      * @return OvershootCorrection with calculated overshoot values.
      */
-    fun invoke(
+    operator fun invoke(
         detectedLeftEyeX: Float,
         detectedLeftEyeY: Float,
         detectedRightEyeX: Float,

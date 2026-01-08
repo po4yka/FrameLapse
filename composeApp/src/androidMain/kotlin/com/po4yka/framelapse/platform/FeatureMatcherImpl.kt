@@ -7,7 +7,6 @@ import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.FeatureDetectorType
 import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.HomographyMatrix
-import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
 import com.po4yka.framelapse.domain.service.FeatureMatchResult
 import com.po4yka.framelapse.domain.service.FeatureMatcher
@@ -20,7 +19,6 @@ import kotlinx.coroutines.withContext
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.calib3d.Calib3d
-import org.opencv.core.CvType
 import org.opencv.core.DMatch
 import org.opencv.core.Mat
 import org.opencv.core.MatOfDMatch
@@ -452,8 +450,8 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
         }
     }
 
-    private fun getDetector(detectorType: FeatureDetectorType, maxKeypoints: Int): org.opencv.features2d.Feature2D {
-        return when (detectorType) {
+    private fun getDetector(detectorType: FeatureDetectorType, maxKeypoints: Int): org.opencv.features2d.Feature2D =
+        when (detectorType) {
             FeatureDetectorType.ORB -> {
                 if (orbDetector == null) {
                     orbDetector = ORB.create(maxKeypoints)
@@ -467,7 +465,6 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
                 akazeDetector!!
             }
         }
-    }
 
     private fun ensureBfMatcherInitialized(detectorType: FeatureDetectorType) {
         val normType = when (detectorType) {

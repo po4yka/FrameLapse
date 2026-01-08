@@ -18,9 +18,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Architecture photography alignment
  * - Any scene without detectable faces or bodies
  */
-class DetectLandscapeFeaturesUseCase(
-    private val featureMatcher: FeatureMatcher,
-) {
+class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Detects feature keypoints from image data.
      *

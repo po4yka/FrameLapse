@@ -73,9 +73,9 @@ import framelapse.composeapp.generated.resources.settings_title
 import framelapse.composeapp.generated.resources.storage_size_gb
 import framelapse.composeapp.generated.resources.storage_size_mb
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.jetbrains.compose.resources.stringResource
 
 private val CONTENT_PADDING = 16.dp
 private const val MIN_FPS = 1f

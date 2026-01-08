@@ -40,10 +40,7 @@ class RefineTranslationUseCase {
      * @param overshoot The detected overshoot correction data.
      * @return RefinementResult with refined matrix and correction details.
      */
-    operator fun invoke(
-        currentMatrix: AlignmentMatrix,
-        overshoot: OvershootCorrection,
-    ): RefinementResult {
+    operator fun invoke(currentMatrix: AlignmentMatrix, overshoot: OvershootCorrection): RefinementResult {
         if (!overshoot.needsCorrection) {
             return RefinementResult(
                 matrix = currentMatrix,

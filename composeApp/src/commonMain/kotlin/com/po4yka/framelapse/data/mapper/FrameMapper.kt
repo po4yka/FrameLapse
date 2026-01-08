@@ -77,7 +77,10 @@ object FrameMapper {
      * Converts alignment update data to database parameters.
      * Overload for backward compatibility with FaceLandmarks.
      */
-    @Deprecated("Use toAlignedParams with Landmarks parameter", ReplaceWith("toAlignedParams(id, alignedPath, confidence, landmarks as Landmarks, stabilizationResult)"))
+    @Deprecated(
+        "Use toAlignedParams with Landmarks parameter",
+        ReplaceWith("toAlignedParams(id, alignedPath, confidence, landmarks as Landmarks, stabilizationResult)"),
+    )
     fun toAlignedParams(
         id: String,
         alignedPath: String,

@@ -285,8 +285,13 @@ class BodyPoseDetectorImpl(private val context: Context) : BodyPoseDetector {
 
         // Include head, shoulders, and hips in bounding box
         val boundingLandmarks = listOf(
-            NOSE_INDEX, LEFT_SHOULDER_INDEX, RIGHT_SHOULDER_INDEX,
-            LEFT_HIP_INDEX, RIGHT_HIP_INDEX, LEFT_EAR_INDEX, RIGHT_EAR_INDEX,
+            NOSE_INDEX,
+            LEFT_SHOULDER_INDEX,
+            RIGHT_SHOULDER_INDEX,
+            LEFT_HIP_INDEX,
+            RIGHT_HIP_INDEX,
+            LEFT_EAR_INDEX,
+            RIGHT_EAR_INDEX,
         )
         for (index in boundingLandmarks) {
             val lm = landmarks.getOrNull(index) ?: continue

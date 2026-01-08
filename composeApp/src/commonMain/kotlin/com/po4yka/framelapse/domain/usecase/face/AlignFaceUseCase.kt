@@ -186,8 +186,8 @@ class AlignFaceUseCase(
         referenceFrame: Frame?,
         settings: AlignmentSettings,
     ): Pair<LandmarkPoint, LandmarkPoint> {
-        // Try to use reference frame landmarks
-        referenceFrame?.landmarks?.let { refLandmarks ->
+        // Try to use reference frame landmarks (only if they are face landmarks)
+        (referenceFrame?.landmarks as? FaceLandmarks)?.let { refLandmarks ->
             // Convert from normalized to pixel coordinates
             val outputSize = settings.outputSize.toFloat()
             return Pair(
@@ -219,12 +219,11 @@ class AlignFaceUseCase(
     /**
      * Normalizes a pixel coordinate point to 0-1 range.
      */
-    private fun normalizePoint(point: LandmarkPoint, outputSize: Int): LandmarkPoint =
-        LandmarkPoint(
-            x = point.x / outputSize,
-            y = point.y / outputSize,
-            z = point.z,
-        )
+    private fun normalizePoint(point: LandmarkPoint, outputSize: Int): LandmarkPoint = LandmarkPoint(
+        x = point.x / outputSize,
+        y = point.y / outputSize,
+        z = point.z,
+    )
 
     /**
      * Calculates confidence score from stabilization result.

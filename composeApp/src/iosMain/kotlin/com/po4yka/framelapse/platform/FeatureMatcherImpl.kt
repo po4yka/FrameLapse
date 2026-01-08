@@ -1,10 +1,8 @@
 package com.po4yka.framelapse.platform
 
-import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.FeatureDetectorType
 import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.HomographyMatrix
-import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
 import com.po4yka.framelapse.domain.service.FeatureMatchResult
 import com.po4yka.framelapse.domain.service.FeatureMatcher
@@ -13,6 +11,7 @@ import com.po4yka.framelapse.domain.util.Result
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -226,7 +225,9 @@ class FeatureMatcherImpl : FeatureMatcher {
             }
             if (!referenceLandmarks.hasEnoughKeypoints()) {
                 return@withContext Result.Error(
-                    IllegalStateException("Insufficient keypoints in reference image: ${referenceLandmarks.keypointCount}"),
+                    IllegalStateException(
+                        "Insufficient keypoints in reference image: ${referenceLandmarks.keypointCount}",
+                    ),
                     "Reference image has too few features for reliable matching",
                 )
             }
@@ -431,8 +432,8 @@ class FeatureMatcherImpl : FeatureMatcher {
 
     private fun uiImageToImageData(uiImage: UIImage): ImageData? {
         val size = uiImage.size
-        val width = platform.CoreGraphics.CGSizeGetWidth(size).toInt()
-        val height = platform.CoreGraphics.CGSizeGetHeight(size).toInt()
+        val width = size.useContents { width.toInt() }
+        val height = size.useContents { height.toInt() }
 
         val pngData = platform.UIKit.UIImagePNGRepresentation(uiImage) ?: return null
         val bytes = pngData.toByteArray()
@@ -475,9 +476,11 @@ class FeatureMatcherImpl : FeatureMatcher {
         // Normalize match count (saturates at 200 matches)
         val normalizedMatchCount = (matchCount.toFloat() / MAX_MATCHES_FOR_CONFIDENCE).coerceAtMost(1f)
 
-        return (inlierRatio * INLIER_RATIO_WEIGHT +
-            matchRatio * MATCH_RATIO_WEIGHT +
-            normalizedMatchCount * MATCH_COUNT_WEIGHT).coerceIn(0f, 1f)
+        return (
+            inlierRatio * INLIER_RATIO_WEIGHT +
+                matchRatio * MATCH_RATIO_WEIGHT +
+                normalizedMatchCount * MATCH_COUNT_WEIGHT
+            ).coerceIn(0f, 1f)
     }
 
     private fun <T> createOpenCVNotAvailableError(): Result<T> = Result.Error(

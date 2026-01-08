@@ -53,12 +53,12 @@ import framelapse.composeapp.generated.resources.export_quality
 import framelapse.composeapp.generated.resources.export_resolution
 import framelapse.composeapp.generated.resources.export_title
 import framelapse.composeapp.generated.resources.export_video_settings
-import framelapse.composeapp.generated.resources.frame_count
 import framelapse.composeapp.generated.resources.fps_label
+import framelapse.composeapp.generated.resources.frame_count
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.jetbrains.compose.resources.stringResource
 
 private val CONTENT_PADDING = 16.dp
 private val SECTION_SPACING = 24.dp

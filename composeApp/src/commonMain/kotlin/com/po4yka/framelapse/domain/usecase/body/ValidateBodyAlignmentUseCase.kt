@@ -15,13 +15,11 @@ class ValidateBodyAlignmentUseCase {
      * @param settings Body alignment configuration containing quality thresholds.
      * @return True if the landmarks are suitable for alignment.
      */
-    operator fun invoke(
-        landmarks: BodyLandmarks,
-        settings: BodyAlignmentSettings = BodyAlignmentSettings(),
-    ): Boolean = validateConfidence(landmarks, settings.minConfidence) &&
-        validateShoulderDistance(landmarks) &&
-        validateBoundingBox(landmarks) &&
-        validateKeyLandmarksVisibility(landmarks)
+    operator fun invoke(landmarks: BodyLandmarks, settings: BodyAlignmentSettings = BodyAlignmentSettings()): Boolean =
+        validateConfidence(landmarks, settings.minConfidence) &&
+            validateShoulderDistance(landmarks) &&
+            validateBoundingBox(landmarks) &&
+            validateKeyLandmarksVisibility(landmarks)
 
     /**
      * Validates the detection confidence.

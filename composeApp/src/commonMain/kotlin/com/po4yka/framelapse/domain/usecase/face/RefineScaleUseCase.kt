@@ -109,10 +109,7 @@ class RefineScaleUseCase {
      * @param scaleFactor The scale factor to apply.
      * @return The corrected alignment matrix.
      */
-    private fun applyScaleCorrection(
-        matrix: AlignmentMatrix,
-        scaleFactor: Float,
-    ): AlignmentMatrix {
+    private fun applyScaleCorrection(matrix: AlignmentMatrix, scaleFactor: Float): AlignmentMatrix {
         // Scale all components except translation
         // Translation needs to be adjusted for the center point
         return AlignmentMatrix(

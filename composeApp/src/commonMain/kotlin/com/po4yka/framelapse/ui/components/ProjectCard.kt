@@ -38,8 +38,8 @@ import framelapse.composeapp.generated.resources.Res
 import framelapse.composeapp.generated.resources.cd_failed_thumbnail
 import framelapse.composeapp.generated.resources.cd_no_thumbnail
 import framelapse.composeapp.generated.resources.cd_project_thumbnail
-import framelapse.composeapp.generated.resources.frame_count
 import framelapse.composeapp.generated.resources.fps_label
+import framelapse.composeapp.generated.resources.frame_count
 import org.jetbrains.compose.resources.stringResource
 
 private val CARD_CORNER_RADIUS = 12.dp

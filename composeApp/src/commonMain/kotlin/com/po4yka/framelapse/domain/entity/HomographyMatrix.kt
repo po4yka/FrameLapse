@@ -24,9 +24,15 @@ import kotlin.math.abs
  */
 @Serializable
 data class HomographyMatrix(
-    val h11: Float, val h12: Float, val h13: Float,
-    val h21: Float, val h22: Float, val h23: Float,
-    val h31: Float, val h32: Float, val h33: Float,
+    val h11: Float,
+    val h12: Float,
+    val h13: Float,
+    val h21: Float,
+    val h22: Float,
+    val h23: Float,
+    val h31: Float,
+    val h32: Float,
+    val h33: Float,
 ) {
     /**
      * Returns the matrix as a flat FloatArray in row-major order.
@@ -79,25 +85,23 @@ data class HomographyMatrix(
      *
      * @param tolerance Maximum allowed deviation from identity values.
      */
-    fun isNearIdentity(tolerance: Float = DEFAULT_IDENTITY_TOLERANCE): Boolean =
-        abs(h11 - 1f) < tolerance &&
-            abs(h12) < tolerance &&
-            abs(h13) < tolerance &&
-            abs(h21) < tolerance &&
-            abs(h22 - 1f) < tolerance &&
-            abs(h23) < tolerance &&
-            abs(h31) < tolerance &&
-            abs(h32) < tolerance &&
-            abs(h33 - 1f) < tolerance
+    fun isNearIdentity(tolerance: Float = DEFAULT_IDENTITY_TOLERANCE): Boolean = abs(h11 - 1f) < tolerance &&
+        abs(h12) < tolerance &&
+        abs(h13) < tolerance &&
+        abs(h21) < tolerance &&
+        abs(h22 - 1f) < tolerance &&
+        abs(h23) < tolerance &&
+        abs(h31) < tolerance &&
+        abs(h32) < tolerance &&
+        abs(h33 - 1f) < tolerance
 
     /**
      * Computes the determinant of the matrix.
      * A zero determinant indicates a degenerate/singular matrix.
      */
-    fun determinant(): Float =
-        h11 * (h22 * h33 - h23 * h32) -
-            h12 * (h21 * h33 - h23 * h31) +
-            h13 * (h21 * h32 - h22 * h31)
+    fun determinant(): Float = h11 * (h22 * h33 - h23 * h32) -
+        h12 * (h21 * h33 - h23 * h31) +
+        h13 * (h21 * h32 - h22 * h31)
 
     /**
      * Checks if this matrix is valid (non-singular).
@@ -110,15 +114,14 @@ data class HomographyMatrix(
      */
     fun approximateRotationDegrees(): Float {
         val radians = kotlin.math.atan2(h21.toDouble(), h11.toDouble())
-        return Math.toDegrees(radians).toFloat()
+        return (radians * 180.0 / kotlin.math.PI).toFloat()
     }
 
     /**
      * Extracts the approximate scale factor.
      * Note: This is an approximation based on the first column.
      */
-    fun approximateScale(): Float =
-        kotlin.math.sqrt((h11 * h11 + h21 * h21).toDouble()).toFloat()
+    fun approximateScale(): Float = kotlin.math.sqrt((h11 * h11 + h21 * h21).toDouble()).toFloat()
 
     companion object {
         private const val EPSILON = 1e-6f
@@ -193,7 +196,7 @@ data class HomographyMatrix(
          * @param degrees Rotation angle in degrees (counterclockwise positive).
          */
         fun rotation(degrees: Float): HomographyMatrix {
-            val radians = Math.toRadians(degrees.toDouble())
+            val radians = degrees.toDouble() * kotlin.math.PI / 180.0
             val cos = kotlin.math.cos(radians).toFloat()
             val sin = kotlin.math.sin(radians).toFloat()
             return HomographyMatrix(

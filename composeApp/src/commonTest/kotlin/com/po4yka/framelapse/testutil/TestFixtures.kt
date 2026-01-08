@@ -8,8 +8,13 @@ import com.po4yka.framelapse.domain.entity.EarlyStopReason
 import com.po4yka.framelapse.domain.entity.ExportQuality
 import com.po4yka.framelapse.domain.entity.ExportSettings
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
+import com.po4yka.framelapse.domain.entity.FeatureDetectorType
+import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
+import com.po4yka.framelapse.domain.entity.LandscapeAlignmentSettings
+import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.OvershootCorrection
 import com.po4yka.framelapse.domain.entity.Project
@@ -21,6 +26,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationScore
 import com.po4yka.framelapse.domain.entity.StabilizationSettings
 import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.entity.VideoCodec
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Test data factory for creating domain entities with sensible defaults.
@@ -64,7 +70,7 @@ object TestFixtures {
         projectId: String = "project_1",
         originalPath: String = "/storage/frames/$id.jpg",
         alignedPath: String? = null,
-        timestamp: Long = System.currentTimeMillis(),
+        timestamp: Long = currentTimeMillis(),
         capturedAt: Long = timestamp,
         confidence: Float? = null,
         landmarks: FaceLandmarks? = null,
@@ -96,14 +102,15 @@ object TestFixtures {
     // ==================== FaceLandmarks ====================
 
     /**
-     * Creates face landmarks with pixel coordinates.
-     * Default values use realistic pixel coordinates for a typical face detection.
+     * Creates face landmarks with normalized coordinates (0-1).
+     * Default values create eyes 200px apart on a 512x512 canvas.
+     * Left eye at ~0.30 and right eye at ~0.69 normalized X position.
      */
     fun createFaceLandmarks(
-        leftEyeCenter: LandmarkPoint = LandmarkPoint(150f, 200f, 0f),
-        rightEyeCenter: LandmarkPoint = LandmarkPoint(350f, 200f, 0f),
-        noseTip: LandmarkPoint = LandmarkPoint(250f, 300f, 0f),
-        boundingBox: BoundingBox = BoundingBox(50f, 50f, 450f, 500f),
+        leftEyeCenter: LandmarkPoint = LandmarkPoint(0.30f, 0.40f, 0f),
+        rightEyeCenter: LandmarkPoint = LandmarkPoint(0.69f, 0.40f, 0f),
+        noseTip: LandmarkPoint = LandmarkPoint(0.50f, 0.60f, 0f),
+        boundingBox: BoundingBox = BoundingBox(0.10f, 0.10f, 0.90f, 0.90f),
     ): FaceLandmarks = FaceLandmarks(
         points = createLandmarkPoints(leftEyeCenter, rightEyeCenter, noseTip),
         leftEyeCenter = leftEyeCenter,
@@ -213,30 +220,42 @@ object TestFixtures {
 
     // ==================== Edge Cases ====================
 
-    /** Creates landmarks with eyes perfectly horizontal (no rotation needed) */
+    /**
+     * Creates landmarks with eyes perfectly horizontal (no rotation needed).
+     * Eyes are ~200px apart on a 512x512 canvas.
+     */
     fun createHorizontalEyesLandmarks(): FaceLandmarks = createFaceLandmarks(
-        leftEyeCenter = LandmarkPoint(150f, 200f, 0f),
-        rightEyeCenter = LandmarkPoint(350f, 200f, 0f),
+        leftEyeCenter = LandmarkPoint(0.30f, 0.40f, 0f),
+        rightEyeCenter = LandmarkPoint(0.69f, 0.40f, 0f),
     )
 
-    /** Creates landmarks with eyes at 45 degrees (tilted) */
+    /**
+     * Creates landmarks with eyes at 45 degrees (tilted).
+     * Eyes are ~200px apart on a 512x512 canvas.
+     */
     fun createTiltedEyesLandmarks(): FaceLandmarks = createFaceLandmarks(
-        leftEyeCenter = LandmarkPoint(150f, 250f, 0f),
-        rightEyeCenter = LandmarkPoint(350f, 150f, 0f),
+        leftEyeCenter = LandmarkPoint(0.30f, 0.50f, 0f),
+        rightEyeCenter = LandmarkPoint(0.69f, 0.30f, 0f),
     )
 
-    /** Creates landmarks with very close eyes (small face) - still > MIN_EYE_DISTANCE (10f) */
+    /**
+     * Creates landmarks with very close eyes (small face).
+     * ~60px distance on a 512x512 canvas (normalized difference ~0.12).
+     */
     fun createSmallFaceLandmarks(): FaceLandmarks = createFaceLandmarks(
-        leftEyeCenter = LandmarkPoint(220f, 200f, 0f),
-        rightEyeCenter = LandmarkPoint(280f, 200f, 0f), // 60px distance
-        boundingBox = BoundingBox(200f, 175f, 300f, 325f),
+        leftEyeCenter = LandmarkPoint(0.44f, 0.40f, 0f),
+        rightEyeCenter = LandmarkPoint(0.56f, 0.40f, 0f), // ~61px distance
+        boundingBox = BoundingBox(0.40f, 0.35f, 0.60f, 0.65f),
     )
 
-    /** Creates landmarks with far apart eyes (large face) */
+    /**
+     * Creates landmarks with far apart eyes (large face).
+     * ~400px distance on a 512x512 canvas (normalized difference ~0.78).
+     */
     fun createLargeFaceLandmarks(): FaceLandmarks = createFaceLandmarks(
-        leftEyeCenter = LandmarkPoint(50f, 200f, 0f),
-        rightEyeCenter = LandmarkPoint(450f, 200f, 0f), // 400px distance
-        boundingBox = BoundingBox(0f, 0f, 500f, 500f),
+        leftEyeCenter = LandmarkPoint(0.10f, 0.40f, 0f),
+        rightEyeCenter = LandmarkPoint(0.88f, 0.40f, 0f), // ~399px distance
+        boundingBox = BoundingBox(0.05f, 0.05f, 0.95f, 0.95f),
     )
 
     // ==================== Stabilization ====================
@@ -306,17 +325,17 @@ object TestFixtures {
     )
 
     fun createOvershootCorrection(
-        leftEyeOvershootX: Float = 5f,
-        leftEyeOvershootY: Float = 2f,
-        rightEyeOvershootX: Float = 5f,
-        rightEyeOvershootY: Float = 2f,
-        needsCorrection: Boolean = true,
+        overshotLeftX: Float = 5f,
+        overshotLeftY: Float = 2f,
+        overshotRightX: Float = 5f,
+        overshotRightY: Float = 2f,
+        currentScore: Float = 10f,
     ): OvershootCorrection = OvershootCorrection(
-        leftEyeOvershootX = leftEyeOvershootX,
-        leftEyeOvershootY = leftEyeOvershootY,
-        rightEyeOvershootX = rightEyeOvershootX,
-        rightEyeOvershootY = rightEyeOvershootY,
-        needsCorrection = needsCorrection,
+        overshotLeftX = overshotLeftX,
+        overshotLeftY = overshotLeftY,
+        overshotRightX = overshotRightX,
+        overshotRightY = overshotRightY,
+        currentScore = currentScore,
     )
 
     /** Creates a frame with stabilization result */
@@ -332,4 +351,113 @@ object TestFixtures {
         confidence = confidence,
         landmarks = createFaceLandmarks(),
     ).copy(stabilizationResult = stabilizationResult)
+
+    // ==================== Landscape Mode ====================
+
+    /**
+     * Creates a single feature keypoint with specified parameters.
+     */
+    fun createFeatureKeypoint(
+        x: Float = 0.5f,
+        y: Float = 0.5f,
+        response: Float = 100f,
+        size: Float = 10f,
+        angle: Float = 0f,
+        octave: Int = 0,
+    ): FeatureKeypoint = FeatureKeypoint(
+        position = LandmarkPoint(x, y, 0f),
+        response = response,
+        size = size,
+        angle = angle,
+        octave = octave,
+    )
+
+    /**
+     * Creates a list of feature keypoints.
+     *
+     * @param count Number of keypoints to create.
+     * @param region Region to distribute keypoints: "left", "right", "center", or "full".
+     */
+    fun createFeatureKeypointList(count: Int = 50, region: String = "full"): List<FeatureKeypoint> {
+        val (xMin, xMax) = when (region) {
+            "left" -> 0.0f to 0.5f
+            "right" -> 0.5f to 1.0f
+            "center" -> 0.25f to 0.75f
+            else -> 0.0f to 1.0f // "full"
+        }
+
+        return (0 until count).map { i ->
+            val t = i.toFloat() / count
+            createFeatureKeypoint(
+                x = xMin + (xMax - xMin) * t,
+                y = t,
+                response = 100f + i * 5f,
+                size = 10f + (i % 5) * 2f,
+                angle = (i * 36f) % 360f,
+                octave = i % 4,
+            )
+        }
+    }
+
+    /**
+     * Creates landscape landmarks with specified keypoint count and settings.
+     */
+    fun createLandscapeLandmarks(
+        keypointCount: Int = 50,
+        detectorType: FeatureDetectorType = FeatureDetectorType.ORB,
+        qualityScore: Float = 0.8f,
+    ): LandscapeLandmarks {
+        val keypoints = createFeatureKeypointList(keypointCount)
+        return LandscapeLandmarks(
+            keypoints = keypoints,
+            detectorType = detectorType,
+            keypointCount = keypoints.size,
+            boundingBox = BoundingBox(0.05f, 0.05f, 0.95f, 0.95f),
+            qualityScore = qualityScore,
+        )
+    }
+
+    /**
+     * Creates a homography matrix of specified type.
+     *
+     * @param type Type of matrix: "identity", "translation", "rotation", "scale".
+     */
+    fun createHomographyMatrix(type: String = "identity"): HomographyMatrix = when (type) {
+        "translation" -> HomographyMatrix.translation(10f, 20f)
+        "rotation" -> HomographyMatrix.rotation(45f)
+        "scale" -> HomographyMatrix.scale(1.5f, 1.5f)
+        else -> HomographyMatrix.IDENTITY
+    }
+
+    /**
+     * Creates default landscape alignment settings.
+     */
+    fun createLandscapeAlignmentSettings(
+        detectorType: FeatureDetectorType = FeatureDetectorType.ORB,
+        maxKeypoints: Int = 500,
+        minMatchedKeypoints: Int = 10,
+        ratioTestThreshold: Float = 0.75f,
+        ransacReprojThreshold: Float = 5.0f,
+        outputSize: Int = 1080,
+        minConfidence: Float = 0.5f,
+        useCrossCheck: Boolean = true,
+        minInlierRatio: Float = 0.3f,
+    ): LandscapeAlignmentSettings = LandscapeAlignmentSettings(
+        detectorType = detectorType,
+        maxKeypoints = maxKeypoints,
+        minMatchedKeypoints = minMatchedKeypoints,
+        ratioTestThreshold = ratioTestThreshold,
+        ransacReprojThreshold = ransacReprojThreshold,
+        outputSize = outputSize,
+        minConfidence = minConfidence,
+        useCrossCheck = useCrossCheck,
+        minInlierRatio = minInlierRatio,
+    )
+
+    /**
+     * Creates a list of match pairs for keypoint matching.
+     *
+     * @param count Number of match pairs to create.
+     */
+    fun createMatchPairs(count: Int = 20): List<Pair<Int, Int>> = (0 until count).map { Pair(it, it) }
 }

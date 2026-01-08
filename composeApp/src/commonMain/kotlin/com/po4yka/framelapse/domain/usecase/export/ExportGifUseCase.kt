@@ -2,6 +2,8 @@ package com.po4yka.framelapse.domain.usecase.export
 
 import com.po4yka.framelapse.domain.entity.DateRange
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.service.GifEncoder
+import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
@@ -10,15 +12,15 @@ import com.po4yka.framelapse.platform.currentTimeMillis
 /**
  * Exports frames as an animated GIF.
  *
- * Note: GIF encoding is simplified here. Platform implementations
- * may use libraries like:
- * - Android: android-gif-encoder or similar
- * - iOS: ImageIO framework
+ * Uses platform-specific GIF encoding:
+ * - Android: Built-in GIF89a encoder with LZW compression
+ * - iOS: ImageIO framework (CGImageDestination)
  */
 class ExportGifUseCase(
     private val frameRepository: FrameRepository,
     private val imageProcessor: ImageProcessor,
     private val fileManager: FileManager,
+    private val gifEncoder: GifEncoder,
 ) {
     /**
      * Exports frames as an animated GIF.
@@ -90,11 +92,11 @@ class ExportGifUseCase(
         val outputPath = "$projectDir/timelapse_$timestamp.gif"
 
         // Process frames
-        val processedFrames = mutableListOf<ByteArray>()
+        val processedFrames = mutableListOf<ImageData>()
         val total = frames.size
 
         for ((index, frame) in frames.withIndex()) {
-            onProgress((index.toFloat() / total) * 0.8f) // 80% for processing
+            onProgress((index.toFloat() / total) * PROCESSING_PROGRESS_WEIGHT)
 
             val imagePath = frame.alignedPath ?: frame.originalPath
             val loadResult = imageProcessor.loadImage(imagePath)
@@ -113,7 +115,7 @@ class ExportGifUseCase(
             }
 
             if (resizedResult.isSuccess) {
-                processedFrames.add(resizedResult.getOrNull()!!.bytes)
+                processedFrames.add(resizedResult.getOrNull()!!)
             }
         }
 
@@ -124,13 +126,18 @@ class ExportGifUseCase(
             )
         }
 
-        // Note: Actual GIF encoding would happen here via platform implementation
-        // This is a placeholder - real implementation needs platform-specific GIF encoder
-        onProgress(1.0f)
+        // Calculate frame delay in milliseconds
+        val delayMs = MILLISECONDS_PER_SECOND / fps
 
-        return Result.Error(
-            UnsupportedOperationException("GIF encoding not yet implemented"),
-            "GIF export not yet implemented - use video export instead",
+        // Encode to GIF using platform-specific encoder
+        return gifEncoder.encode(
+            frames = processedFrames,
+            outputPath = outputPath,
+            delayMs = delayMs,
+            onProgress = { encodingProgress ->
+                // Encoding takes remaining progress (after processing)
+                onProgress(PROCESSING_PROGRESS_WEIGHT + encodingProgress * ENCODING_PROGRESS_WEIGHT)
+            },
         )
     }
 
@@ -138,5 +145,8 @@ class ExportGifUseCase(
         const val DEFAULT_GIF_FPS = 10
         const val DEFAULT_GIF_SIZE = 480
         const val MIN_FRAMES_FOR_GIF = 2
+        private const val MILLISECONDS_PER_SECOND = 1000
+        private const val PROCESSING_PROGRESS_WEIGHT = 0.8f
+        private const val ENCODING_PROGRESS_WEIGHT = 0.2f
     }
 }

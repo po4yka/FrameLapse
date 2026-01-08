@@ -64,6 +64,7 @@ class FrameLocalDataSource(private val queries: FrameQueries) {
             confidence = params.confidence,
             landmarksJson = params.landmarksJson,
             sortOrder = params.sortOrder,
+            stabilizationResultJson = params.stabilizationResultJson,
         )
     }
 
@@ -75,6 +76,7 @@ class FrameLocalDataSource(private val queries: FrameQueries) {
             alignedPath = params.alignedPath,
             confidence = params.confidence,
             landmarksJson = params.landmarksJson,
+            stabilizationResultJson = params.stabilizationResultJson,
             id = params.id,
         )
     }

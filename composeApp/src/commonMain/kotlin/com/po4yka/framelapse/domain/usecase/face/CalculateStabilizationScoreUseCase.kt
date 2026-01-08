@@ -63,7 +63,7 @@ class CalculateStabilizationScoreUseCase {
      * @param canvasHeight Canvas height in pixels.
      * @return The calculated StabilizationScore.
      */
-    fun invoke(
+    operator fun invoke(
         detectedLeftEyeX: Float,
         detectedLeftEyeY: Float,
         detectedRightEyeX: Float,

@@ -29,11 +29,7 @@ class RefineRotationUseCase {
      * @property converged Whether rotation has converged (delta Y <= threshold).
      * @property eyeDeltaY The current eye delta Y in pixels.
      */
-    data class RefinementResult(
-        val matrix: AlignmentMatrix,
-        val converged: Boolean,
-        val eyeDeltaY: Float,
-    )
+    data class RefinementResult(val matrix: AlignmentMatrix, val converged: Boolean, val eyeDeltaY: Float)
 
     /**
      * Refines rotation based on detected landmarks.
@@ -97,10 +93,7 @@ class RefineRotationUseCase {
      * @param angleRadians The rotation angle to apply (in radians).
      * @return The corrected alignment matrix.
      */
-    private fun applyRotationCorrection(
-        matrix: AlignmentMatrix,
-        angleRadians: Float,
-    ): AlignmentMatrix {
+    private fun applyRotationCorrection(matrix: AlignmentMatrix, angleRadians: Float): AlignmentMatrix {
         val cosA = cos(angleRadians)
         val sinA = sin(angleRadians)
 

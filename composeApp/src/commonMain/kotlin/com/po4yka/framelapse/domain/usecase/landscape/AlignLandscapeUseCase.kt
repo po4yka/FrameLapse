@@ -17,6 +17,7 @@ import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import kotlin.time.TimeSource
 
 /**
  * Performs landscape/scenery alignment using feature-based homography.
@@ -68,7 +69,7 @@ class AlignLandscapeUseCase(
         settings: LandscapeAlignmentSettings = LandscapeAlignmentSettings(),
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Frame> {
-        val startTime = System.currentTimeMillis()
+        val startMark = TimeSource.Monotonic.markNow()
 
         // Skip if already aligned
         if (frame.alignedPath != null && frame.landmarks != null) {
@@ -205,7 +206,7 @@ class AlignLandscapeUseCase(
         )
 
         // Create stabilization result for consistency with other alignment types
-        val totalDuration = System.currentTimeMillis() - startTime
+        val totalDuration = startMark.elapsedNow().inWholeMilliseconds
         val stabilizationResult = createStabilizationResult(
             matchCount = matches.size,
             inlierCount = inlierCount,
@@ -327,16 +328,15 @@ class AlignLandscapeUseCase(
     /**
      * Creates a StabilizationProgress for the landscape alignment pipeline.
      */
-    private fun createProgress(step: Int, message: String): StabilizationProgress =
-        StabilizationProgress(
-            currentPass = step,
-            maxPasses = TOTAL_PROGRESS_STEPS,
-            currentStage = StabilizationStage.INITIAL,
-            currentScore = 0f,
-            progressPercent = step.toFloat() / TOTAL_PROGRESS_STEPS,
-            message = message,
-            mode = StabilizationMode.FAST,
-        )
+    private fun createProgress(step: Int, message: String): StabilizationProgress = StabilizationProgress(
+        currentPass = step,
+        maxPasses = TOTAL_PROGRESS_STEPS,
+        currentStage = StabilizationStage.INITIAL,
+        currentScore = 0f,
+        progressPercent = step.toFloat() / TOTAL_PROGRESS_STEPS,
+        message = message,
+        mode = StabilizationMode.FAST,
+    )
 
     /**
      * Calculates alignment confidence based on match quality.
@@ -346,11 +346,7 @@ class AlignLandscapeUseCase(
      * @param settings Alignment settings for thresholds.
      * @return Confidence score from 0.0 to 1.0.
      */
-    private fun calculateConfidence(
-        matchCount: Int,
-        inlierCount: Int,
-        settings: LandscapeAlignmentSettings,
-    ): Float {
+    private fun calculateConfidence(matchCount: Int, inlierCount: Int, settings: LandscapeAlignmentSettings): Float {
         // Calculate inlier ratio
         val inlierRatio = if (matchCount > 0) {
             inlierCount.toFloat() / matchCount
@@ -362,8 +358,10 @@ class AlignLandscapeUseCase(
         val matchFactor = (matchCount.toFloat() / OPTIMAL_MATCH_COUNT).coerceAtMost(1f)
 
         // Calculate inlier factor (higher inlier ratio = more confident)
-        val inlierFactor = ((inlierRatio - settings.minInlierRatio) /
-            (1f - settings.minInlierRatio)).coerceIn(0f, 1f)
+        val inlierFactor = (
+            (inlierRatio - settings.minInlierRatio) /
+                (1f - settings.minInlierRatio)
+            ).coerceIn(0f, 1f)
 
         // Weighted combination
         val confidence = matchFactor * MATCH_FACTOR_WEIGHT + inlierFactor * INLIER_FACTOR_WEIGHT
@@ -402,7 +400,7 @@ class AlignLandscapeUseCase(
                 ),
             ),
             mode = StabilizationMode.FAST,
-            earlyStopReason = if (confidence < 0.5f) EarlyStopReason.MIN_SCORE_REACHED else null,
+            earlyStopReason = if (confidence < 0.5f) EarlyStopReason.SCORE_BELOW_THRESHOLD else null,
             totalDurationMs = durationMs,
             initialScore = 100f,
             finalEyeDeltaY = null,
@@ -424,16 +422,14 @@ class AlignLandscapeUseCase(
      * Creates minimal landscape landmarks for storage when detection fails.
      */
     @Suppress("unused")
-    private fun createMinimalLandmarks(
-        outputSize: Int,
-        detectorType: FeatureDetectorType,
-    ): LandscapeLandmarks = LandscapeLandmarks(
-        keypoints = emptyList(),
-        detectorType = detectorType,
-        keypointCount = 0,
-        boundingBox = BoundingBox(0f, 0f, 1f, 1f),
-        qualityScore = 0f,
-    )
+    private fun createMinimalLandmarks(outputSize: Int, detectorType: FeatureDetectorType): LandscapeLandmarks =
+        LandscapeLandmarks(
+            keypoints = emptyList(),
+            detectorType = detectorType,
+            keypointCount = 0,
+            boundingBox = BoundingBox(0f, 0f, 1f, 1f),
+            qualityScore = 0f,
+        )
 
     /**
      * Checks if landscape alignment is available.

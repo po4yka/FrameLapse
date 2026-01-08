@@ -75,6 +75,11 @@ fun SettingsSwitch(
     } else {
         stringResource(Res.string.state_disabled)
     }
+    val switchContentDescription = stringResource(
+        Res.string.settings_switch_content_description,
+        title,
+        switchState,
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -82,11 +87,7 @@ fun SettingsSwitch(
             .clickable { onCheckedChange(!checked) }
             .semantics {
                 role = Role.Switch
-                contentDescription = stringResource(
-                    Res.string.settings_switch_content_description,
-                    title,
-                    switchState,
-                )
+                contentDescription = switchContentDescription
             }
             .padding(
                 horizontal = ITEM_PADDING_HORIZONTAL,
@@ -129,6 +130,11 @@ fun <T> SettingsDropdown(
     valueLabel: (T) -> String = { it.toString() },
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val dropdownContentDescription = stringResource(
+        Res.string.settings_slider_content_description,
+        title,
+        valueLabel(selectedValue),
+    )
 
     Row(
         modifier = modifier
@@ -137,11 +143,7 @@ fun <T> SettingsDropdown(
             .clickable { expanded = true }
             .semantics {
                 role = Role.DropdownList
-                contentDescription = stringResource(
-                    Res.string.settings_slider_content_description,
-                    title,
-                    valueLabel(selectedValue),
-                )
+                contentDescription = dropdownContentDescription
             }
             .padding(
                 horizontal = ITEM_PADDING_HORIZONTAL,
@@ -190,7 +192,7 @@ fun SettingsSlider(
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
-    valueLabel: ((Float) -> String)? = null,
+    valueLabel: @Composable ((Float) -> String)? = null,
 ) {
     Column(
         modifier = modifier

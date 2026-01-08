@@ -1,12 +1,14 @@
 package com.po4yka.framelapse.testutil
 
-import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.entity.Landmarks
 import com.po4yka.framelapse.domain.entity.Project
+import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.domain.util.Result
+import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,7 @@ class FakeProjectRepository : ProjectRepository {
         if (shouldFail) return Result.Error(failureException)
 
         val id = "project_${projects.value.size + 1}"
-        val now = System.currentTimeMillis()
+        val now = currentTimeMillis()
         val project = Project(
             id = id,
             name = name,
@@ -182,7 +184,8 @@ class FakeFrameRepository : FrameRepository {
         id: String,
         alignedPath: String,
         confidence: Float,
-        landmarks: FaceLandmarks,
+        landmarks: Landmarks,
+        stabilizationResult: StabilizationResult?,
     ): Result<Unit> {
         if (shouldFail) return Result.Error(failureException)
 
@@ -192,6 +195,7 @@ class FakeFrameRepository : FrameRepository {
             alignedPath = alignedPath,
             confidence = confidence,
             landmarks = landmarks,
+            stabilizationResult = stabilizationResult,
         )
         frames.update { it + (id to updated) }
         return Result.Success(Unit)

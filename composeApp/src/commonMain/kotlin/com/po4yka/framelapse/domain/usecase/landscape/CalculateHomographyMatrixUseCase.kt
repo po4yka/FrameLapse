@@ -16,9 +16,7 @@ import kotlin.math.abs
  * system to the reference image coordinate system, enabling perspective-
  * corrected alignment of landscape/scenery images.
  */
-class CalculateHomographyMatrixUseCase(
-    private val featureMatcher: FeatureMatcher,
-) {
+class CalculateHomographyMatrixUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Computes a homography matrix from matched keypoints.
      *
@@ -136,7 +134,7 @@ class CalculateHomographyMatrixUseCase(
             return Result.Error(
                 IllegalStateException(
                     "Insufficient inliers: $inlierCount of ${matches.size} " +
-                        "(ratio: ${"%.2f".format(inlierRatio)}, minimum: $MIN_INLIER_RATIO)",
+                        "(ratio: ${(inlierRatio * 100).toInt() / 100f}, minimum: $MIN_INLIER_RATIO)",
                 ),
                 "Too many outliers in match set",
             )

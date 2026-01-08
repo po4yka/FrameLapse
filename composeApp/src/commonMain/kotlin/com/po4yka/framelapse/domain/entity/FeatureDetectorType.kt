@@ -30,7 +30,6 @@ enum class FeatureDetectorType(val displayName: String, val description: String)
     ;
 
     companion object {
-        fun fromString(value: String): FeatureDetectorType =
-            entries.find { it.name == value } ?: ORB
+        fun fromString(value: String): FeatureDetectorType = entries.find { it.name == value } ?: ORB
     }
 }

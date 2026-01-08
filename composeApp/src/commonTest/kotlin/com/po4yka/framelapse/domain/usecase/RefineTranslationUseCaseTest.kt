@@ -6,6 +6,7 @@ import com.po4yka.framelapse.testutil.TestFixtures
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RefineTranslationUseCaseTest {
@@ -25,11 +26,11 @@ class RefineTranslationUseCaseTest {
         // Given: Positive overshoot (eyes past goal to the right)
         val matrix = TestFixtures.createIdentityMatrix()
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 10f,
-            leftEyeOvershootY = 5f,
-            rightEyeOvershootX = 10f,
-            rightEyeOvershootY = 5f,
-            needsCorrection = true,
+            overshotLeftX = 10f,
+            overshotLeftY = 5f,
+            overshotRightX = 10f,
+            overshotRightY = 5f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
@@ -45,11 +46,11 @@ class RefineTranslationUseCaseTest {
         // Given: Negative overshoot (eyes before goal to the left)
         val matrix = TestFixtures.createIdentityMatrix()
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = -10f,
-            leftEyeOvershootY = -5f,
-            rightEyeOvershootX = -10f,
-            rightEyeOvershootY = -5f,
-            needsCorrection = true,
+            overshotLeftX = -10f,
+            overshotLeftY = -5f,
+            overshotRightX = -10f,
+            overshotRightY = -5f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
@@ -67,11 +68,11 @@ class RefineTranslationUseCaseTest {
         // Given: Different overshoots for left and right eyes
         val matrix = TestFixtures.createIdentityMatrix()
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 20f,
-            leftEyeOvershootY = 10f,
-            rightEyeOvershootX = 10f,
-            rightEyeOvershootY = 6f,
-            needsCorrection = true,
+            overshotLeftX = 20f,
+            overshotLeftY = 10f,
+            overshotRightX = 10f,
+            overshotRightY = 6f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
@@ -97,11 +98,11 @@ class RefineTranslationUseCaseTest {
             skewY = -0.1f,
         )
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 10f,
-            leftEyeOvershootY = 5f,
-            rightEyeOvershootX = 10f,
-            rightEyeOvershootY = 5f,
-            needsCorrection = true,
+            overshotLeftX = 10f,
+            overshotLeftY = 5f,
+            overshotRightX = 10f,
+            overshotRightY = 5f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
@@ -122,11 +123,11 @@ class RefineTranslationUseCaseTest {
             translateY = 30f,
         )
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 10f,
-            leftEyeOvershootY = 10f,
-            rightEyeOvershootX = 10f,
-            rightEyeOvershootY = 10f,
-            needsCorrection = true,
+            overshotLeftX = 10f,
+            overshotLeftY = 10f,
+            overshotRightX = 10f,
+            overshotRightY = 10f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
@@ -144,17 +145,17 @@ class RefineTranslationUseCaseTest {
 
     @Test
     fun `invoke returns unchanged matrix when no correction needed`() {
-        // Given: Zero overshoot
+        // Given: Zero overshoot with low score and opposite directions (needsCorrection = false)
         val matrix = TestFixtures.createAlignmentMatrix(
             translateX = 50f,
             translateY = 30f,
         )
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 0f,
-            leftEyeOvershootY = 0f,
-            rightEyeOvershootX = 0f,
-            rightEyeOvershootY = 0f,
-            needsCorrection = false,
+            overshotLeftX = 0.1f, // Tiny positive
+            overshotLeftY = 0.1f,
+            overshotRightX = -0.1f, // Tiny negative (opposite direction)
+            overshotRightY = -0.1f,
+            currentScore = 0f, // Low score, no same-direction overshoot
         )
 
         // When
@@ -163,45 +164,46 @@ class RefineTranslationUseCaseTest {
         // Then: Matrix should be unchanged
         assertEquals(matrix.translateX, result.matrix.translateX, 0.001f)
         assertEquals(matrix.translateY, result.matrix.translateY, 0.001f)
+        assertFalse(result.correctionApplied)
     }
 
-    // ==================== Converged Tests ====================
+    // ==================== Correction Applied Tests ====================
 
     @Test
-    fun `converged is true when overshoot is small`() {
-        // Given: Very small overshoot
+    fun `correctionApplied is false when overshoot is small and opposite directions`() {
+        // Given: Very small overshoot with opposite directions
         val matrix = TestFixtures.createIdentityMatrix()
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 0.01f,
-            leftEyeOvershootY = 0.01f,
-            rightEyeOvershootX = 0.01f,
-            rightEyeOvershootY = 0.01f,
-            needsCorrection = false,
+            overshotLeftX = 0.01f,
+            overshotLeftY = 0.01f,
+            overshotRightX = -0.01f, // Opposite direction
+            overshotRightY = -0.01f,
+            currentScore = 0f, // Below threshold
         )
 
         // When
         val result = useCase(matrix, overshoot)
 
         // Then
-        assertTrue(result.converged)
+        assertFalse(result.correctionApplied, "Should not apply correction for small opposite-direction overshoots")
     }
 
     @Test
-    fun `converged is false when overshoot is significant`() {
+    fun `correctionApplied is true when overshoot is significant`() {
         // Given: Significant overshoot
         val matrix = TestFixtures.createIdentityMatrix()
         val overshoot = OvershootCorrection(
-            leftEyeOvershootX = 10f,
-            leftEyeOvershootY = 10f,
-            rightEyeOvershootX = 10f,
-            rightEyeOvershootY = 10f,
-            needsCorrection = true,
+            overshotLeftX = 10f,
+            overshotLeftY = 10f,
+            overshotRightX = 10f,
+            overshotRightY = 10f,
+            currentScore = 10f, // High score triggers correction
         )
 
         // When
         val result = useCase(matrix, overshoot)
 
         // Then
-        assertTrue(!result.converged)
+        assertTrue(result.correctionApplied, "Should apply correction for significant overshoots")
     }
 }

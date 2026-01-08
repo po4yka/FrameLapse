@@ -34,9 +34,9 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then: Should detect positive overshoot
-        assertEquals(10f, result.leftEyeOvershootX, 0.1f)
-        assertEquals(10f, result.rightEyeOvershootX, 0.1f)
-        assertTrue(result.bothEyesOvershotSameDirectionX)
+        assertEquals(10f, result.overshotLeftX, 0.1f)
+        assertEquals(10f, result.overshotRightX, 0.1f)
+        assertTrue(result.sameDirectionX)
     }
 
     @Test
@@ -55,9 +55,9 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then: Both eyes undershot (negative overshoot)
-        assertEquals(-10f, result.leftEyeOvershootX, 0.1f)
-        assertEquals(-10f, result.rightEyeOvershootX, 0.1f)
-        assertTrue(result.bothEyesOvershotSameDirectionX)
+        assertEquals(-10f, result.overshotLeftX, 0.1f)
+        assertEquals(-10f, result.overshotRightX, 0.1f)
+        assertTrue(result.sameDirectionX)
     }
 
     @Test
@@ -76,9 +76,9 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then: Opposite direction overshoot
-        assertEquals(10f, result.leftEyeOvershootX, 0.1f)
-        assertEquals(-10f, result.rightEyeOvershootX, 0.1f)
-        assertFalse(result.bothEyesOvershotSameDirectionX)
+        assertEquals(10f, result.overshotLeftX, 0.1f)
+        assertEquals(-10f, result.overshotRightX, 0.1f)
+        assertFalse(result.sameDirectionX)
     }
 
     // ==================== Y Direction Overshoot Tests ====================
@@ -99,9 +99,9 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then
-        assertEquals(10f, result.leftEyeOvershootY, 0.1f)
-        assertEquals(10f, result.rightEyeOvershootY, 0.1f)
-        assertTrue(result.bothEyesOvershotSameDirectionY)
+        assertEquals(10f, result.overshotLeftY, 0.1f)
+        assertEquals(10f, result.overshotRightY, 0.1f)
+        assertTrue(result.sameDirectionY)
     }
 
     // ==================== Needs Correction Tests ====================
@@ -141,7 +141,7 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then: Still needs correction due to same-direction overshoot
-        assertTrue(result.needsCorrection || result.bothEyesOvershotSameDirectionX)
+        assertTrue(result.needsCorrection || result.sameDirectionX)
     }
 
     @Test
@@ -181,10 +181,10 @@ class DetectOvershootUseCaseTest {
         )
 
         // Then
-        assertEquals(0f, result.leftEyeOvershootX, 0.001f)
-        assertEquals(0f, result.leftEyeOvershootY, 0.001f)
-        assertEquals(0f, result.rightEyeOvershootX, 0.001f)
-        assertEquals(0f, result.rightEyeOvershootY, 0.001f)
+        assertEquals(0f, result.overshotLeftX, 0.001f)
+        assertEquals(0f, result.overshotLeftY, 0.001f)
+        assertEquals(0f, result.overshotRightX, 0.001f)
+        assertEquals(0f, result.overshotRightY, 0.001f)
         assertFalse(result.needsCorrection)
     }
 

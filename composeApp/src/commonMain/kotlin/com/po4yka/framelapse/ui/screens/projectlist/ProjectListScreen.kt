@@ -40,8 +40,8 @@ import framelapse.composeapp.generated.resources.nav_settings
 import framelapse.composeapp.generated.resources.projects_create
 import framelapse.composeapp.generated.resources.projects_empty_description
 import framelapse.composeapp.generated.resources.projects_empty_title
-import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 private val CONTENT_PADDING = 16.dp
 private val ITEM_SPACING = 12.dp
