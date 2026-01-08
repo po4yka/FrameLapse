@@ -135,6 +135,17 @@
     <string name="error_storage_full">Not enough storage space available.</string>
     <string name="error_export_failed">Failed to export video. Please try again.</string>
     <string name="error_camera_unavailable">Camera is unavailable.</string>
+    <string name="error_not_enough_features">Not enough features detected for alignment</string>
+    <string name="error_homography_failed">Failed to compute alignment transformation</string>
+
+    <!-- Landscape Mode -->
+    <string name="settings_reference_frame">Reference Frame</string>
+    <string name="settings_reference_frame_description">Frame that all others will be aligned to</string>
+    <string name="gallery_set_as_reference">Set as Reference</string>
+    <string name="landscape_detecting_features">Detecting features...</string>
+    <string name="landscape_matching_features">Matching features...</string>
+    <string name="landscape_computing_homography">Computing alignment...</string>
+    <string name="landscape_applying_transform">Applying transformation...</string>
 
     <!-- Accessibility Content Descriptions -->
     <string name="cd_project_thumbnail">Project thumbnail</string>

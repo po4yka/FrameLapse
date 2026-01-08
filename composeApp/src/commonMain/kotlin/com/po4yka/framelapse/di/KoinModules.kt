@@ -24,6 +24,10 @@ import com.po4yka.framelapse.domain.usecase.body.DetectBodyPoseUseCase
 import com.po4yka.framelapse.domain.usecase.body.MultiPassBodyStabilizationUseCase
 import com.po4yka.framelapse.domain.usecase.body.ValidateBodyAlignmentUseCase
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.DetectLandscapeFeaturesUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.MatchLandscapeFeaturesUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.CalculateMuscleRegionBoundsUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.CropToMuscleRegionUseCase
@@ -186,12 +190,26 @@ val domainModule = module {
         )
     }
 
-    // Content Alignment Dispatcher (routes between Face, Body, and Muscle alignment)
+    // Landscape Processing Use Cases
+    factory { DetectLandscapeFeaturesUseCase(get()) }
+    factory { MatchLandscapeFeaturesUseCase(get()) }
+    factory { CalculateHomographyMatrixUseCase(get()) }
+    factory {
+        AlignLandscapeUseCase(
+            featureMatcher = get(),
+            imageProcessor = get(),
+            frameRepository = get(),
+            fileManager = get(),
+        )
+    }
+
+    // Content Alignment Dispatcher (routes between Face, Body, Muscle, and Landscape alignment)
     factory {
         AlignContentUseCase(
             alignFace = get(),
             alignBody = get(),
             alignMuscle = get(),
+            alignLandscape = get(),
         )
     }
 

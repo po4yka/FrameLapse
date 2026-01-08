@@ -2,6 +2,7 @@ package com.po4yka.framelapse.domain.service
 
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.BoundingBox
+import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.util.Result
 
 /**
@@ -43,6 +44,26 @@ interface ImageProcessor {
     suspend fun applyAffineTransform(
         image: ImageData,
         matrix: AlignmentMatrix,
+        outputWidth: Int,
+        outputHeight: Int,
+    ): Result<ImageData>
+
+    /**
+     * Applies a homography (perspective) transformation to an image.
+     *
+     * Unlike affine transforms which preserve parallel lines, homography
+     * can correct perspective distortion (vanishing points, foreshortening).
+     * Used for landscape/scenery alignment where 3D perspective correction is needed.
+     *
+     * @param image The source image data.
+     * @param matrix The 3x3 homography matrix.
+     * @param outputWidth Output image width.
+     * @param outputHeight Output image height.
+     * @return Result containing the transformed ImageData or an error.
+     */
+    suspend fun applyHomographyTransform(
+        image: ImageData,
+        matrix: HomographyMatrix,
         outputWidth: Int,
         outputHeight: Int,
     ): Result<ImageData>

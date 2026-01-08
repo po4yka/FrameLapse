@@ -55,6 +55,7 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             thumbnailPath = params.thumbnailPath,
             contentType = params.contentType,
             muscleRegion = params.muscleRegion,
+            referenceFrameId = params.referenceFrameId,
         )
     }
 
@@ -71,6 +72,7 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             thumbnailPath = params.thumbnailPath,
             contentType = params.contentType,
             muscleRegion = params.muscleRegion,
+            referenceFrameId = params.referenceFrameId,
             id = params.id,
         )
     }
@@ -85,6 +87,19 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             id = id,
         )
     }
+
+    /**
+     * Updates only the reference frame ID for a project.
+     * Used for LANDSCAPE content type projects to set the alignment reference.
+     */
+    suspend fun updateReferenceFrame(id: String, referenceFrameId: String?, updatedAt: Long): Unit =
+        withContext(Dispatchers.IO) {
+            queries.updateReferenceFrame(
+                referenceFrameId = referenceFrameId,
+                updatedAt = updatedAt,
+                id = id,
+            )
+        }
 
     /**
      * Deletes a project by ID.

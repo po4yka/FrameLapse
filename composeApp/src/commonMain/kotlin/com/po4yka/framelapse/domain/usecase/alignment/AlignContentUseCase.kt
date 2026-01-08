@@ -4,11 +4,13 @@ import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
 import com.po4yka.framelapse.domain.entity.ContentType
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.entity.LandscapeAlignmentSettings
 import com.po4yka.framelapse.domain.entity.MuscleAlignmentSettings
 import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.StabilizationProgress
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
 import com.po4yka.framelapse.domain.util.Result
 
@@ -23,14 +25,13 @@ import com.po4yka.framelapse.domain.util.Result
  * - FACE: Eye-based alignment using FaceDetector (head-centered framing)
  * - BODY: Shoulder-based alignment using BodyPoseDetector (head-to-waist framing)
  * - MUSCLE: Body alignment + region cropping for fitness tracking
- *
- * ## Future Content Types
- * - LANDSCAPE: Feature matching for non-human content (planned)
+ * - LANDSCAPE: Feature matching for scenery/architecture using OpenCV
  */
 class AlignContentUseCase(
     private val alignFace: AlignFaceUseCase,
     private val alignBody: AlignBodyUseCase,
     private val alignMuscle: AlignMuscleUseCase,
+    private val alignLandscape: AlignLandscapeUseCase,
 ) {
     /**
      * Aligns content in the given frame based on the specified content type.
@@ -65,6 +66,12 @@ class AlignContentUseCase(
             settings = MuscleAlignmentSettings(
                 muscleRegion = muscleRegion ?: MuscleRegion.FULL_BODY,
             ),
+            onProgress = onProgress,
+        )
+        ContentType.LANDSCAPE -> alignLandscape(
+            frame = frame,
+            referenceFrame = referenceFrame,
+            settings = LandscapeAlignmentSettings(),
             onProgress = onProgress,
         )
     }
@@ -133,6 +140,27 @@ class AlignContentUseCase(
     )
 
     /**
+     * Aligns content with custom landscape alignment settings.
+     *
+     * @param frame The frame to process.
+     * @param referenceFrame Reference frame to align to (required for landscape mode).
+     * @param settings Landscape alignment settings including detector type and thresholds.
+     * @param onProgress Optional callback for progress updates.
+     * @return Result containing the updated Frame with homography-aligned image.
+     */
+    suspend fun alignLandscapeWithSettings(
+        frame: Frame,
+        referenceFrame: Frame?,
+        settings: LandscapeAlignmentSettings = LandscapeAlignmentSettings(),
+        onProgress: ((StabilizationProgress) -> Unit)? = null,
+    ): Result<Frame> = alignLandscape(
+        frame = frame,
+        referenceFrame = referenceFrame,
+        settings = settings,
+        onProgress = onProgress,
+    )
+
+    /**
      * Checks if a specific content type alignment is available on this device.
      *
      * @param contentType The content type to check.
@@ -142,5 +170,6 @@ class AlignContentUseCase(
         ContentType.FACE -> true // Face detection is always available
         ContentType.BODY -> true // Body detection is available on supported devices
         ContentType.MUSCLE -> true // Muscle mode uses body detection
+        ContentType.LANDSCAPE -> alignLandscape.isAvailable // Requires OpenCV
     }
 }

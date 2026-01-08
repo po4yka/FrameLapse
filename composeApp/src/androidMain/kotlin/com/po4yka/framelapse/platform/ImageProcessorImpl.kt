@@ -9,16 +9,25 @@ import android.graphics.Paint
 import androidx.exifinterface.media.ExifInterface
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.BoundingBox
+import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.Size
+import org.opencv.imgproc.Imgproc
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
 class ImageProcessorImpl(private val context: Context) : ImageProcessor {
+
+    private var isOpenCvInitialized = false
 
     override suspend fun loadImage(path: String): Result<ImageData> = withContext(Dispatchers.IO) {
         try {
@@ -141,6 +150,80 @@ class ImageProcessorImpl(private val context: Context) : ImageProcessor {
             )
         } catch (e: Exception) {
             Result.Error(e, "Failed to apply transform: ${e.message}")
+        }
+    }
+
+    override suspend fun applyHomographyTransform(
+        image: ImageData,
+        matrix: HomographyMatrix,
+        outputWidth: Int,
+        outputHeight: Int,
+    ): Result<ImageData> = withContext(Dispatchers.IO) {
+        try {
+            ensureOpenCvInitialized()
+
+            val sourceBitmap = byteArrayToBitmap(image.bytes, image.width, image.height)
+                ?: return@withContext Result.Error(
+                    IllegalStateException("Failed to create bitmap from data"),
+                    "Failed to create bitmap",
+                )
+
+            // Convert bitmap to OpenCV Mat
+            val sourceMat = Mat()
+            Utils.bitmapToMat(sourceBitmap, sourceMat)
+
+            // Create homography matrix (3x3) from HomographyMatrix
+            val homographyMat = Mat(3, 3, CvType.CV_64FC1)
+            homographyMat.put(0, 0, matrix.h11.toDouble())
+            homographyMat.put(0, 1, matrix.h12.toDouble())
+            homographyMat.put(0, 2, matrix.h13.toDouble())
+            homographyMat.put(1, 0, matrix.h21.toDouble())
+            homographyMat.put(1, 1, matrix.h22.toDouble())
+            homographyMat.put(1, 2, matrix.h23.toDouble())
+            homographyMat.put(2, 0, matrix.h31.toDouble())
+            homographyMat.put(2, 1, matrix.h32.toDouble())
+            homographyMat.put(2, 2, matrix.h33.toDouble())
+
+            // Create output Mat
+            val outputMat = Mat()
+            val outputSize = Size(outputWidth.toDouble(), outputHeight.toDouble())
+
+            // Apply perspective transformation with high-quality interpolation
+            Imgproc.warpPerspective(
+                sourceMat,
+                outputMat,
+                homographyMat,
+                outputSize,
+                Imgproc.INTER_LINEAR,
+                org.opencv.core.Core.BORDER_CONSTANT,
+            )
+
+            // Convert output Mat back to Bitmap
+            val outputBitmap = Bitmap.createBitmap(
+                outputWidth,
+                outputHeight,
+                Bitmap.Config.ARGB_8888,
+            )
+            Utils.matToBitmap(outputMat, outputBitmap)
+
+            val bytes = bitmapToByteArray(outputBitmap)
+
+            // Release resources
+            sourceBitmap.recycle()
+            outputBitmap.recycle()
+            sourceMat.release()
+            homographyMat.release()
+            outputMat.release()
+
+            Result.Success(
+                ImageData(
+                    width = outputWidth,
+                    height = outputHeight,
+                    bytes = bytes,
+                ),
+            )
+        } catch (e: Exception) {
+            Result.Error(e, "Failed to apply homography transform: ${e.message}")
         }
     }
 
@@ -364,6 +447,25 @@ class ImageProcessorImpl(private val context: Context) : ImageProcessor {
             Pair((maxHeight * aspectRatio).toInt(), maxHeight)
         } else {
             Pair(maxWidth, (maxWidth / aspectRatio).toInt())
+        }
+    }
+
+    /**
+     * Ensures OpenCV is initialized before using OpenCV operations.
+     * Uses initLocal (newer API) with fallback to initDebug.
+     */
+    private fun ensureOpenCvInitialized() {
+        if (isOpenCvInitialized) return
+
+        isOpenCvInitialized = try {
+            OpenCVLoader.initLocal()
+        } catch (e: Exception) {
+            @Suppress("DEPRECATION")
+            OpenCVLoader.initDebug()
+        }
+
+        if (!isOpenCvInitialized) {
+            throw IllegalStateException("Failed to initialize OpenCV")
         }
     }
 }

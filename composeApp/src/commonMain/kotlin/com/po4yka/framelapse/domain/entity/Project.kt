@@ -15,13 +15,20 @@ data class Project(
     val resolution: Resolution = Resolution.HD_1080P,
     val orientation: Orientation = Orientation.PORTRAIT,
     val thumbnailPath: String? = null,
-    /** The content type for this project's alignment (FACE, BODY, or MUSCLE). */
+    /** The content type for this project's alignment (FACE, BODY, MUSCLE, or LANDSCAPE). */
     val contentType: ContentType = ContentType.FACE,
     /**
      * The muscle region for MUSCLE content type projects.
      * Only used when contentType is MUSCLE, null otherwise.
      */
     val muscleRegion: MuscleRegion? = null,
+    /**
+     * The reference frame ID for LANDSCAPE content type projects.
+     * This is the frame that all other frames will be aligned to.
+     * User-selectable; defaults to first captured frame if not set.
+     * Only used when contentType is LANDSCAPE, null otherwise.
+     */
+    val referenceFrameId: String? = null,
 )
 
 /**

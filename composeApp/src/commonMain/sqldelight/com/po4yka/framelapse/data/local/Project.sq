@@ -9,7 +9,8 @@ CREATE TABLE Project (
     orientation TEXT NOT NULL DEFAULT 'PORTRAIT',
     thumbnailPath TEXT,
     contentType TEXT NOT NULL DEFAULT 'FACE',
-    muscleRegion TEXT
+    muscleRegion TEXT,
+    referenceFrameId TEXT
 );
 
 -- Get all projects ordered by most recently updated
@@ -22,8 +23,8 @@ SELECT * FROM Project WHERE id = ?;
 
 -- Insert a new project
 insert:
-INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath, contentType, muscleRegion)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath, contentType, muscleRegion, referenceFrameId)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Update an existing project
 update:
@@ -35,12 +36,17 @@ UPDATE Project SET
     orientation = ?,
     thumbnailPath = ?,
     contentType = ?,
-    muscleRegion = ?
+    muscleRegion = ?,
+    referenceFrameId = ?
 WHERE id = ?;
 
 -- Update only the thumbnail path
 updateThumbnail:
 UPDATE Project SET thumbnailPath = ?, updatedAt = ? WHERE id = ?;
+
+-- Update only the reference frame (for LANDSCAPE mode)
+updateReferenceFrame:
+UPDATE Project SET referenceFrameId = ?, updatedAt = ? WHERE id = ?;
 
 -- Delete a project by ID
 delete:

@@ -26,6 +26,7 @@ object ProjectMapper {
         thumbnailPath = entity.thumbnailPath,
         contentType = ContentType.fromString(entity.contentType),
         muscleRegion = entity.muscleRegion?.let { MuscleRegion.fromString(it) },
+        referenceFrameId = entity.referenceFrameId,
     )
 
     /**
@@ -42,6 +43,7 @@ object ProjectMapper {
         thumbnailPath = domain.thumbnailPath,
         contentType = domain.contentType.name,
         muscleRegion = domain.muscleRegion?.name,
+        referenceFrameId = domain.referenceFrameId,
     )
 
     /**
@@ -57,6 +59,7 @@ object ProjectMapper {
         thumbnailPath = domain.thumbnailPath,
         contentType = domain.contentType.name,
         muscleRegion = domain.muscleRegion?.name,
+        referenceFrameId = domain.referenceFrameId,
     )
 }
 
@@ -74,6 +77,7 @@ data class InsertProjectParams(
     val thumbnailPath: String?,
     val contentType: String,
     val muscleRegion: String?,
+    val referenceFrameId: String?,
 )
 
 /**
@@ -89,4 +93,5 @@ data class UpdateProjectParams(
     val thumbnailPath: String?,
     val contentType: String,
     val muscleRegion: String?,
+    val referenceFrameId: String?,
 )

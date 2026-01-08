@@ -2,6 +2,7 @@ package com.po4yka.framelapse.platform
 
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.BoundingBox
+import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
@@ -214,6 +215,62 @@ class ImageProcessorImpl : ImageProcessor {
             )
         } catch (e: Exception) {
             Result.Error(e, "Failed to apply transform: ${e.message}")
+        }
+    }
+
+    /**
+     * Applies a homography (perspective) transformation to an image.
+     *
+     * IMPORTANT: Full perspective transformation (homography) requires OpenCV's warpPerspective
+     * function, which is not available without OpenCV cinterop configuration.
+     *
+     * This implementation provides two approaches:
+     * 1. If the homography is near-affine (h31 and h32 close to zero), uses Core Graphics
+     *    with CATransform3D for an approximation.
+     * 2. For full perspective transformations, returns an error indicating OpenCV is required.
+     *
+     * Core Graphics CGAffineTransform only supports affine transformations (6 DOF), not
+     * full perspective/projective transformations (8 DOF) that homography provides.
+     *
+     * TODO: Implement full homography support with OpenCV warpPerspective via cinterop.
+     */
+    override suspend fun applyHomographyTransform(
+        image: ImageData,
+        matrix: HomographyMatrix,
+        outputWidth: Int,
+        outputHeight: Int,
+    ): Result<ImageData> = withContext(Dispatchers.IO) {
+        try {
+            // Check if homography is approximately affine (no significant perspective distortion)
+            // A homography is affine when h31 ≈ 0 and h32 ≈ 0
+            val isNearAffine = kotlin.math.abs(matrix.h31) < PERSPECTIVE_THRESHOLD &&
+                kotlin.math.abs(matrix.h32) < PERSPECTIVE_THRESHOLD
+
+            if (!isNearAffine) {
+                // Full perspective transformation requires OpenCV
+                return@withContext Result.Error(
+                    UnsupportedOperationException(HOMOGRAPHY_NOT_SUPPORTED_MESSAGE),
+                    HOMOGRAPHY_NOT_SUPPORTED_MESSAGE,
+                )
+            }
+
+            // For near-affine homographies, approximate using CGAffineTransform
+            // Normalize by h33 to get standard affine form
+            val h33 = if (kotlin.math.abs(matrix.h33) > EPSILON) matrix.h33 else 1f
+
+            val affineMatrix = AlignmentMatrix(
+                scaleX = matrix.h11 / h33,
+                skewX = matrix.h12 / h33,
+                translateX = matrix.h13 / h33,
+                skewY = matrix.h21 / h33,
+                scaleY = matrix.h22 / h33,
+                translateY = matrix.h23 / h33,
+            )
+
+            // Delegate to affine transform implementation
+            applyAffineTransform(image, affineMatrix, outputWidth, outputHeight)
+        } catch (e: Exception) {
+            Result.Error(e, "Failed to apply homography transform: ${e.message}")
         }
     }
 
@@ -465,5 +522,30 @@ class ImageProcessorImpl : ImageProcessor {
         } else {
             Pair(maxWidth, (maxWidth / aspectRatio).toInt())
         }
+    }
+
+    companion object {
+        /**
+         * Threshold for determining if a homography has significant perspective distortion.
+         * If h31 and h32 are below this threshold, the homography can be approximated
+         * by an affine transformation without noticeable loss of quality.
+         */
+        private const val PERSPECTIVE_THRESHOLD = 0.001f
+
+        /**
+         * Small value to prevent division by zero when normalizing homography matrix.
+         */
+        private const val EPSILON = 1e-6f
+
+        /**
+         * Error message when full homography (perspective) transformation is required
+         * but OpenCV is not configured.
+         */
+        private const val HOMOGRAPHY_NOT_SUPPORTED_MESSAGE =
+            "Full perspective (homography) transformation requires OpenCV integration. " +
+                "The provided transformation contains significant perspective distortion " +
+                "(h31 or h32 values exceed threshold) that cannot be handled by Core Graphics " +
+                "affine transforms. Please configure OpenCV iOS framework via cinterop for " +
+                "full homography support, or use a near-affine transformation."
     }
 }

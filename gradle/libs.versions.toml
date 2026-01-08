@@ -20,6 +20,9 @@ camerax = "1.5.2"
 # MediaPipe
 mediapipe = "0.10.29"
 
+# OpenCV
+opencv = "4.9.0"
+
 # Image Processing
 exifinterface = "1.4.2"
 
@@ -90,6 +93,9 @@ camerax-view = { module = "androidx.camera:camera-view", version.ref = "camerax"
 
 # MediaPipe
 mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipe" }
+
+# OpenCV
+opencv-android = { module = "org.opencv:opencv", version.ref = "opencv" }
 
 # Image Processing
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }

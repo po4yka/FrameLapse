@@ -99,6 +99,9 @@ kotlin {
             // MediaPipe
             implementation(libs.mediapipe.tasks.vision)
 
+            // OpenCV
+            implementation(libs.opencv.android)
+
             // Image Processing
             implementation(libs.androidx.exifinterface)
         }

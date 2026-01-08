@@ -5,6 +5,9 @@ target 'iosApp' do
 
   # MediaPipe for face detection
   pod 'MediaPipeTasksVision', '~> 0.10.18'
+
+  # OpenCV for feature matching (landscape mode)
+  pod 'OpenCV', '~> 4.9.0'
 end
 
 post_install do |installer|

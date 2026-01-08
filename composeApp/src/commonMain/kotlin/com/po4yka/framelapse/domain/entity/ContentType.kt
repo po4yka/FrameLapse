@@ -9,8 +9,6 @@ import kotlinx.serialization.Serializable
  * - FACE: Uses eye positions for alignment (default, existing behavior)
  * - BODY: Uses shoulder positions for upper-body timelapses
  * - MUSCLE: Body alignment + region-specific cropping for muscle focus
- *
- * Future content types (not yet implemented):
  * - LANDSCAPE: Feature matching for nature/architecture timelapses
  */
 @Serializable
@@ -36,6 +34,14 @@ enum class ContentType(val displayName: String) {
      * Uses body alignment (shoulder-based) then crops to the target region.
      */
     MUSCLE("Muscle"),
+
+    /**
+     * Landscape-based alignment using OpenCV feature matching.
+     * Best for: Nature timelapses, architecture, construction progress, scenery.
+     * Framing: Maintains consistent scene composition using homography transformation.
+     * Uses ORB/AKAZE feature detection with RANSAC-based homography estimation.
+     */
+    LANDSCAPE("Landscape"),
     ;
 
     companion object {
