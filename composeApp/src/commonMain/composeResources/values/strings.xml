@@ -34,6 +34,7 @@
     <string name="nav_gallery">Gallery</string>
     <string name="nav_capture">Capture</string>
     <string name="nav_export">Export</string>
+    <string name="nav_statistics">Statistics</string>
 
     <!-- Project List Screen -->
     <string name="projects_title">FrameLapse</string>

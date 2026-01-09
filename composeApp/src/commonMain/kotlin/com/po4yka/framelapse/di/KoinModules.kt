@@ -67,6 +67,9 @@ import com.po4yka.framelapse.domain.usecase.project.DeleteProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
+import com.po4yka.framelapse.domain.usecase.statistics.CalculateStreakUseCase
+import com.po4yka.framelapse.domain.usecase.statistics.GetGlobalStatisticsUseCase
+import com.po4yka.framelapse.domain.usecase.statistics.GetProjectStatisticsUseCase
 import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
 import com.po4yka.framelapse.presentation.calibration.CalibrationViewModel
@@ -76,6 +79,7 @@ import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
 import com.po4yka.framelapse.presentation.main.MainViewModel
 import com.po4yka.framelapse.presentation.projectlist.ProjectListViewModel
 import com.po4yka.framelapse.presentation.settings.SettingsViewModel
+import com.po4yka.framelapse.presentation.statistics.StatisticsViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -284,6 +288,11 @@ val domainModule = module {
     }
     factory { SuggestSimilarFramesUseCase(get()) }
     factory { BatchApplyAdjustmentUseCase(get(), get(), get()) }
+
+    // Statistics Use Cases
+    factory { CalculateStreakUseCase() }
+    factory { GetProjectStatisticsUseCase(get(), get(), get()) }
+    factory { GetGlobalStatisticsUseCase(get(), get(), get()) }
 }
 
 /**
@@ -299,6 +308,7 @@ val presentationModule = module {
     factory { SettingsViewModel(get(), get()) }
     factory { ManualAdjustmentViewModel(get(), get(), get(), get()) }
     factory { CalibrationViewModel(get(), get(), get(), get()) }
+    factory { StatisticsViewModel(get(), get(), get()) }
 }
 
 /**

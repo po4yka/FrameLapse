@@ -22,6 +22,7 @@ import com.po4yka.framelapse.ui.screens.export.ExportScreen
 import com.po4yka.framelapse.ui.screens.gallery.GalleryScreen
 import com.po4yka.framelapse.ui.screens.projectlist.ProjectListScreen
 import com.po4yka.framelapse.ui.screens.settings.SettingsScreen
+import com.po4yka.framelapse.ui.screens.statistics.StatisticsScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -53,6 +54,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         },
                         onNavigateToSettings = {
                             backStack.add(SettingsKey)
+                        },
+                        onNavigateToStatistics = {
+                            backStack.add(StatisticsKey())
                         },
                         onShowCreateDialog = {
                             backStack.add(CreateProjectDialogKey())
@@ -105,6 +109,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         onNavigateToManualAdjustment = { frameId ->
                             backStack.add(ManualAdjustmentKey(frameId, key.projectId))
                         },
+                        onNavigateToStatistics = {
+                            backStack.add(StatisticsKey(key.projectId))
+                        },
                     )
                 }
 
@@ -135,6 +142,15 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         onNavigateToFrame = { newFrameId ->
                             backStack.removeLastOrNull()
                             backStack.add(ManualAdjustmentKey(newFrameId, key.projectId))
+                        },
+                    )
+                }
+
+                is StatisticsKey -> NavEntry(key) {
+                    StatisticsScreen(
+                        projectId = key.projectId,
+                        onNavigateBack = {
+                            backStack.removeLastOrNull()
                         },
                     )
                 }

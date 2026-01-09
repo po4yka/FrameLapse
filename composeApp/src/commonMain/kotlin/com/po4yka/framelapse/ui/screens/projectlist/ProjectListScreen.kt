@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import com.po4yka.framelapse.ui.util.HandleEffects
 import framelapse.composeapp.generated.resources.Res
 import framelapse.composeapp.generated.resources.app_name
 import framelapse.composeapp.generated.resources.nav_settings
+import framelapse.composeapp.generated.resources.nav_statistics
 import framelapse.composeapp.generated.resources.projects_create
 import framelapse.composeapp.generated.resources.projects_empty_description
 import framelapse.composeapp.generated.resources.projects_empty_title
@@ -54,6 +56,7 @@ fun ProjectListScreen(
     onNavigateToCapture: (String) -> Unit,
     onNavigateToGallery: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToStatistics: () -> Unit,
     onShowCreateDialog: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ProjectListViewModel = koinViewModel<ProjectListViewModel>(),
@@ -78,6 +81,7 @@ fun ProjectListScreen(
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
         onNavigateToSettings = onNavigateToSettings,
+        onNavigateToStatistics = onNavigateToStatistics,
         onShowCreateDialog = onShowCreateDialog,
         modifier = modifier,
     )
@@ -90,6 +94,7 @@ private fun ProjectListContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (ProjectListEvent) -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToStatistics: () -> Unit,
     onShowCreateDialog: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -99,6 +104,12 @@ private fun ProjectListContent(
             TopAppBar(
                 title = { Text(stringResource(Res.string.app_name)) },
                 actions = {
+                    IconButton(onClick = onNavigateToStatistics) {
+                        Icon(
+                            imageVector = Icons.Default.Analytics,
+                            contentDescription = stringResource(Res.string.nav_statistics),
+                        )
+                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,

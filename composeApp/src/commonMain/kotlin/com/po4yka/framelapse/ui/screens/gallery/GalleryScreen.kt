@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -61,6 +62,7 @@ import framelapse.composeapp.generated.resources.gallery_empty_description
 import framelapse.composeapp.generated.resources.gallery_empty_title
 import framelapse.composeapp.generated.resources.gallery_export_button
 import framelapse.composeapp.generated.resources.gallery_title
+import framelapse.composeapp.generated.resources.nav_statistics
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -80,6 +82,7 @@ fun GalleryScreen(
     onShowDeleteDialog: (Int) -> Unit = {},
     onShowFilterSheet: () -> Unit = {},
     onNavigateToManualAdjustment: (frameId: String) -> Unit = {},
+    onNavigateToStatistics: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GalleryViewModel = koinViewModel<GalleryViewModel>(),
 ) {
@@ -132,6 +135,7 @@ fun GalleryScreen(
         snackbarHostState = snackbarHostState,
         onEvent = viewModel::onEvent,
         onNavigateBack = onNavigateBack,
+        onNavigateToStatistics = onNavigateToStatistics,
         modifier = modifier,
     )
 
@@ -182,6 +186,7 @@ private fun GalleryContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (GalleryEvent) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateToStatistics: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -198,6 +203,14 @@ private fun GalleryContent(
                 FrameLapseTopBar(
                     title = state.project?.name ?: stringResource(Res.string.gallery_title),
                     onBackClick = onNavigateBack,
+                    actions = {
+                        IconButton(onClick = onNavigateToStatistics) {
+                            Icon(
+                                imageVector = Icons.Default.Analytics,
+                                contentDescription = stringResource(Res.string.nav_statistics),
+                            )
+                        }
+                    },
                 )
             }
         },

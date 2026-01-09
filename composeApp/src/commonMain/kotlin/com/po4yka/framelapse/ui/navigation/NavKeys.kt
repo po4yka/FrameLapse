@@ -56,6 +56,13 @@ data class ManualAdjustmentKey(val frameId: String, val projectId: String) : Nav
 @Serializable
 data class CalibrationKey(val projectId: String) : NavKey
 
+/**
+ * Statistics screen for viewing project/global stats and streak tracking.
+ * @param projectId Optional project ID to open in project mode with that project selected.
+ */
+@Serializable
+data class StatisticsKey(val projectId: String? = null) : NavKey
+
 // ==================== Dialog NavKeys ====================
 
 /**
@@ -104,6 +111,7 @@ val navKeySavedStateConfig: SavedStateConfiguration = SavedStateConfiguration {
             subclass(SettingsKey::class, SettingsKey.serializer())
             subclass(ManualAdjustmentKey::class, ManualAdjustmentKey.serializer())
             subclass(CalibrationKey::class, CalibrationKey.serializer())
+            subclass(StatisticsKey::class, StatisticsKey.serializer())
             subclass(CreateProjectDialogKey::class, CreateProjectDialogKey.serializer())
             subclass(DeleteFramesDialogKey::class, DeleteFramesDialogKey.serializer())
             subclass(DeleteProjectDialogKey::class, DeleteProjectDialogKey.serializer())
