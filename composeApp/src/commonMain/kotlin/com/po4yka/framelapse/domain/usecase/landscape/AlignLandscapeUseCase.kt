@@ -1,6 +1,5 @@
 package com.po4yka.framelapse.domain.usecase.landscape
 
-import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.EarlyStopReason
@@ -17,6 +16,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipeline
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipelineStep
 import com.po4yka.framelapse.domain.util.Result
@@ -47,7 +47,7 @@ class AlignLandscapeUseCase(
     private val featureMatcher: FeatureMatcher,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
-    private val imageStorageManager: ImageStorageManager,
+    private val mediaStore: MediaStore,
     private val detectFeatures: DetectLandscapeFeaturesUseCase,
     private val matchFeatures: MatchLandscapeFeaturesUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
@@ -251,9 +251,10 @@ class AlignLandscapeUseCase(
                                 IllegalStateException("Aligned image not available"),
                                 "Failed to apply homography transform",
                             )
-                        val originalFilename = context.frame.originalPath.substringAfterLast("/")
-                        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
-                        val alignedPath = imageStorageManager.getAlignedPath(context.frame.projectId, alignedFilename)
+                        val alignedPath = mediaStore.getAlignedPath(
+                            context.frame.projectId,
+                            context.frame.originalPath,
+                        )
                         val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
                         if (saveResult.isError) {
                             return@AlignmentPipelineStep Result.Error(
@@ -446,9 +447,7 @@ class AlignLandscapeUseCase(
         val (alignedImage, stabResult) = stabilizationResult.getOrNull()!!
 
         // Step 6: Save aligned image
-        val originalFilename = frame.originalPath.substringAfterLast("/")
-        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
-        val alignedPath = imageStorageManager.getAlignedPath(frame.projectId, alignedFilename)
+        val alignedPath = mediaStore.getAlignedPath(frame.projectId, frame.originalPath)
 
         val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
         if (saveResult.isError) {

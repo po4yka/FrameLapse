@@ -1,9 +1,9 @@
 package com.po4yka.framelapse.domain.usecase.capture
 
-import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.service.CameraController
+import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.util.Result
@@ -20,7 +20,7 @@ import com.po4yka.framelapse.platform.currentTimeMillis
 class CaptureImageUseCase(
     private val addFrameUseCase: AddFrameUseCase,
     private val alignFaceUseCase: AlignFaceUseCase,
-    private val imageStorageManager: ImageStorageManager,
+    private val mediaStore: MediaStore,
 ) {
     /**
      * Captures an image and adds it to the project.
@@ -46,8 +46,7 @@ class CaptureImageUseCase(
 
         // Generate output path for captured image
         val timestamp = currentTimeMillis()
-        val filename = imageStorageManager.generateFrameFilename(timestamp)
-        val capturePath = imageStorageManager.getFramePath(projectId, filename)
+        val capturePath = mediaStore.getCapturePath(projectId, timestamp)
 
         // Capture image
         val captureResult = cameraController.captureImage(capturePath)
@@ -64,7 +63,7 @@ class CaptureImageUseCase(
         val addResult = addFrameUseCase(projectId, savedPath)
         if (addResult.isError) {
             // Clean up the captured file on failure
-            imageStorageManager.deleteImage(savedPath)
+            mediaStore.deleteImage(savedPath)
             return Result.Error(
                 addResult.exceptionOrNull()!!,
                 "Failed to save frame",

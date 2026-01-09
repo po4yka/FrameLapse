@@ -1,6 +1,5 @@
 package com.po4yka.framelapse.domain.usecase.body
 
-import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
@@ -12,6 +11,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
 
 /**
@@ -31,7 +31,7 @@ class AlignBodyUseCase(
     private val bodyPoseDetector: BodyPoseDetector,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
-    private val imageStorageManager: ImageStorageManager,
+    private val mediaStore: MediaStore,
     private val multiPassBodyStabilization: MultiPassBodyStabilizationUseCase,
     private val validateBodyAlignment: ValidateBodyAlignmentUseCase = ValidateBodyAlignmentUseCase(),
 ) {
@@ -100,9 +100,7 @@ class AlignBodyUseCase(
         val (alignedImage, stabResult) = stabilizationResult.getOrNull()!!
 
         // Generate aligned image path
-        val originalFilename = frame.originalPath.substringAfterLast("/")
-        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
-        val alignedPath = imageStorageManager.getAlignedPath(frame.projectId, alignedFilename)
+        val alignedPath = mediaStore.getAlignedPath(frame.projectId, frame.originalPath)
 
         // Save aligned image
         val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)

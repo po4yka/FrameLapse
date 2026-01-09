@@ -10,6 +10,7 @@ import com.po4yka.framelapse.data.repository.ManualAdjustmentRepositoryImpl
 import com.po4yka.framelapse.data.repository.ProjectRepositoryImpl
 import com.po4yka.framelapse.data.repository.SettingsRepositoryImpl
 import com.po4yka.framelapse.data.storage.ImageStorageManager
+import com.po4yka.framelapse.data.storage.MediaStoreImpl
 import com.po4yka.framelapse.data.storage.StorageCleanupManager
 import com.po4yka.framelapse.data.storage.ThumbnailGenerator
 import com.po4yka.framelapse.data.storage.VideoStorageManager
@@ -17,6 +18,9 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
+import com.po4yka.framelapse.domain.service.MediaStore
+import com.po4yka.framelapse.domain.service.ModelCapabilitiesProvider
+import com.po4yka.framelapse.domain.service.ModelCapabilitiesProviderImpl
 import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseCase
 import com.po4yka.framelapse.domain.usecase.adjustment.BatchApplyAdjustmentUseCase
 import com.po4yka.framelapse.domain.usecase.adjustment.SuggestSimilarFramesUseCase
@@ -75,7 +79,7 @@ import org.koin.dsl.module
  * Common module for shared utilities and configurations.
  */
 val commonModule = module {
-    // Add common dependencies here
+    single<ModelCapabilitiesProvider> { ModelCapabilitiesProviderImpl(get(), get(), get()) }
 }
 
 /**
@@ -100,6 +104,7 @@ val dataModule = module {
     single { ImageStorageManager(get()) }
     single { VideoStorageManager(get()) }
     single { ThumbnailGenerator(get(), get()) }
+    single<MediaStore> { MediaStoreImpl(get(), get()) }
     single { StorageCleanupManager(get(), get(), get(), get(), get()) }
 
     // Repositories
@@ -157,7 +162,7 @@ val domainModule = module {
             faceDetector = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            imageStorageManager = get(),
+            mediaStore = get(),
             multiPassStabilization = get(),
             validateAlignment = get(),
         )
@@ -179,7 +184,7 @@ val domainModule = module {
             bodyPoseDetector = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            imageStorageManager = get(),
+            mediaStore = get(),
             multiPassBodyStabilization = get(),
             validateBodyAlignment = get(),
         )
@@ -200,7 +205,7 @@ val domainModule = module {
             cropToRegion = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            imageStorageManager = get(),
+            mediaStore = get(),
         )
     }
 
@@ -231,7 +236,7 @@ val domainModule = module {
             featureMatcher = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            imageStorageManager = get(),
+            mediaStore = get(),
             detectFeatures = get(),
             matchFeatures = get(),
             calculateHomography = get(),
