@@ -107,7 +107,7 @@ internal class AndroidBitmapTransformer(private val codec: AndroidBitmapCodec) {
         image: ImageData,
         width: Int,
         height: Int,
-        maintainAspectRatio: Boolean,
+        maintainAspectRatio: Boolean
     ): Result<ImageData> {
         return try {
             val sourceBitmap = codec.byteArrayToBitmap(image.bytes)

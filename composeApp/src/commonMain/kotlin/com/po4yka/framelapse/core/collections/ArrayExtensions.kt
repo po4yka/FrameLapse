@@ -13,9 +13,8 @@ package com.po4yka.framelapse.core.collections
  * val normalized = coordinates.mapArray { it / 3.0f }
  * ```
  */
-public inline fun FloatArray.mapArray(transform: (Float) -> Float): FloatArray {
-    return FloatArray(size) { index -> transform(this[index]) }
-}
+public inline fun FloatArray.mapArray(transform: (Float) -> Float): FloatArray =
+    FloatArray(size) { index -> transform(this[index]) }
 
 /**
  * Returns a [FloatArray] containing the results of applying the given
@@ -28,9 +27,8 @@ public inline fun FloatArray.mapArray(transform: (Float) -> Float): FloatArray {
  * val weighted = values.mapArrayIndexed { index, value -> value * (index + 1) }
  * ```
  */
-public inline fun FloatArray.mapArrayIndexed(transform: (index: Int, Float) -> Float): FloatArray {
-    return FloatArray(size) { index -> transform(index, this[index]) }
-}
+public inline fun FloatArray.mapArrayIndexed(transform: (index: Int, Float) -> Float): FloatArray =
+    FloatArray(size) { index -> transform(index, this[index]) }
 
 /**
  * Returns a [FloatList] containing the results of applying the given
@@ -42,10 +40,8 @@ public inline fun FloatArray.mapArrayIndexed(transform: (index: Int, Float) -> F
  * val distances: FloatList = coordinates.map { it * 2.0f }
  * ```
  */
-public inline fun FloatArray.map(transform: (Float) -> Float): FloatList {
-    return buildFloatList(size) {
-        this@map.forEach { add(transform(it)) }
-    }
+public inline fun FloatArray.map(transform: (Float) -> Float): FloatList = buildFloatList(size) {
+    this@map.forEach { add(transform(it)) }
 }
 
 /**
@@ -83,10 +79,8 @@ public inline fun FloatArray.filterArray(predicate: (Float) -> Boolean): FloatAr
  * val highScores: FloatList = scores.filter { it >= 0.5f }
  * ```
  */
-public inline fun FloatArray.filter(predicate: (Float) -> Boolean): FloatList {
-    return buildFloatList {
-        this@filter.forEach { if (predicate(it)) add(it) }
-    }
+public inline fun FloatArray.filter(predicate: (Float) -> Boolean): FloatList = buildFloatList {
+    this@filter.forEach { if (predicate(it)) add(it) }
 }
 
 /**

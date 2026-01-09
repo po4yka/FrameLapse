@@ -25,10 +25,7 @@ package com.po4yka.framelapse.core.collections.inplace
  * // Processes: [f1, f2, f3], [f4, f5, f6], [f7]
  * ```
  */
-public inline fun <T> List<T>.forEachChunk(
-    chunkSize: Int,
-    action: (InPlaceSubList<T>) -> Unit,
-) {
+public inline fun <T> List<T>.forEachChunk(chunkSize: Int, action: (InPlaceSubList<T>) -> Unit) {
     forEachWindow(chunkSize, chunkSize, partialWindows = true, action)
 }
 
@@ -59,7 +56,7 @@ public inline fun <T> List<T>.forEachChunk(
  */
 public inline fun <T> List<T>.forEachChunkIndexed(
     chunkSize: Int,
-    action: (index: Int, InPlaceSubList<T>) -> Unit,
+    action: (index: Int, InPlaceSubList<T>) -> Unit
 ) {
     var index = 0
     forEachChunk(chunkSize) { chunk ->

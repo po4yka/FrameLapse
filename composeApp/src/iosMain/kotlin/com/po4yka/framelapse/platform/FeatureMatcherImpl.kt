@@ -53,15 +53,14 @@ class FeatureMatcherImpl : FeatureMatcher {
         maxKeypoints: Int,
         ratioTestThreshold: Float,
         ransacThreshold: Float,
-    ): Result<FeatureMatchResult> =
-        core.findHomography(
-            sourceImageData = sourceImageData,
-            referenceImageData = referenceImageData,
-            detectorType = detectorType,
-            maxKeypoints = maxKeypoints,
-            ratioTestThreshold = ratioTestThreshold,
-            ransacThreshold = ransacThreshold,
-        )
+    ): Result<FeatureMatchResult> = core.findHomography(
+        sourceImageData = sourceImageData,
+        referenceImageData = referenceImageData,
+        detectorType = detectorType,
+        maxKeypoints = maxKeypoints,
+        ratioTestThreshold = ratioTestThreshold,
+        ransacThreshold = ransacThreshold,
+    )
 
     override suspend fun calculateReprojectionError(
         sourceKeypoints: List<FeatureKeypoint>,
@@ -70,15 +69,14 @@ class FeatureMatcherImpl : FeatureMatcher {
         homography: HomographyMatrix,
         imageWidth: Int,
         imageHeight: Int,
-    ): Result<ReprojectionErrorResult> =
-        core.calculateReprojectionError(
-            sourceKeypoints = sourceKeypoints,
-            referenceKeypoints = referenceKeypoints,
-            matches = matches,
-            homography = homography,
-            imageWidth = imageWidth,
-            imageHeight = imageHeight,
-        )
+    ): Result<ReprojectionErrorResult> = core.calculateReprojectionError(
+        sourceKeypoints = sourceKeypoints,
+        referenceKeypoints = referenceKeypoints,
+        matches = matches,
+        homography = homography,
+        imageWidth = imageWidth,
+        imageHeight = imageHeight,
+    )
 
     override fun release() {
         core.release()

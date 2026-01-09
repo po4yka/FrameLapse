@@ -149,7 +149,7 @@ class ArrayExtensionsTest {
 
         assertEquals(
             listOf(0 to 10.0f, 1 to 20.0f, 2 to 30.0f),
-            collected
+            collected,
         )
     }
 
@@ -251,8 +251,8 @@ class ArrayExtensionsTest {
             .filterArray { it > 5.0f }
 
         assertEquals(3, result.size)
-        assertEquals(6.0f, result[0])  // 3 * 2
-        assertEquals(8.0f, result[1])  // 4 * 2
+        assertEquals(6.0f, result[0]) // 3 * 2
+        assertEquals(8.0f, result[1]) // 4 * 2
         assertEquals(10.0f, result[2]) // 5 * 2
     }
 

@@ -1,12 +1,12 @@
 package com.po4yka.framelapse.domain.usecase.capture
 
+import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**

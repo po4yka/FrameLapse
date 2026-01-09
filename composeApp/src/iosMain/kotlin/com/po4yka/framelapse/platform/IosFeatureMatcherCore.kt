@@ -93,7 +93,12 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         }
 
         try {
-            matchFeaturesWithOpenCV(sourceFeatures, referenceFeatures, ratioTestThreshold, useCrossCheck)
+            matchFeaturesWithOpenCV(
+                sourceFeatures,
+                referenceFeatures,
+                ratioTestThreshold,
+                useCrossCheck
+            )
         } catch (e: Exception) {
             Result.Error(e, "Feature matching failed: ${e.message}")
         }
@@ -120,7 +125,12 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         }
 
         try {
-            computeHomographyWithOpenCV(sourceKeypoints, referenceKeypoints, matches, ransacThreshold)
+            computeHomographyWithOpenCV(
+                sourceKeypoints,
+                referenceKeypoints,
+                matches,
+                ransacThreshold
+            )
         } catch (e: Exception) {
             Result.Error(e, "Homography computation failed: ${e.message}")
         }
@@ -142,7 +152,12 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         }
 
         try {
-            val sourceResult = detectFeaturesWithOpenCV(sourceImageData, detectorType, maxKeypoints, isSource = true)
+            val sourceResult = detectFeaturesWithOpenCV(
+                sourceImageData,
+                detectorType,
+                maxKeypoints,
+                isSource = true
+            )
             if (sourceResult is Result.Error) {
                 return@withContext Result.Error(
                     sourceResult.exception,
@@ -151,7 +166,12 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
             }
             val sourceLandmarks = (sourceResult as Result.Success).data
 
-            val refResult = detectFeaturesWithOpenCV(referenceImageData, detectorType, maxKeypoints, isSource = false)
+            val refResult = detectFeaturesWithOpenCV(
+                referenceImageData,
+                detectorType,
+                maxKeypoints,
+                isSource = false
+            )
             if (refResult is Result.Error) {
                 return@withContext Result.Error(
                     refResult.exception,
@@ -239,15 +259,14 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         homography: HomographyMatrix,
         imageWidth: Int,
         imageHeight: Int,
-    ): Result<ReprojectionErrorResult> =
-        ReprojectionErrorCalculator.calculate(
-            sourceKeypoints = sourceKeypoints,
-            referenceKeypoints = referenceKeypoints,
-            matches = matches,
-            homography = homography,
-            imageWidth = imageWidth,
-            imageHeight = imageHeight,
-        )
+    ): Result<ReprojectionErrorResult> = ReprojectionErrorCalculator.calculate(
+        sourceKeypoints = sourceKeypoints,
+        referenceKeypoints = referenceKeypoints,
+        matches = matches,
+        homography = homography,
+        imageWidth = imageWidth,
+        imageHeight = imageHeight,
+    )
 
     fun release() {
         lastSourceDescriptors = null
@@ -478,7 +497,8 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         } else {
             0f
         }.coerceAtMost(1f)
-        val qualityScore = (countScore * COUNT_WEIGHT + responseScore * RESPONSE_WEIGHT).coerceIn(0f, 1f)
+        val qualityScore =
+            (countScore * COUNT_WEIGHT + responseScore * RESPONSE_WEIGHT).coerceIn(0f, 1f)
 
         return LandscapeLandmarks(
             keypoints = keypoints.take(LandscapeLandmarks.MAX_KEYPOINTS),
@@ -489,10 +509,11 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         )
     }
 
-    private fun mapDetectorType(detectorType: FeatureDetectorType): CVDetectorType = when (detectorType) {
-        FeatureDetectorType.ORB -> CVDetectorType.CVDetectorTypeOrb
-        FeatureDetectorType.AKAZE -> CVDetectorType.CVDetectorTypeAkaze
-    }
+    private fun mapDetectorType(detectorType: FeatureDetectorType): CVDetectorType =
+        when (detectorType) {
+            FeatureDetectorType.ORB -> CVDetectorType.CVDetectorTypeOrb
+            FeatureDetectorType.AKAZE -> CVDetectorType.CVDetectorTypeAkaze
+        }
 
     private data class DescriptorData(
         val data: platform.Foundation.NSData?,

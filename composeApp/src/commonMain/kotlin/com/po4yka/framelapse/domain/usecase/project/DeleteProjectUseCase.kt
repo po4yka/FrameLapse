@@ -3,12 +3,8 @@ package com.po4yka.framelapse.domain.usecase.project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
 
-/**
- * Deletes a project and all its associated data.
- */
-class DeleteProjectUseCase(
-    private val projectRepository: ProjectRepository,
-) {
+/** Deletes a project and all its associated data. */
+class DeleteProjectUseCase(private val projectRepository: ProjectRepository) {
     /**
      * Deletes a project, its frames, and all associated files.
      *

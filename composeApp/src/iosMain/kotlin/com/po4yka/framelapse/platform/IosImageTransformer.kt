@@ -185,7 +185,7 @@ internal class IosImageTransformer(private val codec: IosImageCodec) {
         image: ImageData,
         width: Int,
         height: Int,
-        maintainAspectRatio: Boolean,
+        maintainAspectRatio: Boolean
     ): Result<ImageData> {
         return try {
             val uiImage = codec.byteArrayToUIImage(image.bytes)

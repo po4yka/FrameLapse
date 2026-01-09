@@ -63,7 +63,7 @@ class InPlaceCollectionsTest {
 
         assertEquals(
             listOf(0 to "c", 1 to "d", 2 to "e"),
-            collected
+            collected,
         )
     }
 
@@ -92,9 +92,9 @@ class InPlaceCollectionsTest {
             listOf(
                 listOf(1, 2, 3),
                 listOf(2, 3, 4),
-                listOf(3, 4, 5)
+                listOf(3, 4, 5),
             ),
-            windows
+            windows,
         )
     }
 
@@ -111,9 +111,9 @@ class InPlaceCollectionsTest {
             listOf(
                 listOf(1, 2),
                 listOf(3, 4),
-                listOf(5, 6)
+                listOf(5, 6),
             ),
-            windows
+            windows,
         )
     }
 
@@ -130,9 +130,9 @@ class InPlaceCollectionsTest {
             listOf(
                 listOf(1, 2, 3),
                 listOf(3, 4, 5),
-                listOf(5)
+                listOf(5),
             ),
-            windows
+            windows,
         )
     }
 
@@ -148,9 +148,9 @@ class InPlaceCollectionsTest {
         assertEquals(
             listOf(
                 listOf(1, 2, 3),
-                listOf(3, 4, 5)
+                listOf(3, 4, 5),
             ),
-            windows
+            windows,
         )
     }
 
@@ -236,9 +236,9 @@ class InPlaceCollectionsTest {
             listOf(
                 listOf(1, 2, 3),
                 listOf(4, 5, 6),
-                listOf(7)
+                listOf(7),
             ),
-            chunks
+            chunks,
         )
     }
 
@@ -255,9 +255,9 @@ class InPlaceCollectionsTest {
             listOf(
                 listOf(1, 2),
                 listOf(3, 4),
-                listOf(5, 6)
+                listOf(5, 6),
             ),
-            chunks
+            chunks,
         )
     }
 
@@ -272,7 +272,7 @@ class InPlaceCollectionsTest {
 
         assertEquals(
             listOf(listOf("a"), listOf("b"), listOf("c")),
-            chunks
+            chunks,
         )
     }
 
@@ -311,9 +311,9 @@ class InPlaceCollectionsTest {
             listOf(
                 0 to listOf(1, 2),
                 1 to listOf(3, 4),
-                2 to listOf(5)
+                2 to listOf(5),
             ),
-            results
+            results,
         )
     }
 

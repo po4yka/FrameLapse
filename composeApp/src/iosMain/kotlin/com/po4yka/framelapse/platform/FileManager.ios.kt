@@ -3,8 +3,8 @@ package com.po4yka.framelapse.platform
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
-import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSFileSize
+import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSFileType
 import platform.Foundation.NSFileTypeDirectory
 import platform.Foundation.NSNumber
