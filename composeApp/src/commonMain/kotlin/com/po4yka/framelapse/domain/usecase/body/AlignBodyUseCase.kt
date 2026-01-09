@@ -1,5 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.body
 
+import com.po4yka.framelapse.data.storage.ImageStorageManager
+import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
 import com.po4yka.framelapse.domain.entity.BoundingBox
@@ -11,7 +13,6 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 
 /**
  * Performs body alignment pipeline using multi-pass stabilization.
@@ -30,7 +31,7 @@ class AlignBodyUseCase(
     private val bodyPoseDetector: BodyPoseDetector,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
-    private val fileManager: FileManager,
+    private val imageStorageManager: ImageStorageManager,
     private val multiPassBodyStabilization: MultiPassBodyStabilizationUseCase,
     private val validateBodyAlignment: ValidateBodyAlignmentUseCase = ValidateBodyAlignmentUseCase(),
 ) {
@@ -99,8 +100,9 @@ class AlignBodyUseCase(
         val (alignedImage, stabResult) = stabilizationResult.getOrNull()!!
 
         // Generate aligned image path
-        val projectDir = fileManager.getProjectDirectory(frame.projectId)
-        val alignedPath = "$projectDir/aligned_${frame.id}.jpg"
+        val originalFilename = frame.originalPath.substringAfterLast("/")
+        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
+        val alignedPath = imageStorageManager.getAlignedPath(frame.projectId, alignedFilename)
 
         // Save aligned image
         val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
@@ -114,6 +116,16 @@ class AlignBodyUseCase(
         // Detect landmarks on aligned image for database storage
         val alignedDetectResult = bodyPoseDetector.detectBodyPose(alignedImage)
         val landmarks = alignedDetectResult.getOrNull()
+        val diagnostics = AlignmentDiagnostics(
+            alignedLandmarksDetected = landmarks != null,
+            alignedLandmarksError = when {
+                alignedDetectResult.isError -> alignedDetectResult.exceptionOrNull()?.message ?: "Body detection failed"
+                landmarks == null -> "No body detected in aligned image"
+                else -> null
+            },
+            fallbackLandmarksGenerated = landmarks == null,
+            referenceFrameId = referenceFrame?.id,
+        )
 
         // Validate alignment quality if landmarks detected
         if (landmarks != null && !validateBodyAlignment(landmarks, settings)) {
@@ -128,13 +140,14 @@ class AlignBodyUseCase(
         val confidence = calculateConfidenceFromStabilization(stabResult)
 
         // Update frame in database with stabilization result
+        val stabilizedResult = stabResult.copy(diagnostics = diagnostics)
         val updateResult = if (landmarks != null) {
             frameRepository.updateAlignedFrame(
                 id = frame.id,
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = landmarks,
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             )
         } else {
             // If landmarks detection failed on aligned image, store minimal data
@@ -143,7 +156,7 @@ class AlignBodyUseCase(
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = createMinimalBodyLandmarks(goalLeftShoulder, goalRightShoulder, settings.outputSize),
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             )
         }
 
@@ -160,7 +173,7 @@ class AlignBodyUseCase(
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = landmarks,
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             ),
         )
     }

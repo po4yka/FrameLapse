@@ -179,7 +179,7 @@ val domainModule = module {
             bodyPoseDetector = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            fileManager = get(),
+            imageStorageManager = get(),
             multiPassBodyStabilization = get(),
             validateBodyAlignment = get(),
         )
@@ -200,7 +200,7 @@ val domainModule = module {
             cropToRegion = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            fileManager = get(),
+            imageStorageManager = get(),
         )
     }
 
@@ -231,7 +231,7 @@ val domainModule = module {
             featureMatcher = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            fileManager = get(),
+            imageStorageManager = get(),
             detectFeatures = get(),
             matchFeatures = get(),
             calculateHomography = get(),

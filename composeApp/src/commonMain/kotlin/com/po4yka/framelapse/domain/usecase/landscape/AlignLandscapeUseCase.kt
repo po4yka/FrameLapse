@@ -1,5 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.landscape
 
+import com.po4yka.framelapse.data.storage.ImageStorageManager
+import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.EarlyStopReason
 import com.po4yka.framelapse.domain.entity.FeatureDetectorType
@@ -15,8 +17,9 @@ import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipeline
+import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipelineStep
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
@@ -44,7 +47,7 @@ class AlignLandscapeUseCase(
     private val featureMatcher: FeatureMatcher,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
-    private val fileManager: FileManager,
+    private val imageStorageManager: ImageStorageManager,
     private val detectFeatures: DetectLandscapeFeaturesUseCase,
     private val matchFeatures: MatchLandscapeFeaturesUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
@@ -100,120 +103,199 @@ class AlignLandscapeUseCase(
         onProgress: ((StabilizationProgress) -> Unit)?,
     ): Result<Frame> {
         val startTime = currentTimeMillis()
+        val pipeline = AlignmentPipeline(
+            mode = StabilizationMode.FAST,
+            totalSteps = TOTAL_PROGRESS_STEPS,
+            onProgress = onProgress,
+        )
 
-        // Report initial progress
-        onProgress?.invoke(createProgress(1, "Loading images"))
-
-        // Step 1: Load and prepare reference frame
-        val referenceLandmarksResult = getReferenceLandmarks(
+        val initialContext = LandscapePipelineContext(
+            frame = frame,
             referenceFrame = referenceFrame,
-            sourceFrame = frame,
             settings = settings,
         )
-        if (referenceLandmarksResult.isError) {
-            return Result.Error(
-                referenceLandmarksResult.exceptionOrNull()!!,
-                "Failed to get reference landmarks",
-            )
-        }
-        val referenceLandmarks = referenceLandmarksResult.getOrNull()!!
 
-        // Step 2: Load source image
-        onProgress?.invoke(createProgress(2, "Loading source image"))
-
-        val sourceImageResult = imageProcessor.loadImage(frame.originalPath)
-        if (sourceImageResult.isError) {
-            return Result.Error(
-                sourceImageResult.exceptionOrNull()!!,
-                "Failed to load source image",
-            )
-        }
-        val sourceImage = sourceImageResult.getOrNull()!!
-
-        // Step 3: Detect features in source image
-        onProgress?.invoke(createProgress(3, "Detecting features"))
-
-        val sourceLandmarksResult = detectFeatures(
-            imageData = sourceImage,
-            detectorType = settings.detectorType,
-            maxKeypoints = settings.maxKeypoints,
+        val pipelineResult = pipeline.execute(
+            initial = initialContext,
+            steps = listOf(
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Loading images",
+                    action = { context ->
+                        val referenceLandmarksResult = getReferenceLandmarks(
+                            referenceFrame = context.referenceFrame,
+                            sourceFrame = context.frame,
+                            settings = context.settings,
+                        )
+                        referenceLandmarksResult.map { landmarks ->
+                            context.copy(referenceLandmarks = landmarks)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Loading source image",
+                    action = { context ->
+                        val sourceImageResult = imageProcessor.loadImage(context.frame.originalPath)
+                        sourceImageResult.map { sourceImage ->
+                            context.copy(sourceImage = sourceImage)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Detecting features",
+                    action = { context ->
+                        val sourceImage = context.sourceImage
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Source image not loaded"),
+                                "Failed to load source image",
+                            )
+                        val sourceLandmarksResult = detectFeatures(
+                            imageData = sourceImage,
+                            detectorType = context.settings.detectorType,
+                            maxKeypoints = context.settings.maxKeypoints,
+                        )
+                        sourceLandmarksResult.map { landmarks ->
+                            context.copy(sourceLandmarks = landmarks)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Matching features",
+                    action = { context ->
+                        val sourceLandmarks = context.sourceLandmarks
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Source landmarks not available"),
+                                "Failed to detect features in source image",
+                            )
+                        val referenceLandmarks = context.referenceLandmarks
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Reference landmarks not available"),
+                                "Failed to get reference landmarks",
+                            )
+                        val matchesResult = matchFeatures(
+                            sourceLandmarks = sourceLandmarks,
+                            referenceLandmarks = referenceLandmarks,
+                            ratioTestThreshold = context.settings.ratioTestThreshold,
+                            useCrossCheck = context.settings.useCrossCheck,
+                            minMatchCount = context.settings.minMatchedKeypoints,
+                        )
+                        matchesResult.map { matches ->
+                            context.copy(matches = matches)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Computing homography",
+                    action = { context ->
+                        val sourceLandmarks = context.sourceLandmarks
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Source landmarks not available"),
+                                "Failed to detect features in source image",
+                            )
+                        val referenceLandmarks = context.referenceLandmarks
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Reference landmarks not available"),
+                                "Failed to get reference landmarks",
+                            )
+                        val matches = context.matches
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Feature matches not available"),
+                                "Failed to match features between images",
+                            )
+                        val homographyResult = calculateHomography(
+                            sourceKeypoints = sourceLandmarks.keypoints,
+                            referenceKeypoints = referenceLandmarks.keypoints,
+                            matches = matches,
+                            ransacThreshold = context.settings.ransacReprojThreshold,
+                        )
+                        homographyResult.map { (homography, inlierCount) ->
+                            context.copy(homography = homography, inlierCount = inlierCount)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Applying transformation",
+                    action = { context ->
+                        val sourceImage = context.sourceImage
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Source image not loaded"),
+                                "Failed to load source image",
+                            )
+                        val homography = context.homography
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Homography not available"),
+                                "Failed to compute homography",
+                            )
+                        val transformedResult = imageProcessor.applyHomographyTransform(
+                            image = sourceImage,
+                            matrix = homography,
+                            outputWidth = context.settings.outputSize,
+                            outputHeight = context.settings.outputSize,
+                        )
+                        transformedResult.map { alignedImage ->
+                            context.copy(alignedImage = alignedImage)
+                        }
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Saving aligned image",
+                    action = { context ->
+                        val alignedImage = context.alignedImage
+                            ?: return@AlignmentPipelineStep Result.Error(
+                                IllegalStateException("Aligned image not available"),
+                                "Failed to apply homography transform",
+                            )
+                        val originalFilename = context.frame.originalPath.substringAfterLast("/")
+                        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
+                        val alignedPath = imageStorageManager.getAlignedPath(context.frame.projectId, alignedFilename)
+                        val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
+                        if (saveResult.isError) {
+                            return@AlignmentPipelineStep Result.Error(
+                                saveResult.exceptionOrNull()!!,
+                                "Failed to save aligned image",
+                            )
+                        }
+                        Result.Success(context.copy(alignedPath = alignedPath))
+                    },
+                ),
+                AlignmentPipelineStep(
+                    stage = StabilizationStage.INITIAL,
+                    message = "Finalizing",
+                    action = { context -> Result.Success(context) },
+                ),
+            ),
         )
-        if (sourceLandmarksResult.isError) {
+
+        if (pipelineResult.isError) {
             return Result.Error(
-                sourceLandmarksResult.exceptionOrNull()!!,
+                pipelineResult.exceptionOrNull()!!,
+                pipelineResult.exceptionOrNull()?.message ?: "Landscape alignment failed",
+            )
+        }
+
+        val pipelineContext = pipelineResult.getOrNull()!!
+        val sourceLandmarks = pipelineContext.sourceLandmarks
+            ?: return Result.Error(
+                IllegalStateException("Source landmarks not available"),
                 "Failed to detect features in source image",
             )
-        }
-        val sourceLandmarks = sourceLandmarksResult.getOrNull()!!
-
-        // Step 4: Match features between source and reference
-        onProgress?.invoke(createProgress(4, "Matching features"))
-
-        val matchesResult = matchFeatures(
-            sourceLandmarks = sourceLandmarks,
-            referenceLandmarks = referenceLandmarks,
-            ratioTestThreshold = settings.ratioTestThreshold,
-            useCrossCheck = settings.useCrossCheck,
-            minMatchCount = settings.minMatchedKeypoints,
-        )
-        if (matchesResult.isError) {
-            return Result.Error(
-                matchesResult.exceptionOrNull()!!,
+        val matches = pipelineContext.matches
+            ?: return Result.Error(
+                IllegalStateException("Feature matches not available"),
                 "Failed to match features between images",
             )
-        }
-        val matches = matchesResult.getOrNull()!!
-
-        // Step 5: Compute homography matrix
-        onProgress?.invoke(createProgress(5, "Computing homography"))
-
-        val homographyResult = calculateHomography(
-            sourceKeypoints = sourceLandmarks.keypoints,
-            referenceKeypoints = referenceLandmarks.keypoints,
-            matches = matches,
-            ransacThreshold = settings.ransacReprojThreshold,
-        )
-        if (homographyResult.isError) {
-            return Result.Error(
-                homographyResult.exceptionOrNull()!!,
-                "Failed to compute homography",
-            )
-        }
-        val (homography, inlierCount) = homographyResult.getOrNull()!!
-
-        // Step 6: Apply homography transform
-        onProgress?.invoke(createProgress(6, "Applying transformation"))
-
-        val transformedResult = imageProcessor.applyHomographyTransform(
-            image = sourceImage,
-            matrix = homography,
-            outputWidth = settings.outputSize,
-            outputHeight = settings.outputSize,
-        )
-        if (transformedResult.isError) {
-            return Result.Error(
-                transformedResult.exceptionOrNull()!!,
-                "Failed to apply homography transform",
-            )
-        }
-        val alignedImage = transformedResult.getOrNull()!!
-
-        // Step 7: Save aligned image
-        onProgress?.invoke(createProgress(7, "Saving aligned image"))
-
-        val projectDir = fileManager.getProjectDirectory(frame.projectId)
-        val alignedPath = "$projectDir/aligned_${frame.id}.jpg"
-
-        val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
-        if (saveResult.isError) {
-            return Result.Error(
-                saveResult.exceptionOrNull()!!,
+        val inlierCount = pipelineContext.inlierCount ?: 0
+        val alignedPath = pipelineContext.alignedPath
+            ?: return Result.Error(
+                IllegalStateException("Aligned path not available"),
                 "Failed to save aligned image",
             )
-        }
-
-        // Step 8: Update frame in repository
-        onProgress?.invoke(createProgress(8, "Finalizing"))
 
         // Calculate confidence based on match quality
         val confidence = calculateConfidence(
@@ -229,6 +311,11 @@ class AlignLandscapeUseCase(
             inlierCount = inlierCount,
             confidence = confidence,
             durationMs = totalDuration,
+            diagnostics = AlignmentDiagnostics(
+                alignedLandmarksDetected = true,
+                fallbackLandmarksGenerated = false,
+                referenceFrameId = referenceFrame?.id,
+            ),
         )
 
         // Update frame in database
@@ -359,8 +446,9 @@ class AlignLandscapeUseCase(
         val (alignedImage, stabResult) = stabilizationResult.getOrNull()!!
 
         // Step 6: Save aligned image
-        val projectDir = fileManager.getProjectDirectory(frame.projectId)
-        val alignedPath = "$projectDir/aligned_${frame.id}.jpg"
+        val originalFilename = frame.originalPath.substringAfterLast("/")
+        val alignedFilename = imageStorageManager.generateAlignedFilename(originalFilename)
+        val alignedPath = imageStorageManager.getAlignedPath(frame.projectId, alignedFilename)
 
         val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
         if (saveResult.isError) {
@@ -378,12 +466,20 @@ class AlignLandscapeUseCase(
         }
 
         // Step 8: Update frame in repository
+        val stabilizedResult = stabResult.copy(
+            diagnostics = AlignmentDiagnostics(
+                alignedLandmarksDetected = true,
+                fallbackLandmarksGenerated = false,
+                referenceFrameId = referenceFrame?.id,
+            ),
+        )
+
         val updateResult = frameRepository.updateAlignedFrame(
             id = frame.id,
             alignedPath = alignedPath,
             confidence = confidence,
             landmarks = sourceLandmarks,
-            stabilizationResult = stabResult,
+            stabilizationResult = stabilizedResult,
         )
 
         if (updateResult.isError) {
@@ -399,7 +495,7 @@ class AlignLandscapeUseCase(
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = sourceLandmarks,
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             ),
         )
     }
@@ -481,14 +577,18 @@ class AlignLandscapeUseCase(
     /**
      * Creates a StabilizationProgress for the landscape alignment pipeline.
      */
-    private fun createProgress(step: Int, message: String): StabilizationProgress = StabilizationProgress(
-        currentPass = step,
-        maxPasses = TOTAL_PROGRESS_STEPS,
-        currentStage = StabilizationStage.INITIAL,
-        currentScore = 0f,
-        progressPercent = step.toFloat() / TOTAL_PROGRESS_STEPS,
-        message = message,
-        mode = StabilizationMode.FAST,
+    private data class LandscapePipelineContext(
+        val frame: Frame,
+        val referenceFrame: Frame?,
+        val settings: LandscapeAlignmentSettings,
+        val referenceLandmarks: LandscapeLandmarks? = null,
+        val sourceImage: com.po4yka.framelapse.domain.service.ImageData? = null,
+        val sourceLandmarks: LandscapeLandmarks? = null,
+        val matches: List<Pair<Int, Int>>? = null,
+        val homography: com.po4yka.framelapse.domain.entity.HomographyMatrix? = null,
+        val inlierCount: Int? = null,
+        val alignedImage: com.po4yka.framelapse.domain.service.ImageData? = null,
+        val alignedPath: String? = null,
     )
 
     /**
@@ -530,6 +630,7 @@ class AlignLandscapeUseCase(
         inlierCount: Int,
         confidence: Float,
         durationMs: Long,
+        diagnostics: AlignmentDiagnostics? = null,
     ): StabilizationResult {
         // Convert confidence to a "stabilization score" (lower is better)
         val score = ((1f - confidence) * 100f).coerceAtLeast(0f)
@@ -559,6 +660,7 @@ class AlignLandscapeUseCase(
             finalEyeDeltaY = null,
             finalEyeDistance = null,
             goalEyeDistance = null,
+            diagnostics = diagnostics,
         )
     }
 

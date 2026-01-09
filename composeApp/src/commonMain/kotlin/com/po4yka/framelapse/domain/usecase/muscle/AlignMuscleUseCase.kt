@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.domain.usecase.muscle
 
+import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.MuscleAlignmentSettings
@@ -9,7 +10,6 @@ import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 
 /**
  * Performs muscle alignment: body alignment followed by region-specific cropping.
@@ -32,7 +32,7 @@ class AlignMuscleUseCase(
     private val cropToRegion: CropToMuscleRegionUseCase,
     private val imageProcessor: ImageProcessor,
     private val frameRepository: FrameRepository,
-    private val fileManager: FileManager,
+    private val imageStorageManager: ImageStorageManager,
 ) {
 
     /**
@@ -105,8 +105,10 @@ class AlignMuscleUseCase(
         val croppedImage = (cropResult as Result.Success).data
 
         // Step 6: Save muscle-cropped image
-        val projectDir = fileManager.getProjectDirectory(frame.projectId)
-        val musclePath = "$projectDir/muscle_${frame.id}.jpg"
+        val musclePath = imageStorageManager.getAlignedPath(
+            projectId = frame.projectId,
+            filename = "muscle_${frame.id}.jpg",
+        )
 
         val saveResult = imageProcessor.saveImage(croppedImage, musclePath)
         if (saveResult is Result.Error) {

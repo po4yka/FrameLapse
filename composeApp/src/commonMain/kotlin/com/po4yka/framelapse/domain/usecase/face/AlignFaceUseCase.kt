@@ -1,5 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.face
 
+import com.po4yka.framelapse.data.storage.ImageStorageManager
+import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
@@ -7,7 +9,6 @@ import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.StabilizationProgress
 import com.po4yka.framelapse.domain.entity.StabilizationResult
-import com.po4yka.framelapse.data.storage.ImageStorageManager
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
@@ -116,6 +117,16 @@ class AlignFaceUseCase(
         // Detect landmarks on aligned image for database storage
         val alignedDetectResult = faceDetector.detectFace(alignedImage)
         val landmarks = alignedDetectResult.getOrNull()
+        val diagnostics = AlignmentDiagnostics(
+            alignedLandmarksDetected = landmarks != null,
+            alignedLandmarksError = when {
+                alignedDetectResult.isError -> alignedDetectResult.exceptionOrNull()?.message ?: "Face detection failed"
+                landmarks == null -> "No face detected in aligned image"
+                else -> null
+            },
+            fallbackLandmarksGenerated = landmarks == null,
+            referenceFrameId = referenceFrame?.id,
+        )
 
         // Validate alignment quality if landmarks detected
         if (landmarks != null && !validateAlignment(landmarks, settings)) {
@@ -130,13 +141,14 @@ class AlignFaceUseCase(
         val confidence = calculateConfidenceFromStabilization(stabResult)
 
         // Update frame in database with stabilization result
+        val stabilizedResult = stabResult.copy(diagnostics = diagnostics)
         val updateResult = if (landmarks != null) {
             frameRepository.updateAlignedFrame(
                 id = frame.id,
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = landmarks,
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             )
         } else {
             // If landmarks detection failed on aligned image, store minimal data
@@ -151,7 +163,7 @@ class AlignFaceUseCase(
                     noseTip = LandmarkPoint(0.5f, 0.6f, 0f),
                     boundingBox = BoundingBox(0f, 0f, 1f, 1f),
                 ),
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             )
         }
 
@@ -168,7 +180,7 @@ class AlignFaceUseCase(
                 alignedPath = alignedPath,
                 confidence = confidence,
                 landmarks = landmarks,
-                stabilizationResult = stabResult,
+                stabilizationResult = stabilizedResult,
             ),
         )
     }

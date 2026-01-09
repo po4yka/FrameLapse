@@ -64,6 +64,11 @@ data class StabilizationResult(
      * Goal eye distance in pixels.
      */
     val goalEyeDistance: Float? = null,
+
+    /**
+     * Diagnostics captured during alignment (optional).
+     */
+    val diagnostics: AlignmentDiagnostics? = null,
 ) {
     /**
      * Total improvement in score from initial to final.
