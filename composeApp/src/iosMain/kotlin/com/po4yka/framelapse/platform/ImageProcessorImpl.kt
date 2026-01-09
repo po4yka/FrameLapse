@@ -6,6 +6,7 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
+import com.po4yka.framelapse.opencv.OpenCVWrapper
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -31,6 +32,7 @@ import platform.CoreGraphics.CGSizeMake
 import platform.CoreGraphics.kCGInterpolationHigh
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSNumber
 import platform.Foundation.create
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
@@ -221,12 +223,8 @@ class ImageProcessorImpl : ImageProcessor {
     /**
      * Applies a homography (perspective) transformation to an image.
      *
-     * This implementation uses Core Graphics affine approximation for near-affine
-     * homographies. Full perspective transformation requires OpenCV integration
-     * which is available via the OpenCVWrapper when the iOS app is built with Xcode.
-     *
-     * Note: Full OpenCV integration via cinterop is pending additional configuration.
-     * The OpenCVWrapper can be called from Swift directly for full homography support.
+     * Uses Core Graphics affine approximation for near-affine homographies and
+     * OpenCVWrapper for full perspective transforms.
      */
     override suspend fun applyHomographyTransform(
         image: ImageData,
@@ -240,9 +238,67 @@ class ImageProcessorImpl : ImageProcessor {
                 kotlin.math.abs(matrix.h32) < PERSPECTIVE_THRESHOLD
 
             if (!isNearAffine) {
-                return@withContext Result.Error(
-                    UnsupportedOperationException(HOMOGRAPHY_NOT_SUPPORTED_MESSAGE),
-                    HOMOGRAPHY_NOT_SUPPORTED_MESSAGE,
+                if (!OpenCVWrapper.isAvailable()) {
+                    return@withContext Result.Error(
+                        UnsupportedOperationException(HOMOGRAPHY_NOT_SUPPORTED_MESSAGE),
+                        HOMOGRAPHY_NOT_SUPPORTED_MESSAGE,
+                    )
+                }
+
+                val rgbaResult = imageDataToRgbaBytes(image)
+                    ?: return@withContext Result.Error(
+                        IllegalStateException("Failed to convert image to RGBA"),
+                        "Failed to convert image for OpenCV",
+                    )
+                val (rgbaBytes, inputWidth, inputHeight) = rgbaResult
+
+                val inputData = rgbaBytes.usePinned { pinned ->
+                    NSData.create(bytes = pinned.addressOf(0), length = rgbaBytes.size.toULong())
+                }
+
+                val homographyValues = listOf(
+                    NSNumber.numberWithDouble(matrix.h11.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h12.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h13.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h21.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h22.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h23.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h31.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h32.toDouble()),
+                    NSNumber.numberWithDouble(matrix.h33.toDouble()),
+                )
+
+                val outputData = OpenCVWrapper.warpPerspectiveWithImageData(
+                    imageData = inputData,
+                    width = inputWidth,
+                    height = inputHeight,
+                    homography = homographyValues,
+                    outputWidth = outputWidth,
+                    outputHeight = outputHeight,
+                ) ?: return@withContext Result.Error(
+                    IllegalStateException("OpenCV warpPerspective returned null"),
+                    "Failed to apply homography",
+                )
+
+                val outputBytes = outputData.toByteArray()
+                val outputImage = rgbaBytesToUIImage(outputBytes, outputWidth, outputHeight)
+                    ?: return@withContext Result.Error(
+                        IllegalStateException("Failed to build output image"),
+                        "Failed to convert OpenCV output",
+                    )
+
+                val resultData = UIImagePNGRepresentation(outputImage)
+                    ?: return@withContext Result.Error(
+                        IllegalStateException("Failed to encode result image"),
+                        "Failed to encode result",
+                    )
+
+                return@withContext Result.Success(
+                    ImageData(
+                        width = outputWidth,
+                        height = outputHeight,
+                        bytes = resultData.toByteArray(),
+                    ),
                 )
             }
 
@@ -500,6 +556,64 @@ class ImageProcessorImpl : ImageProcessor {
         return UIImage.imageWithData(data)
     }
 
+    private fun rgbaBytesToUIImage(bytes: ByteArray, width: Int, height: Int): UIImage? {
+        if (bytes.size < width * height * RGBA_BYTES_PER_PIXEL) return null
+        val bytesPerRow = width * RGBA_BYTES_PER_PIXEL
+        val colorSpace = CGColorSpaceCreateDeviceRGB()
+        val cgImage = bytes.usePinned { pinned ->
+            val context = CGBitmapContextCreate(
+                data = pinned.addressOf(0),
+                width = width.toULong(),
+                height = height.toULong(),
+                bitsPerComponent = 8u,
+                bytesPerRow = bytesPerRow.toULong(),
+                space = colorSpace,
+                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value,
+            ) ?: return null
+
+            val image = CGBitmapContextCreateImage(context)
+            CGContextRelease(context)
+            image
+        } ?: return null
+
+        val uiImage = UIImage.imageWithCGImage(cgImage)
+        CGImageRelease(cgImage)
+        return uiImage
+    }
+
+    private fun imageDataToRgbaBytes(imageData: ImageData): Triple<ByteArray, Int, Int>? {
+        val expectedSize = imageData.width * imageData.height * RGBA_BYTES_PER_PIXEL
+        if (imageData.bytes.size == expectedSize) {
+            return Triple(imageData.bytes, imageData.width, imageData.height)
+        }
+
+        val uiImage = byteArrayToUIImage(imageData.bytes) ?: return null
+        val cgImage = uiImage.CGImage ?: return null
+        val width = CGImageGetWidth(cgImage).toInt()
+        val height = CGImageGetHeight(cgImage).toInt()
+        val bytesPerRow = width * RGBA_BYTES_PER_PIXEL
+        val rgbaBytes = ByteArray(bytesPerRow * height)
+
+        rgbaBytes.usePinned { pinned ->
+            val colorSpace = CGColorSpaceCreateDeviceRGB()
+            val context = CGBitmapContextCreate(
+                data = pinned.addressOf(0),
+                width = width.toULong(),
+                height = height.toULong(),
+                bitsPerComponent = 8u,
+                bytesPerRow = bytesPerRow.toULong(),
+                space = colorSpace,
+                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value,
+            ) ?: return null
+
+            val rect = CGRectMake(0.0, 0.0, width.toDouble(), height.toDouble())
+            CGContextDrawImage(context, rect, cgImage)
+            CGContextRelease(context)
+        }
+
+        return Triple(rgbaBytes, width, height)
+    }
+
     private fun calculateAspectRatioSize(
         srcWidth: Int,
         srcHeight: Int,
@@ -526,6 +640,7 @@ class ImageProcessorImpl : ImageProcessor {
          * Small value to prevent division by zero when normalizing homography matrix.
          */
         private const val EPSILON = 1e-6f
+        private const val RGBA_BYTES_PER_PIXEL = 4
 
         /**
          * Error message when full homography (perspective) transformation is required
@@ -533,8 +648,6 @@ class ImageProcessorImpl : ImageProcessor {
          */
         private const val HOMOGRAPHY_NOT_SUPPORTED_MESSAGE =
             "Full perspective (homography) transformation requires OpenCV integration. " +
-                "The provided transformation contains significant perspective distortion " +
-                "(h31 or h32 values exceed threshold) that cannot be handled by Core Graphics " +
-                "affine transforms. The OpenCVWrapper can be called from Swift for full support."
+                "Ensure the iOS app is built via Xcode with the OpenCV pod linked."
     }
 }

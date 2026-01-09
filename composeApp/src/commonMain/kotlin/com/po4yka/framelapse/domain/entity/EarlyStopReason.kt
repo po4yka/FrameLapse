@@ -48,4 +48,36 @@ enum class EarlyStopReason {
      * Cannot continue without detected landmarks.
      */
     FACE_DETECTION_FAILED,
+
+    // ===== Landscape-specific reasons =====
+
+    /**
+     * Inlier ratio has converged (improvement < threshold).
+     * Landscape match quality refinement complete.
+     */
+    INLIER_RATIO_CONVERGED,
+
+    /**
+     * Reprojection error has converged (error < threshold).
+     * Landscape RANSAC threshold refinement complete.
+     */
+    REPROJECTION_ERROR_CONVERGED,
+
+    /**
+     * Perspective has stabilized (determinant change < threshold).
+     * Landscape perspective stability refinement complete.
+     */
+    PERSPECTIVE_CONVERGED,
+
+    /**
+     * Computed homography is invalid (singular, extreme determinant, etc.).
+     * Cannot proceed with invalid transformation matrix.
+     */
+    HOMOGRAPHY_INVALID,
+
+    /**
+     * Feature detection failed during landscape alignment.
+     * Cannot continue without detected features.
+     */
+    FEATURE_DETECTION_FAILED,
 }

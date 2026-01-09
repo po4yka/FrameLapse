@@ -120,6 +120,29 @@ interface FeatureMatcher {
     ): Result<FeatureMatchResult>
 
     /**
+     * Calculates the mean reprojection error for a set of matches given a homography.
+     *
+     * For each matched pair, transforms the source point using the homography
+     * and measures the distance to the corresponding reference point.
+     *
+     * @param sourceKeypoints Keypoints from the source image.
+     * @param referenceKeypoints Keypoints from the reference image.
+     * @param matches List of matched indices (sourceIdx, refIdx).
+     * @param homography The homography matrix to evaluate.
+     * @param imageWidth Width of the image (for coordinate conversion).
+     * @param imageHeight Height of the image (for coordinate conversion).
+     * @return Result containing ReprojectionErrorResult with mean error and inlier info.
+     */
+    suspend fun calculateReprojectionError(
+        sourceKeypoints: List<FeatureKeypoint>,
+        referenceKeypoints: List<FeatureKeypoint>,
+        matches: List<Pair<Int, Int>>,
+        homography: HomographyMatrix,
+        imageWidth: Int,
+        imageHeight: Int,
+    ): Result<ReprojectionErrorResult>
+
+    /**
      * Releases resources held by the feature matcher.
      * Should be called when the matcher is no longer needed.
      */
@@ -155,4 +178,38 @@ data class FeatureMatchResult(
     /** Whether this result meets minimum quality thresholds. */
     fun isValid(minInlierRatio: Float = 0.3f, minMatches: Int = 10): Boolean =
         matchCount >= minMatches && inlierRatio >= minInlierRatio && homography.isValid()
+}
+
+/**
+ * Result of reprojection error calculation.
+ */
+data class ReprojectionErrorResult(
+    /** Mean reprojection error across all matches in pixels. */
+    val meanError: Float,
+
+    /** Median reprojection error in pixels. */
+    val medianError: Float,
+
+    /** Maximum reprojection error in pixels. */
+    val maxError: Float,
+
+    /** Number of inliers (matches with error below threshold). */
+    val inlierCount: Int,
+
+    /** Total number of matches evaluated. */
+    val totalMatches: Int,
+
+    /** The threshold used for inlier classification. */
+    val inlierThreshold: Float,
+
+    /** Individual errors for each match (for advanced analysis). */
+    val errors: List<Float>,
+) {
+    /** Inlier ratio = inliers / total matches. */
+    val inlierRatio: Float
+        get() = if (totalMatches > 0) inlierCount.toFloat() / totalMatches else 0f
+
+    /** Whether the reprojection quality is acceptable. */
+    fun isAcceptable(maxMeanError: Float = 2.0f, minInlierRatio: Float = 0.5f): Boolean =
+        meanError <= maxMeanError && inlierRatio >= minInlierRatio
 }

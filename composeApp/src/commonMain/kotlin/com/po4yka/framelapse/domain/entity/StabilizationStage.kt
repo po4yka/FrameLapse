@@ -33,4 +33,24 @@ enum class StabilizationStage {
      * Final refinement if score is still above success threshold.
      */
     CLEANUP,
+
+    // ===== Landscape-specific stages =====
+
+    /**
+     * Match quality refinement stage (Landscape SLOW mode).
+     * Progressively filters to higher-quality feature matches.
+     */
+    MATCH_QUALITY_REFINE,
+
+    /**
+     * RANSAC threshold refinement stage (Landscape SLOW mode).
+     * Progressively tightens reprojection error tolerance.
+     */
+    RANSAC_THRESHOLD_REFINE,
+
+    /**
+     * Perspective stability refinement stage (Landscape SLOW mode).
+     * Validates and corrects extreme perspective distortions.
+     */
+    PERSPECTIVE_STABILITY_REFINE,
 }

@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
  *
  * Controls the behavior of the OpenCV-based feature detection,
  * matching, and homography computation pipeline.
+ *
+ * Supports both FAST (single-pass) and SLOW (multi-pass) stabilization modes.
  */
 @Serializable
 data class LandscapeAlignmentSettings(
@@ -65,7 +67,19 @@ data class LandscapeAlignmentSettings(
      * Range: 0.0 to 1.0
      */
     val minInlierRatio: Float = DEFAULT_MIN_INLIER_RATIO,
+
+    /**
+     * Multi-pass stabilization settings.
+     * Controls behavior when stabilizationSettings.mode = SLOW.
+     */
+    val stabilizationSettings: LandscapeStabilizationSettings = LandscapeStabilizationSettings(),
 ) {
+    /**
+     * Convenience property for the stabilization mode.
+     */
+    val stabilizationMode: StabilizationMode
+        get() = stabilizationSettings.mode
+
     init {
         require(maxKeypoints >= MIN_KEYPOINTS_LIMIT) {
             "Max keypoints must be at least $MIN_KEYPOINTS_LIMIT"
@@ -115,7 +129,7 @@ data class LandscapeAlignmentSettings(
         const val MAX_OUTPUT_SIZE = 4096
 
         /**
-         * Preset for fast processing (fewer keypoints, less strict matching).
+         * Preset for fast processing (fewer keypoints, less strict matching, single-pass).
          */
         val FAST = LandscapeAlignmentSettings(
             detectorType = FeatureDetectorType.ORB,
@@ -123,10 +137,11 @@ data class LandscapeAlignmentSettings(
             minMatchedKeypoints = 8,
             ratioTestThreshold = 0.8f,
             useCrossCheck = false,
+            stabilizationSettings = LandscapeStabilizationSettings.FAST,
         )
 
         /**
-         * Preset for high quality (more keypoints, stricter matching).
+         * Preset for high quality with multi-pass stabilization.
          */
         val HIGH_QUALITY = LandscapeAlignmentSettings(
             detectorType = FeatureDetectorType.AKAZE,
@@ -135,6 +150,20 @@ data class LandscapeAlignmentSettings(
             ratioTestThreshold = 0.7f,
             useCrossCheck = true,
             minInlierRatio = 0.5f,
+            stabilizationSettings = LandscapeStabilizationSettings.SLOW,
+        )
+
+        /**
+         * Preset for maximum quality with strict multi-pass stabilization.
+         */
+        val MAXIMUM_QUALITY = LandscapeAlignmentSettings(
+            detectorType = FeatureDetectorType.AKAZE,
+            maxKeypoints = 1500,
+            minMatchedKeypoints = 30,
+            ratioTestThreshold = 0.65f,
+            useCrossCheck = true,
+            minInlierRatio = 0.6f,
+            stabilizationSettings = LandscapeStabilizationSettings.HIGH_QUALITY,
         )
     }
 }

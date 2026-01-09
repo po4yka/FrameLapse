@@ -17,7 +17,7 @@ import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
-import kotlin.time.TimeSource
+import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Performs landscape/scenery alignment using feature-based homography.
@@ -48,6 +48,7 @@ class AlignLandscapeUseCase(
     private val detectFeatures: DetectLandscapeFeaturesUseCase,
     private val matchFeatures: MatchLandscapeFeaturesUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
+    private val multiPassStabilization: MultiPassLandscapeStabilizationUseCase? = null,
 ) {
     // Cache for reference frame features to avoid re-detection
     private var cachedReferenceFrameId: String? = null
@@ -69,8 +70,6 @@ class AlignLandscapeUseCase(
         settings: LandscapeAlignmentSettings = LandscapeAlignmentSettings(),
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Frame> {
-        val startMark = TimeSource.Monotonic.markNow()
-
         // Skip if already aligned
         if (frame.alignedPath != null && frame.landmarks != null) {
             return Result.Success(frame)
@@ -83,6 +82,24 @@ class AlignLandscapeUseCase(
                 "Feature matching not available",
             )
         }
+
+        // Branch based on stabilization mode
+        return when (settings.stabilizationMode) {
+            StabilizationMode.FAST -> executeFastMode(frame, referenceFrame, settings, onProgress)
+            StabilizationMode.SLOW -> executeSlowMode(frame, referenceFrame, settings, onProgress)
+        }
+    }
+
+    /**
+     * Executes FAST mode (single-pass) alignment.
+     */
+    private suspend fun executeFastMode(
+        frame: Frame,
+        referenceFrame: Frame?,
+        settings: LandscapeAlignmentSettings,
+        onProgress: ((StabilizationProgress) -> Unit)?,
+    ): Result<Frame> {
+        val startTime = currentTimeMillis()
 
         // Report initial progress
         onProgress?.invoke(createProgress(1, "Loading images"))
@@ -206,7 +223,7 @@ class AlignLandscapeUseCase(
         )
 
         // Create stabilization result for consistency with other alignment types
-        val totalDuration = startMark.elapsedNow().inWholeMilliseconds
+        val totalDuration = currentTimeMillis() - startTime
         val stabilizationResult = createStabilizationResult(
             matchCount = matches.size,
             inlierCount = inlierCount,
@@ -247,6 +264,142 @@ class AlignLandscapeUseCase(
                 confidence = confidence,
                 landmarks = sourceLandmarks,
                 stabilizationResult = stabilizationResult,
+            ),
+        )
+    }
+
+    /**
+     * Executes SLOW mode (multi-pass) alignment with iterative refinement.
+     */
+    private suspend fun executeSlowMode(
+        frame: Frame,
+        referenceFrame: Frame?,
+        settings: LandscapeAlignmentSettings,
+        onProgress: ((StabilizationProgress) -> Unit)?,
+    ): Result<Frame> {
+        // Check if multi-pass stabilization is available
+        if (multiPassStabilization == null) {
+            // Fall back to FAST mode if multi-pass not available
+            return executeFastMode(frame, referenceFrame, settings, onProgress)
+        }
+
+        val startTime = currentTimeMillis()
+
+        // Report initial progress
+        onProgress?.invoke(
+            StabilizationProgress.initial(StabilizationMode.SLOW),
+        )
+
+        // Step 1: Load and prepare reference frame
+        val referenceLandmarksResult = getReferenceLandmarks(
+            referenceFrame = referenceFrame,
+            sourceFrame = frame,
+            settings = settings,
+        )
+        if (referenceLandmarksResult.isError) {
+            return Result.Error(
+                referenceLandmarksResult.exceptionOrNull()!!,
+                "Failed to get reference landmarks",
+            )
+        }
+        val referenceLandmarks = referenceLandmarksResult.getOrNull()!!
+
+        // Step 2: Load source image
+        val sourceImageResult = imageProcessor.loadImage(frame.originalPath)
+        if (sourceImageResult.isError) {
+            return Result.Error(
+                sourceImageResult.exceptionOrNull()!!,
+                "Failed to load source image",
+            )
+        }
+        val sourceImage = sourceImageResult.getOrNull()!!
+
+        // Step 3: Detect features in source image
+        val sourceLandmarksResult = detectFeatures(
+            imageData = sourceImage,
+            detectorType = settings.detectorType,
+            maxKeypoints = settings.maxKeypoints,
+        )
+        if (sourceLandmarksResult.isError) {
+            return Result.Error(
+                sourceLandmarksResult.exceptionOrNull()!!,
+                "Failed to detect features in source image",
+            )
+        }
+        val sourceLandmarks = sourceLandmarksResult.getOrNull()!!
+
+        // Step 4: Load reference image for multi-pass
+        val refFrame = referenceFrame ?: getFirstFrameInProject(frame.projectId)
+        val referenceImageResult = imageProcessor.loadImage(refFrame?.originalPath ?: frame.originalPath)
+        if (referenceImageResult.isError) {
+            return Result.Error(
+                referenceImageResult.exceptionOrNull()!!,
+                "Failed to load reference image",
+            )
+        }
+        val referenceImage = referenceImageResult.getOrNull()!!
+
+        // Step 5: Run multi-pass stabilization
+        val stabilizationResult = multiPassStabilization(
+            sourceImage = sourceImage,
+            referenceImage = referenceImage,
+            sourceLandmarks = sourceLandmarks,
+            referenceLandmarks = referenceLandmarks,
+            alignmentSettings = settings,
+            onProgress = onProgress,
+        )
+
+        if (stabilizationResult.isError) {
+            return Result.Error(
+                stabilizationResult.exceptionOrNull()!!,
+                "Multi-pass stabilization failed",
+            )
+        }
+
+        val (alignedImage, stabResult) = stabilizationResult.getOrNull()!!
+
+        // Step 6: Save aligned image
+        val projectDir = fileManager.getProjectDirectory(frame.projectId)
+        val alignedPath = "$projectDir/aligned_${frame.id}.jpg"
+
+        val saveResult = imageProcessor.saveImage(alignedImage, alignedPath)
+        if (saveResult.isError) {
+            return Result.Error(
+                saveResult.exceptionOrNull()!!,
+                "Failed to save aligned image",
+            )
+        }
+
+        // Step 7: Calculate confidence from stabilization result
+        val confidence = if (stabResult.success) {
+            1f - (stabResult.finalScore.value / 100f).coerceIn(0f, 1f)
+        } else {
+            0.5f
+        }
+
+        // Step 8: Update frame in repository
+        val updateResult = frameRepository.updateAlignedFrame(
+            id = frame.id,
+            alignedPath = alignedPath,
+            confidence = confidence,
+            landmarks = sourceLandmarks,
+            stabilizationResult = stabResult,
+        )
+
+        if (updateResult.isError) {
+            return Result.Error(
+                updateResult.exceptionOrNull()!!,
+                "Failed to update frame",
+            )
+        }
+
+        // Return updated frame
+        return Result.Success(
+            frame.copy(
+                alignedPath = alignedPath,
+                confidence = confidence,
+                landmarks = sourceLandmarks,
+                stabilizationResult = stabResult,
             ),
         )
     }

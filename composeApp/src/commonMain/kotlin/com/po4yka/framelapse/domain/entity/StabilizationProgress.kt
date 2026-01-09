@@ -84,6 +84,10 @@ data class StabilizationProgress(
                 StabilizationStage.SCALE_REFINE -> "Refining scale (pass $passNumber)..."
                 StabilizationStage.TRANSLATION_REFINE -> "Refining position (pass $passNumber)..."
                 StabilizationStage.CLEANUP -> "Final cleanup..."
+                // Landscape-specific stages
+                StabilizationStage.MATCH_QUALITY_REFINE -> "Refining match quality (pass $passNumber)..."
+                StabilizationStage.RANSAC_THRESHOLD_REFINE -> "Tightening alignment (pass $passNumber)..."
+                StabilizationStage.PERSPECTIVE_STABILITY_REFINE -> "Stabilizing perspective (pass $passNumber)..."
             }
 
             return StabilizationProgress(

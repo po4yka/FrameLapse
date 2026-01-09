@@ -42,6 +42,10 @@ import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.DetectLandscapeFeaturesUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.MatchLandscapeFeaturesUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.MultiPassLandscapeStabilizationUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.RefineMatchQualityUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.RefinePerspectiveStabilityUseCase
+import com.po4yka.framelapse.domain.usecase.landscape.RefineRansacThresholdUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.CalculateMuscleRegionBoundsUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.CropToMuscleRegionUseCase
@@ -194,6 +198,24 @@ val domainModule = module {
     factory { DetectLandscapeFeaturesUseCase(get()) }
     factory { MatchLandscapeFeaturesUseCase(get()) }
     factory { CalculateHomographyMatrixUseCase(get()) }
+
+    // Landscape Multi-Pass Stabilization Use Cases
+    factory { RefineMatchQualityUseCase(get()) }
+    factory { RefineRansacThresholdUseCase(get()) }
+    factory { RefinePerspectiveStabilityUseCase() }
+    factory {
+        MultiPassLandscapeStabilizationUseCase(
+            featureMatcher = get(),
+            imageProcessor = get(),
+            detectFeatures = get(),
+            matchFeatures = get(),
+            calculateHomography = get(),
+            refineMatchQuality = get(),
+            refineRansacThreshold = get(),
+            refinePerspectiveStability = get(),
+        )
+    }
+
     factory {
         AlignLandscapeUseCase(
             featureMatcher = get(),
@@ -203,6 +225,7 @@ val domainModule = module {
             detectFeatures = get(),
             matchFeatures = get(),
             calculateHomography = get(),
+            multiPassStabilization = get(),
         )
     }
 
