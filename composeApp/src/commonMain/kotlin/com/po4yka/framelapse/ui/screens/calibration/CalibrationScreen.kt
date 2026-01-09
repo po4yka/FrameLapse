@@ -38,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -47,11 +46,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.po4yka.framelapse.domain.entity.AdjustmentPointType
 import com.po4yka.framelapse.domain.entity.CameraFacing
-import com.po4yka.framelapse.domain.entity.FlashMode
 import com.po4yka.framelapse.domain.entity.FaceManualAdjustment
-import com.po4yka.framelapse.domain.entity.LandmarkPoint
+import com.po4yka.framelapse.domain.entity.FlashMode
 import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.platform.currentTimeMillis
@@ -338,7 +335,7 @@ private fun CalibrationAdjustContent(
                             contentAlignment = Alignment.Center,
                         ) {
                             Image(
-                                bitmap = imageResult.bitmap,
+                                bitmap = imageResult.image,
                                 contentDescription = "Calibration Reference",
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier
@@ -383,7 +380,7 @@ private fun CalibrationAdjustContent(
                             CircularProgressIndicator()
                         }
                     }
-                    is ImageLoadResult.Error, ImageLoadResult.Empty -> {
+                    is ImageLoadResult.Error -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center,

@@ -25,14 +25,14 @@ import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseC
 import com.po4yka.framelapse.domain.usecase.adjustment.BatchApplyAdjustmentUseCase
 import com.po4yka.framelapse.domain.usecase.adjustment.SuggestSimilarFramesUseCase
 import com.po4yka.framelapse.domain.usecase.alignment.AlignContentUseCase
-import com.po4yka.framelapse.domain.usecase.calibration.CaptureCalibrationImageUseCase
-import com.po4yka.framelapse.domain.usecase.calibration.GetCalibrationUseCase
-import com.po4yka.framelapse.domain.usecase.calibration.SaveCalibrationUseCase
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.body.DetectBodyPoseUseCase
 import com.po4yka.framelapse.domain.usecase.body.MultiPassBodyStabilizationUseCase
 import com.po4yka.framelapse.domain.usecase.body.ValidateBodyAlignmentUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.CaptureCalibrationImageUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.GetCalibrationUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.SaveCalibrationUseCase
 import com.po4yka.framelapse.domain.usecase.capture.CaptureImageUseCase
 import com.po4yka.framelapse.domain.usecase.export.CompileVideoUseCase
 import com.po4yka.framelapse.domain.usecase.export.ExportGifUseCase

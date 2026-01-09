@@ -93,7 +93,7 @@ class StorageCleanupManager(
      *
      * @return StorageAudit with totals and orphaned file paths.
      */
-    fun getStorageAudit(): StorageAudit {
+    suspend fun getStorageAudit(): StorageAudit {
         val appDir = fileManager.getAppDirectory()
         val projectsRoot = "$appDir/projects"
         val importsRoot = "$appDir/imports"

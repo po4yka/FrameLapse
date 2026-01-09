@@ -6,6 +6,7 @@ import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGAffineTransformMake
 import platform.CoreGraphics.CGBitmapContextCreate
 import platform.CoreGraphics.CGBitmapContextCreateImage
@@ -181,12 +182,7 @@ internal class IosImageTransformer(private val codec: IosImageCodec) {
         }
     }
 
-    fun resizeImage(
-        image: ImageData,
-        width: Int,
-        height: Int,
-        maintainAspectRatio: Boolean
-    ): Result<ImageData> {
+    fun resizeImage(image: ImageData, width: Int, height: Int, maintainAspectRatio: Boolean): Result<ImageData> {
         return try {
             val uiImage = codec.byteArrayToUIImage(image.bytes)
                 ?: return Result.Error(
@@ -247,7 +243,9 @@ internal class IosImageTransformer(private val codec: IosImageCodec) {
                 )
 
             val radians = degrees * kotlin.math.PI.toFloat() / 180f
-            val rotatedSize = CGSizeMake(uiImage.size.width, uiImage.size.height)
+            val imageWidth = uiImage.size.useContents { width }
+            val imageHeight = uiImage.size.useContents { height }
+            val rotatedSize = CGSizeMake(imageWidth, imageHeight)
 
             UIGraphicsBeginImageContextWithOptions(rotatedSize, false, 1.0)
 
@@ -259,18 +257,18 @@ internal class IosImageTransformer(private val codec: IosImageCodec) {
 
             platform.CoreGraphics.CGContextTranslateCTM(
                 context,
-                uiImage.size.width / 2,
-                uiImage.size.height / 2,
+                imageWidth / 2,
+                imageHeight / 2,
             )
             platform.CoreGraphics.CGContextRotateCTM(context, radians.toDouble())
             platform.CoreGraphics.CGContextTranslateCTM(
                 context,
-                -uiImage.size.width / 2,
-                -uiImage.size.height / 2,
+                -imageWidth / 2,
+                -imageHeight / 2,
             )
 
             uiImage.drawInRect(
-                CGRectMake(0.0, 0.0, uiImage.size.width, uiImage.size.height),
+                CGRectMake(0.0, 0.0, imageWidth, imageHeight),
             )
 
             val rotatedImage = UIGraphicsGetImageFromCurrentImageContext()

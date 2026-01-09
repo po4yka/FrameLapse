@@ -20,15 +20,13 @@ class FeatureMatcherImpl : FeatureMatcher {
         imageData: ImageData,
         detectorType: FeatureDetectorType,
         maxKeypoints: Int,
-    ): Result<LandscapeLandmarks> =
-        core.detectFeatures(imageData, detectorType, maxKeypoints, isSource = true)
+    ): Result<LandscapeLandmarks> = core.detectFeatures(imageData, detectorType, maxKeypoints, isSource = true)
 
     override suspend fun detectFeaturesFromPath(
         imagePath: String,
         detectorType: FeatureDetectorType,
         maxKeypoints: Int,
-    ): Result<LandscapeLandmarks> =
-        core.detectFeaturesFromPath(imagePath, detectorType, maxKeypoints)
+    ): Result<LandscapeLandmarks> = core.detectFeaturesFromPath(imagePath, detectorType, maxKeypoints)
 
     override suspend fun matchFeatures(
         sourceFeatures: LandscapeLandmarks,

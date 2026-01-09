@@ -8,9 +8,7 @@ import com.po4yka.framelapse.domain.util.Result
 /**
  * Retrieves calibration data for a project.
  */
-class GetCalibrationUseCase(
-    private val projectRepository: ProjectRepository,
-) {
+class GetCalibrationUseCase(private val projectRepository: ProjectRepository) {
 
     /**
      * Gets calibration data for the specified project.

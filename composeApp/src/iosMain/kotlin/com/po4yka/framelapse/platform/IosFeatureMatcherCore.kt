@@ -11,12 +11,17 @@ import com.po4yka.framelapse.domain.service.ReprojectionErrorResult
 import com.po4yka.framelapse.domain.util.ReprojectionErrorCalculator
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.opencv.CVDetectorType
+import com.po4yka.framelapse.opencv.CVDetectorTypeAKAZE
+import com.po4yka.framelapse.opencv.CVDetectorTypeORB
+import com.po4yka.framelapse.opencv.CVKeypoint
+import com.po4yka.framelapse.opencv.CVMatch
 import com.po4yka.framelapse.opencv.OpenCVWrapper
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import platform.Foundation.NSNumber
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
@@ -97,7 +102,7 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
                 sourceFeatures,
                 referenceFeatures,
                 ratioTestThreshold,
-                useCrossCheck
+                useCrossCheck,
             )
         } catch (e: Exception) {
             Result.Error(e, "Feature matching failed: ${e.message}")
@@ -129,7 +134,7 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
                 sourceKeypoints,
                 referenceKeypoints,
                 matches,
-                ransacThreshold
+                ransacThreshold,
             )
         } catch (e: Exception) {
             Result.Error(e, "Homography computation failed: ${e.message}")
@@ -156,7 +161,7 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
                 sourceImageData,
                 detectorType,
                 maxKeypoints,
-                isSource = true
+                isSource = true,
             )
             if (sourceResult is Result.Error) {
                 return@withContext Result.Error(
@@ -170,7 +175,7 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
                 referenceImageData,
                 detectorType,
                 maxKeypoints,
-                isSource = false
+                isSource = false,
             )
             if (refResult is Result.Error) {
                 return@withContext Result.Error(
@@ -314,16 +319,17 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
             )
         }
 
-        val featureKeypoints = keypoints.map { kp ->
+        val featureKeypoints = keypoints.mapNotNull { kp ->
+            val cvKp = kp as? CVKeypoint ?: return@mapNotNull null
             FeatureKeypoint.fromPixelCoordinates(
-                x = kp.x,
-                y = kp.y,
+                x = cvKp.x,
+                y = cvKp.y,
                 imageWidth = imageWidth,
                 imageHeight = imageHeight,
-                response = kp.response,
-                size = kp.size,
-                angle = kp.angle,
-                octave = kp.octave,
+                response = cvKp.response,
+                size = cvKp.size,
+                angle = cvKp.angle,
+                octave = cvKp.octave,
             )
         }
 
@@ -397,7 +403,10 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
             "Feature matching failed",
         )
 
-        val forwardPairs = forwardMatches.map { it.queryIdx to it.trainIdx }
+        val forwardPairs = forwardMatches.mapNotNull { match ->
+            val cvMatch = match as? CVMatch ?: return@mapNotNull null
+            cvMatch.queryIdx to cvMatch.trainIdx
+        }
         val filteredPairs = if (useCrossCheck) {
             val reverseMatches = OpenCVWrapper.matchFeaturesWithDescriptors1(
                 descriptors1 = referenceDescriptors.data,
@@ -414,7 +423,10 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
                 "Feature matching failed",
             )
 
-            val reverseMap = reverseMatches.associate { it.queryIdx to it.trainIdx }
+            val reverseMap = reverseMatches.mapNotNull { match ->
+                val cvMatch = match as? CVMatch ?: return@mapNotNull null
+                cvMatch.queryIdx to cvMatch.trainIdx
+            }.toMap()
             forwardPairs.filter { (srcIdx, refIdx) -> reverseMap[refIdx] == srcIdx }
         } else {
             forwardPairs
@@ -429,28 +441,42 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         matches: List<Pair<Int, Int>>,
         ransacThreshold: Float,
     ): Result<Pair<HomographyMatrix, Int>> {
-        val srcPoints = matches.map { (srcIdx, _) ->
-            val kp = sourceKeypoints[srcIdx]
-            floatArrayOf(kp.position.x, kp.position.y)
-        }
-        val dstPoints = matches.map { (_, refIdx) ->
-            val kp = referenceKeypoints[refIdx]
-            floatArrayOf(kp.position.x, kp.position.y)
+        // Convert keypoints to flat NSNumber arrays for Objective-C interop
+        val srcPointsList = mutableListOf<NSNumber>()
+        val dstPointsList = mutableListOf<NSNumber>()
+
+        for ((srcIdx, refIdx) in matches) {
+            val srcKp = sourceKeypoints[srcIdx]
+            val dstKp = referenceKeypoints[refIdx]
+            srcPointsList.add(NSNumber(float = srcKp.position.x))
+            srcPointsList.add(NSNumber(float = srcKp.position.y))
+            dstPointsList.add(NSNumber(float = dstKp.position.x))
+            dstPointsList.add(NSNumber(float = dstKp.position.y))
         }
 
-        val src = srcPoints.map { listOf(it[0], it[1]) }
-        val dst = dstPoints.map { listOf(it[0], it[1]) }
-
-        val result = OpenCVWrapper.findHomography(
-            srcPoints = src,
-            dstPoints = dst,
-            ransacThreshold = ransacThreshold,
+        val result = OpenCVWrapper.computeHomographyWithSrcPoints(
+            srcPoints = srcPointsList,
+            dstPoints = dstPointsList,
+            ransacThreshold = ransacThreshold.toDouble(),
         ) ?: return Result.Error(
-            IllegalStateException("OpenCV findHomography returned null"),
+            IllegalStateException("OpenCV computeHomography returned null"),
             "Homography computation failed",
         )
 
-        val matrix = HomographyMatrix.fromDoubleArray(result.homography)
+        if (!result.success) {
+            return Result.Error(
+                IllegalStateException("Homography computation failed"),
+                "Homography computation failed",
+            )
+        }
+
+        val matrixValues = result.matrix?.map { (it as NSNumber).doubleValue }
+            ?: return Result.Error(
+                IllegalStateException("Homography matrix is null"),
+                "Homography matrix is null",
+            )
+
+        val matrix = HomographyMatrix.fromDoubleArray(matrixValues.toDoubleArray())
         return Result.Success(Pair(matrix, result.inlierCount))
     }
 
@@ -509,11 +535,10 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
         )
     }
 
-    private fun mapDetectorType(detectorType: FeatureDetectorType): CVDetectorType =
-        when (detectorType) {
-            FeatureDetectorType.ORB -> CVDetectorType.CVDetectorTypeOrb
-            FeatureDetectorType.AKAZE -> CVDetectorType.CVDetectorTypeAkaze
-        }
+    private fun mapDetectorType(detectorType: FeatureDetectorType): CVDetectorType = when (detectorType) {
+        FeatureDetectorType.ORB -> CVDetectorTypeORB
+        FeatureDetectorType.AKAZE -> CVDetectorTypeAKAZE
+    }
 
     private data class DescriptorData(
         val data: platform.Foundation.NSData?,

@@ -5,10 +5,14 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.opencv.OpenCVWrapper
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
+import platform.Foundation.NSData
 import platform.Foundation.NSNumber
+import platform.Foundation.create
 
+@OptIn(ExperimentalForeignApi::class)
 internal class IosHomographyTransformer(private val codec: IosImageCodec) {
     fun applyHomographyTransform(
         image: ImageData,
@@ -37,19 +41,19 @@ internal class IosHomographyTransformer(private val codec: IosImageCodec) {
                 val (rgbaBytes, inputWidth, inputHeight) = rgbaResult
 
                 val inputData = rgbaBytes.usePinned { pinned ->
-                    platform.Foundation.NSData.create(bytes = pinned.addressOf(0), length = rgbaBytes.size.toULong())
+                    NSData.create(bytes = pinned.addressOf(0), length = rgbaBytes.size.toULong())
                 }
 
                 val homographyValues = listOf(
-                    NSNumber.numberWithDouble(matrix.h11.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h12.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h13.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h21.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h22.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h23.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h31.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h32.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h33.toDouble()),
+                    NSNumber(double = matrix.h11.toDouble()),
+                    NSNumber(double = matrix.h12.toDouble()),
+                    NSNumber(double = matrix.h13.toDouble()),
+                    NSNumber(double = matrix.h21.toDouble()),
+                    NSNumber(double = matrix.h22.toDouble()),
+                    NSNumber(double = matrix.h23.toDouble()),
+                    NSNumber(double = matrix.h31.toDouble()),
+                    NSNumber(double = matrix.h32.toDouble()),
+                    NSNumber(double = matrix.h33.toDouble()),
                 )
 
                 val outputData = OpenCVWrapper.warpPerspectiveWithImageData(

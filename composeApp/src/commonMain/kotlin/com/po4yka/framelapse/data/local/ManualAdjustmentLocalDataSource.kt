@@ -28,22 +28,19 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
     }
 
     /** Gets all adjustments for a project. */
-    suspend fun getByProject(projectId: String): List<ManualAdjustment> =
-        withContext(Dispatchers.IO) {
-            queries.selectByProject(projectId).executeAsList()
-        }
+    suspend fun getByProject(projectId: String): List<ManualAdjustment> = withContext(Dispatchers.IO) {
+        queries.selectByProject(projectId).executeAsList()
+    }
 
     /** Gets all active adjustments for a project. */
-    suspend fun getActiveByProject(projectId: String): List<ManualAdjustment> =
-        withContext(Dispatchers.IO) {
-            queries.selectActiveByProject(projectId).executeAsList()
-        }
+    suspend fun getActiveByProject(projectId: String): List<ManualAdjustment> = withContext(Dispatchers.IO) {
+        queries.selectActiveByProject(projectId).executeAsList()
+    }
 
     /** Gets frame IDs that have active manual adjustments in a project. */
-    suspend fun getFrameIdsWithAdjustments(projectId: String): List<String> =
-        withContext(Dispatchers.IO) {
-            queries.selectFrameIdsWithAdjustments(projectId).executeAsList()
-        }
+    suspend fun getFrameIdsWithAdjustments(projectId: String): List<String> = withContext(Dispatchers.IO) {
+        queries.selectFrameIdsWithAdjustments(projectId).executeAsList()
+    }
 
     /** Counts active adjustments for a project. */
     suspend fun countActiveByProject(projectId: String): Long = withContext(Dispatchers.IO) {
@@ -98,12 +95,7 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
     }
 
     /** Updates an existing adjustment. */
-    suspend fun update(
-        id: String,
-        adjustmentJson: String,
-        isActive: Boolean,
-        updatedAt: Long
-    ): Unit =
+    suspend fun update(id: String, adjustmentJson: String, isActive: Boolean, updatedAt: Long): Unit =
         withContext(Dispatchers.IO) {
             queries.update(
                 adjustmentJson = adjustmentJson,
@@ -114,12 +106,7 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
         }
 
     /** Updates an adjustment by frame ID. */
-    suspend fun updateByFrameId(
-        frameId: String,
-        adjustmentJson: String,
-        isActive: Boolean,
-        updatedAt: Long
-    ): Unit =
+    suspend fun updateByFrameId(frameId: String, adjustmentJson: String, isActive: Boolean, updatedAt: Long): Unit =
         withContext(Dispatchers.IO) {
             queries.updateByFrameId(
                 adjustmentJson = adjustmentJson,
@@ -130,14 +117,13 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
         }
 
     /** Toggles the active state of an adjustment. */
-    suspend fun toggleActive(frameId: String, isActive: Boolean, updatedAt: Long): Unit =
-        withContext(Dispatchers.IO) {
-            queries.toggleActive(
-                isActive = if (isActive) 1L else 0L,
-                updatedAt = updatedAt,
-                frameId = frameId,
-            )
-        }
+    suspend fun toggleActive(frameId: String, isActive: Boolean, updatedAt: Long): Unit = withContext(Dispatchers.IO) {
+        queries.toggleActive(
+            isActive = if (isActive) 1L else 0L,
+            updatedAt = updatedAt,
+            frameId = frameId,
+        )
+    }
 
     /** Activates an adjustment. */
     suspend fun activate(frameId: String, updatedAt: Long): Unit = withContext(Dispatchers.IO) {

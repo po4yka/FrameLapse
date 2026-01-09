@@ -23,7 +23,7 @@ class MediaStoreImpl(
     }
 
     override fun getMusclePath(projectId: String, frameId: String): String =
-        imageStorageManager.getAlignedPath(projectId, "muscle_${frameId}.jpg")
+        imageStorageManager.getAlignedPath(projectId, "muscle_$frameId.jpg")
 
     override fun getExportPath(projectId: String, timestamp: Long, extension: String): String {
         val filename = videoStorageManager.generateExportFilename(timestamp, extension)

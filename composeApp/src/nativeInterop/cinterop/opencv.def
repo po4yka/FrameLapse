@@ -3,8 +3,11 @@ package = com.po4yka.framelapse.opencv
 
 headers = headers/OpenCVWrapper.h
 
-# Header filter for the generated bindings
-headerFilter = OpenCVWrapper.h
+# Include all declarations from this header
+headerFilter = headers/OpenCVWrapper.h
+
+# Compiler options for header parsing
+compilerOpts = -I/Users/po4yka/GitRep/FrameLapse/composeApp/src/nativeInterop/cinterop
 
 # Link against Foundation framework (required for NS* types)
 linkerOpts = -framework Foundation

@@ -45,7 +45,7 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
     ): Result<LandscapeLandmarks> = withContext(Dispatchers.Default) {
         mutex.withLock {
             try {
-                ensureOpenCvInitialized()
+                openCvInitializer.ensureInitialized()
 
                 val bitmap = BitmapFactory.decodeByteArray(
                     imageData.bytes,
@@ -86,7 +86,7 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
                     )
                 }
 
-                ensureOpenCvInitialized()
+                openCvInitializer.ensureInitialized()
 
                 val bitmap = BitmapFactory.decodeFile(imagePath)
                     ?: return@withContext Result.Error(
@@ -118,7 +118,7 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
     ): Result<List<Pair<Int, Int>>> = withContext(Dispatchers.Default) {
         mutex.withLock {
             try {
-                ensureOpenCvInitialized()
+                openCvInitializer.ensureInitialized()
 
                 if (sourceFeatures.keypoints.isEmpty() || referenceFeatures.keypoints.isEmpty()) {
                     return@withContext Result.Error(
@@ -150,7 +150,7 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
     ): Result<Pair<HomographyMatrix, Int>> = withContext(Dispatchers.Default) {
         mutex.withLock {
             try {
-                ensureOpenCvInitialized()
+                openCvInitializer.ensureInitialized()
 
                 if (matches.size < MIN_MATCHES_FOR_HOMOGRAPHY) {
                     return@withContext Result.Error(
@@ -176,7 +176,7 @@ class FeatureMatcherImpl(private val context: Context) : FeatureMatcher {
     ): Result<FeatureMatchResult> = withContext(Dispatchers.Default) {
         mutex.withLock {
             try {
-                ensureOpenCvInitialized()
+                openCvInitializer.ensureInitialized()
 
                 core.findHomography(
                     sourceImageData = sourceImageData,

@@ -12,9 +12,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Eye positions (left and right) in normalized coordinates (0-1)
  * - Offset adjustments for fine-tuning alignment target
  */
-class SaveCalibrationUseCase(
-    private val projectRepository: ProjectRepository,
-) {
+class SaveCalibrationUseCase(private val projectRepository: ProjectRepository) {
 
     /**
      * Saves calibration data to the specified project.
@@ -74,8 +72,7 @@ class SaveCalibrationUseCase(
         )
     }
 
-    private fun isValidNormalizedPosition(point: LandmarkPoint): Boolean =
-        point.x in 0f..1f && point.y in 0f..1f
+    private fun isValidNormalizedPosition(point: LandmarkPoint): Boolean = point.x in 0f..1f && point.y in 0f..1f
 
     companion object {
         private const val OFFSET_MIN = -0.2f

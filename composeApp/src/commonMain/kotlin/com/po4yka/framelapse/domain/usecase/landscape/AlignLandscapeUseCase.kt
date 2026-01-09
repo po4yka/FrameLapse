@@ -103,7 +103,7 @@ class AlignLandscapeUseCase(
         onProgress: ((StabilizationProgress) -> Unit)?,
     ): Result<Frame> {
         val startTime = currentTimeMillis()
-        val pipeline = AlignmentPipeline(
+        val pipeline = AlignmentPipeline<LandscapePipelineContext>(
             mode = StabilizationMode.FAST,
             totalSteps = TOTAL_PROGRESS_STEPS,
             onProgress = onProgress,

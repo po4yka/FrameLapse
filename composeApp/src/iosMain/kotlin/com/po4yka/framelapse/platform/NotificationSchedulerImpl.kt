@@ -256,7 +256,9 @@ class NotificationSchedulerImpl : NotificationScheduler {
             is RepeatInterval.Weekly -> {
                 dateComponents.setHour(dateTime.hour.toLong())
                 // Convert ISO 8601 day (Monday=1) to NSCalendar weekday (Sunday=1)
-                val isoDay = dateTime.dayOfWeek.isoDayNumber
+                // DayOfWeek.ordinal: MONDAY=0, TUESDAY=1, ..., SUNDAY=6
+                // ISO day number: MONDAY=1, ..., SUNDAY=7
+                val isoDay = dateTime.dayOfWeek.ordinal + 1
                 val nsWeekday = ((isoDay % 7) + 1).toLong()
                 dateComponents.setWeekday(nsWeekday)
             }
@@ -362,7 +364,8 @@ class NotificationSchedulerImpl : NotificationScheduler {
 
     private fun LocalDateTime.toNSDateComponents(timeZone: TimeZone): NSDateComponents {
         val epochSeconds = this.toInstant(timeZone).epochSeconds.toDouble()
-        val nsDate = NSDate.dateWithTimeIntervalSince1970(epochSeconds)
+        // Apple reference date is January 1, 2001 (978307200 seconds after Unix epoch)
+        val nsDate = NSDate(timeIntervalSinceReferenceDate = epochSeconds - APPLE_REFERENCE_DATE_OFFSET)
 
         return NSCalendar.currentCalendar.components(
             unitFlags = NSCalendarUnitYear or NSCalendarUnitMonth or NSCalendarUnitDay or
@@ -377,5 +380,8 @@ class NotificationSchedulerImpl : NotificationScheduler {
         private const val KEY_MINUTE = "scheduled_minute"
         private const val KEY_SCHEDULED = "is_scheduled"
         private const val DEEP_LINK_URI_KEY = "deep_link_uri"
+
+        /** Seconds between Unix epoch (1970-01-01) and Apple reference date (2001-01-01) */
+        private const val APPLE_REFERENCE_DATE_OFFSET = 978307200.0
     }
 }

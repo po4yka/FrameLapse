@@ -2,12 +2,14 @@ package com.po4yka.framelapse.platform
 
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.Foundation.NSFileManager
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImagePNGRepresentation
 
+@OptIn(ExperimentalForeignApi::class)
 internal class IosImageStore(private val codec: IosImageCodec) {
     fun loadImage(path: String): Result<ImageData> {
         return try {

@@ -54,10 +54,7 @@ public inline fun <T> List<T>.forEachChunk(chunkSize: Int, action: (InPlaceSubLi
  * }
  * ```
  */
-public inline fun <T> List<T>.forEachChunkIndexed(
-    chunkSize: Int,
-    action: (index: Int, InPlaceSubList<T>) -> Unit
-) {
+public inline fun <T> List<T>.forEachChunkIndexed(chunkSize: Int, action: (index: Int, InPlaceSubList<T>) -> Unit) {
     var index = 0
     forEachChunk(chunkSize) { chunk ->
         action(index++, chunk)
