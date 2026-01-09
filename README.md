@@ -183,7 +183,19 @@ VERSION_CODE=1
 
 ## Documentation
 
-- [Architecture Details](./Architecture.md) - Technical implementation details
+### Getting Started
+- [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute to the project
+- [Changelog](./CHANGELOG.md) - Version history and release notes
+
+### Technical Documentation
+- [Architecture](./Architecture.md) - System architecture and design patterns
+- [Algorithms](./docs/ALGORITHMS.md) - Face detection, alignment, and video compilation algorithms
+- [Navigation Map](./docs/NAVIGATION_MAP.md) - Screen flow and navigation structure
+- [API Reference](./docs/API_REFERENCE.md) - Use cases, services, and ViewModels
+
+### Reference
+- [Troubleshooting](./docs/TROUBLESHOOTING.md) - Common issues and solutions
 - [Feature Research](./Daily_Selfie_Timelapse_Apps.md) - Comprehensive feature and technology analysis
 - [Agent Definitions](./AGENTS.md) - Specialized AI agents for development tasks
 

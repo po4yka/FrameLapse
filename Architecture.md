@@ -1,6 +1,78 @@
+# FrameLapse Architecture
+
+This document provides detailed technical architecture documentation for FrameLapse.
+
+> For algorithm details, see [docs/ALGORITHMS.md](./docs/ALGORITHMS.md)
+> For API reference, see [docs/API_REFERENCE.md](./docs/API_REFERENCE.md)
+
+---
+
 ### 1. High-Level Architecture: Clean Architecture + KMP
 
 The application follows a **Clean Architecture** approach with **Unidirectional Data Flow (UDF)**. The core philosophy is to share as much logic as possible (business rules, view models, data storage) while keeping heavy media processing (camera, ML, video encoding) native for maximum performance.
+
+#### Architecture Diagram
+
+```mermaid
+flowchart TB
+    subgraph UI["UI Layer (Compose Multiplatform)"]
+        A[Composable Screens]
+        B[UI Components]
+    end
+
+    subgraph Presentation["Presentation Layer"]
+        C[ViewModels]
+        D[State/Event/Effect]
+    end
+
+    subgraph Domain["Domain Layer (Pure Kotlin)"]
+        E[Use Cases]
+        F[Entities]
+        G[Repository Interfaces]
+    end
+
+    subgraph Data["Data Layer"]
+        H[Repository Implementations]
+        I[Local Data Sources]
+        J[SQLDelight Database]
+    end
+
+    subgraph Platform["Platform Layer"]
+        K[expect/actual]
+        L[Android: MediaPipe, CameraX, MediaCodec]
+        M[iOS: Vision, AVFoundation, AVAssetWriter]
+    end
+
+    UI --> Presentation
+    Presentation --> Domain
+    Domain --> Data
+    Data --> Platform
+
+    style UI fill:#e3f2fd
+    style Presentation fill:#e8f5e9
+    style Domain fill:#fff3e0
+    style Data fill:#fce4ec
+    style Platform fill:#f3e5f5
+```
+
+#### Module Dependencies
+
+```mermaid
+flowchart LR
+    composeApp --> domain
+    composeApp --> data
+    composeApp --> platform
+    composeApp --> core
+
+    data --> domain
+    data --> platform
+    data --> core
+
+    domain --> platform
+    domain --> core
+
+    platform --> core
+```
 
 #### The Layers
 
@@ -91,22 +163,110 @@ To avoid large library sizes (like bundling FFmpeg), the app uses **Hardware Acc
 
 ### 4. Workflows & State Management
 
+#### Data Flow Diagram
+
+```mermaid
+flowchart TD
+    subgraph UI
+        A[User Action]
+        B[UI State Display]
+    end
+
+    subgraph ViewModel
+        C[onEvent]
+        D[State Update]
+        E[Effect Emission]
+    end
+
+    subgraph UseCase
+        F[Business Logic]
+    end
+
+    subgraph Repository
+        G[Data Operations]
+    end
+
+    subgraph DataSource
+        H[SQLDelight]
+        I[File Storage]
+        J[Platform Services]
+    end
+
+    A -->|Event| C
+    C -->|invoke| F
+    F -->|call| G
+    G --> H
+    G --> I
+    G --> J
+    G -->|Result| F
+    F -->|Result| C
+    C --> D
+    C --> E
+    D -->|StateFlow| B
+    E -->|SharedFlow| B
+```
+
 **The Capture Loop:**
 
-1.  **State:** UI subscribes to `CaptureViewModel`.
-2.  **Action:** User taps shutter.
-3.  **IO:** Camera Interface captures bytes.
-4.  **Processing:**
-    -   Save "Raw" image to disk.
-    -   Run Face Detection (Native).
-    -   Calculate Alignment Matrix (Shared).
-    -   Save "Aligned" thumbnail (Shared).
-5.  **Update:** Database insert; UI updates the "Ghost" overlay to the new image.
+```mermaid
+sequenceDiagram
+    participant UI as CaptureScreen
+    participant VM as CaptureViewModel
+    participant UC as CaptureImageUseCase
+    participant FD as FaceDetector
+    participant AF as AlignFaceUseCase
+    participant Repo as FrameRepository
+
+    UI->>VM: onEvent(CaptureImage)
+    VM->>VM: updateState(isProcessing = true)
+    VM->>UC: invoke(projectId, imageData)
+    UC->>FD: detectFace(imageData)
+    FD-->>UC: FaceLandmarks
+    UC->>AF: invoke(frame, reference)
+    AF-->>UC: AlignedFrame
+    UC->>Repo: addFrame(frame)
+    Repo-->>UC: Result.Success
+    UC-->>VM: Result<Frame>
+    VM->>VM: updateState(frameCount++, ghostImage)
+    VM->>VM: sendEffect(PlayCaptureSound)
+    VM-->>UI: State + Effect
+```
 
 **The Compilation Loop:**
 
-1.  **Input:** User selects "Export Video".
-2.  **Logic:** `CompileVideoUseCase` retrieves all frame paths from DB, sorted by date.
-3.  **Native Bridge:** Passes list to Native Video Encoder.
-4.  **Feedback:** Native encoder emits progress integers back to Shared Flow.
-5.  **Result:** Returns path to generated MP4/MOV file.
+```mermaid
+sequenceDiagram
+    participant UI as ExportScreen
+    participant VM as ExportViewModel
+    participant UC as CompileVideoUseCase
+    participant Repo as FrameRepository
+    participant Enc as VideoEncoder
+
+    UI->>VM: onEvent(StartExport)
+    VM->>VM: updateState(isExporting = true)
+    VM->>UC: invoke(projectId, settings, onProgress)
+    UC->>Repo: getFrames(projectId)
+    Repo-->>UC: List<Frame>
+    UC->>Enc: encode(framePaths, outputPath, settings)
+
+    loop For Each Frame
+        Enc->>Enc: Load & encode frame
+        Enc-->>UC: progress callback
+        UC-->>VM: onProgress(0.0 - 1.0)
+        VM->>VM: updateState(progress)
+    end
+
+    Enc-->>UC: Result.Success
+    UC-->>VM: Result<String> (video path)
+    VM->>VM: updateState(exportedFilePath)
+    VM-->>UI: State update
+```
+
+---
+
+### 5. Related Documentation
+
+- [Algorithms](./docs/ALGORITHMS.md) - Detailed algorithm implementations with diagrams
+- [Navigation Map](./docs/NAVIGATION_MAP.md) - Screen flow and navigation patterns
+- [API Reference](./docs/API_REFERENCE.md) - Use cases, services, and ViewModels
+- [Quick Start](./docs/QUICK_START.md) - Getting started guide

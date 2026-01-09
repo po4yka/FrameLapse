@@ -6,6 +6,17 @@
 
 **Status:** Production-ready (all core features implemented)
 
+## Documentation Quick Links
+
+| Document | Purpose |
+|----------|---------|
+| [Quick Start](./docs/QUICK_START.md) | 5-minute setup guide |
+| [Algorithms](./docs/ALGORITHMS.md) | Face detection, alignment, stabilization algorithms |
+| [Navigation Map](./docs/NAVIGATION_MAP.md) | Screen flow and navigation |
+| [API Reference](./docs/API_REFERENCE.md) | Use cases, services, ViewModels |
+| [Architecture](./Architecture.md) | System design with diagrams |
+| [Troubleshooting](./docs/TROUBLESHOOTING.md) | Common issues and solutions |
+
 ## Quick Commands
 
 ```shell
@@ -211,13 +222,36 @@ VERSION_NAME=1.0.0
 VERSION_CODE=1
 ```
 
+## Algorithm Overview
+
+> For full details with diagrams, see [docs/ALGORITHMS.md](./docs/ALGORITHMS.md)
+
+### Face Alignment Pipeline
+1. **Detection**: MediaPipe (Android) / Vision (iOS) extracts 478 3D landmarks
+2. **Key Points**: Left eye (#468), Right eye (#473), Nose (#1)
+3. **Matrix Calculation**: Rotation, scale, translation to align eyes horizontally
+4. **Multi-Pass Stabilization**: FAST (4 passes) or SLOW (11 passes) refinement
+
+### Stabilization Score
+```
+score = ((leftEyeError + rightEyeError) / 2) * 1000 / canvasHeight
+- < 0.5: Perfect (no correction needed)
+- < 20.0: Success
+- >= 20.0: Failed (manual adjustment needed)
+```
+
+### Video Compilation
+- Bitrate: `width × height × fps × 0.1 × qualityMultiplier`
+- Codecs: H.264 (universal) or HEVC (better compression)
+- Uses MediaCodec (Android) / AVAssetWriter (iOS)
+
 ## Important Notes
 
 - All image processing runs on background dispatchers
 - Face alignment uses affine transformation based on eye positions
 - Video encoding uses hardware acceleration (no FFmpeg bundled)
 - Images stored in app sandbox, not public gallery
-- Minimum face confidence threshold: 0.7
+- Minimum face confidence threshold: 0.7 (standard) / 0.3 (realtime preview)
 - Storage availability is checked before write operations
 - Accessibility: All interactive elements have content descriptions
 - Colors comply with WCAG AA contrast requirements
