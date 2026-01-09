@@ -100,7 +100,7 @@ val dataModule = module {
     single { ImageStorageManager(get()) }
     single { VideoStorageManager(get()) }
     single { ThumbnailGenerator(get(), get()) }
-    single { StorageCleanupManager(get(), get(), get()) }
+    single { StorageCleanupManager(get(), get(), get(), get(), get()) }
 
     // Repositories
     single<ProjectRepository> { ProjectRepositoryImpl(get(), get()) }
@@ -117,7 +117,7 @@ val domainModule = module {
     factory { CreateProjectUseCase(get()) }
     factory { GetProjectsUseCase(get()) }
     factory { GetProjectUseCase(get()) }
-    factory { DeleteProjectUseCase(get(), get(), get()) }
+    factory { DeleteProjectUseCase(get()) }
     factory { UpdateProjectSettingsUseCase(get()) }
 
     // Frame Management Use Cases
@@ -157,7 +157,7 @@ val domainModule = module {
             faceDetector = get(),
             imageProcessor = get(),
             frameRepository = get(),
-            fileManager = get(),
+            imageStorageManager = get(),
             multiPassStabilization = get(),
             validateAlignment = get(),
         )
@@ -250,7 +250,7 @@ val domainModule = module {
     }
 
     // Export Use Cases
-    factory { CompileVideoUseCase(get(), get(), get()) }
+    factory { CompileVideoUseCase(get(), get(), get(), get()) }
     factory { ExportGifUseCase(get(), get(), get(), get()) }
 
     // Capture Use Cases (CameraController passed at runtime from UI layer)

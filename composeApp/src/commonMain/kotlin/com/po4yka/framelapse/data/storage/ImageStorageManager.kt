@@ -153,9 +153,9 @@ class ImageStorageManager(private val fileManager: FileManager) {
         try {
             val projectDir = fileManager.getProjectDirectory(projectId)
 
-            deleteDirectoryContents("$projectDir/$FRAMES_DIR")
-            deleteDirectoryContents("$projectDir/$ALIGNED_DIR")
-            deleteDirectoryContents("$projectDir/$THUMBNAILS_DIR")
+            deleteDirectory("$projectDir/$FRAMES_DIR")
+            deleteDirectory("$projectDir/$ALIGNED_DIR")
+            deleteDirectory("$projectDir/$THUMBNAILS_DIR")
 
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -182,12 +182,9 @@ class ImageStorageManager(private val fileManager: FileManager) {
         return "${nameWithoutExtension}_aligned.$extension"
     }
 
-    private fun deleteDirectoryContents(directoryPath: String) {
-        // Note: This is a simplified implementation.
-        // A more robust implementation would list directory contents and delete each file.
-        // For now, we rely on the cascade delete behavior when deleting the project.
+    private fun deleteDirectory(directoryPath: String) {
         if (fileManager.fileExists(directoryPath)) {
-            fileManager.deleteFile(directoryPath)
+            fileManager.deleteRecursively(directoryPath)
         }
     }
 

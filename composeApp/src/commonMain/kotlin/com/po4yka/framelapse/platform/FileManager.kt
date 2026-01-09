@@ -28,6 +28,14 @@ expect class FileManager {
     fun deleteFile(path: String): Boolean
 
     /**
+     * Deletes a file or directory tree at the given path.
+     *
+     * @param path The file or directory path to delete
+     * @return True if deletion was successful
+     */
+    fun deleteRecursively(path: String): Boolean
+
+    /**
      * Checks if a file exists at the given path.
      *
      * @param path The file path to check
@@ -42,6 +50,22 @@ expect class FileManager {
      * @return True if creation was successful
      */
     fun createDirectory(path: String): Boolean
+
+    /**
+     * Lists all files under the given path recursively.
+     *
+     * @param path Root directory to scan
+     * @return Absolute paths for files found (directories excluded)
+     */
+    fun listFilesRecursively(path: String): List<String>
+
+    /**
+     * Returns the file size in bytes for the given path.
+     *
+     * @param path File path
+     * @return File size in bytes or 0 if not found
+     */
+    fun getFileSizeBytes(path: String): Long
 
     /**
      * Returns the available storage space in bytes.

@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.export
 
 import com.po4yka.framelapse.data.storage.StorageError
+import com.po4yka.framelapse.data.storage.VideoStorageManager
 import com.po4yka.framelapse.domain.entity.ExportSettings
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.VideoEncoder
@@ -80,6 +81,7 @@ class CompileVideoUseCase(
     private val frameRepository: FrameRepository,
     private val videoEncoder: VideoEncoder,
     private val fileManager: FileManager,
+    private val videoStorageManager: VideoStorageManager,
 ) {
     /**
      * Compiles all frames in a project into a video.
@@ -159,10 +161,10 @@ class CompileVideoUseCase(
         }
 
         // Generate output path
-        val projectDir = fileManager.getProjectDirectory(projectId)
         val timestamp = currentTimeMillis()
         val extension = "mp4" // Both H.264 and HEVC use mp4 container
-        val outputPath = "$projectDir/timelapse_$timestamp.$extension"
+        val filename = videoStorageManager.generateExportFilename(timestamp, extension)
+        val outputPath = videoStorageManager.getExportPath(projectId, filename)
 
         // Encode video with error handling and cleanup
         return try {

@@ -4,6 +4,9 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSystemFreeSize
+import platform.Foundation.NSFileSize
+import platform.Foundation.NSFileType
+import platform.Foundation.NSFileTypeDirectory
 import platform.Foundation.NSNumber
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSURL
@@ -37,6 +40,13 @@ actual class FileManager {
         false
     }
 
+    actual fun deleteRecursively(path: String): Boolean = try {
+        fileManager.removeItemAtPath(path, null)
+        true
+    } catch (e: Exception) {
+        false
+    }
+
     actual fun fileExists(path: String): Boolean = fileManager.fileExistsAtPath(path)
 
     actual fun createDirectory(path: String): Boolean = try {
@@ -48,6 +58,31 @@ actual class FileManager {
         )
     } catch (e: Exception) {
         false
+    }
+
+    actual fun listFilesRecursively(path: String): List<String> = try {
+        val enumerator = fileManager.enumeratorAtPath(path)
+        val results = mutableListOf<String>()
+        while (true) {
+            val next = enumerator?.nextObject() as? String ?: break
+            val fullPath = "$path/$next"
+            val attributes = fileManager.attributesOfItemAtPath(fullPath, null)
+            val fileType = attributes?.get(NSFileType) as? String
+            if (fileType != NSFileTypeDirectory) {
+                results.add(fullPath)
+            }
+        }
+        results
+    } catch (e: Exception) {
+        emptyList()
+    }
+
+    actual fun getFileSizeBytes(path: String): Long = try {
+        val attributes = fileManager.attributesOfItemAtPath(path, null)
+        val size = attributes?.get(NSFileSize) as? NSNumber
+        size?.longLongValue ?: 0L
+    } catch (e: Exception) {
+        0L
     }
 
     actual fun getAvailableStorageBytes(): Long = try {

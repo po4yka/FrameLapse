@@ -1,12 +1,12 @@
 package com.po4yka.framelapse.domain.usecase.export
 
+import com.po4yka.framelapse.data.storage.VideoStorageManager
 import com.po4yka.framelapse.domain.entity.DateRange
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.GifEncoder
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
@@ -19,7 +19,7 @@ import com.po4yka.framelapse.platform.currentTimeMillis
 class ExportGifUseCase(
     private val frameRepository: FrameRepository,
     private val imageProcessor: ImageProcessor,
-    private val fileManager: FileManager,
+    private val videoStorageManager: VideoStorageManager,
     private val gifEncoder: GifEncoder,
 ) {
     /**
@@ -87,9 +87,9 @@ class ExportGifUseCase(
         }
 
         // Generate output path
-        val projectDir = fileManager.getProjectDirectory(projectId)
         val timestamp = currentTimeMillis()
-        val outputPath = "$projectDir/timelapse_$timestamp.gif"
+        val filename = videoStorageManager.generateExportFilename(timestamp, "gif")
+        val outputPath = videoStorageManager.getExportPath(projectId, filename)
 
         // Process frames
         val processedFrames = mutableListOf<ImageData>()

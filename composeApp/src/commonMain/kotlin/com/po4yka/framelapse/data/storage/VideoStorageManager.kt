@@ -65,7 +65,7 @@ class VideoStorageManager(private val fileManager: FileManager) {
         try {
             val exportsDir = getExportsDirectory(projectId)
             if (fileManager.fileExists(exportsDir)) {
-                fileManager.deleteFile(exportsDir)
+                fileManager.deleteRecursively(exportsDir)
             }
             Result.Success(Unit)
         } catch (e: Exception) {
