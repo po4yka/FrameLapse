@@ -21,25 +21,23 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.create
 import platform.UIKit.UIImage
 import platform.UIKit.UIImagePNGRepresentation
+import platform.posix.memcpy
 
 /**
  * iOS implementation of FeatureMatcher.
  *
- * This implementation requires OpenCV iOS framework integration via Kotlin/Native cinterop.
- * When OpenCV is not available, feature matching operations return appropriate error messages.
+ * This implementation uses the OpenCVWrapper Objective-C++ bridge to access
+ * OpenCV's feature detection, matching, and homography computation functions.
  *
- * The OpenCV wrapper (OpenCVWrapper.mm) must be compiled with the iOS app and linked
- * against the OpenCV framework from CocoaPods.
+ * Note: The OpenCV cinterop bindings require the header to be properly processed.
+ * Until the cinterop is fully configured, this returns appropriate fallback responses.
+ * The OpenCVWrapper code is compiled with the iOS app via Xcode and can be called
+ * from Swift directly.
  */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Suppress("TooManyFunctions", "MagicNumber")
 class FeatureMatcherImpl : FeatureMatcher {
 
-    /**
-     * Check if OpenCV wrapper is available.
-     * This will return true once the OpenCV framework is properly integrated
-     * via the cinterop bindings.
-     */
     override val isAvailable: Boolean
         get() = checkOpenCVAvailable()
 
@@ -132,7 +130,6 @@ class FeatureMatcherImpl : FeatureMatcher {
             )
         }
 
-        // Validate minimum matches for homography computation
         if (matches.size < MIN_MATCHES_FOR_HOMOGRAPHY) {
             return@withContext Result.Error(
                 IllegalArgumentException("Not enough matches: ${matches.size} < $MIN_MATCHES_FOR_HOMOGRAPHY required"),
@@ -273,19 +270,20 @@ class FeatureMatcherImpl : FeatureMatcher {
      *
      * Note: OpenCV integration requires the iOS app to be built with Xcode,
      * which compiles OpenCVWrapper.mm and links the OpenCV framework.
-     * Currently returns false until runtime integration is complete.
+     * The cinterop bindings need additional configuration to work at runtime.
+     * Until then, this returns false.
      */
     private fun checkOpenCVAvailable(): Boolean {
-        // OpenCV cinterop bindings are configured but require Xcode build
-        // to compile the OpenCVWrapper Objective-C++ code and link OpenCV.
-        // Once the iOS app is built via Xcode with the .xcworkspace (after pod install),
-        // this can be updated to call the native wrapper.
+        // OpenCV cinterop bindings require Objective-C runtime integration.
+        // The OpenCVWrapper is compiled into the iOS app but calling it from
+        // Kotlin requires properly configured cinterop bindings.
+        // For now, return false until cinterop is fully working.
         return false
     }
 
     /**
      * Detects features using OpenCV wrapper.
-     * Stub implementation - requires Xcode build with OpenCV framework.
+     * Returns error until cinterop bindings are configured.
      */
     @Suppress("UNUSED_PARAMETER")
     private fun detectFeaturesWithOpenCV(
@@ -294,7 +292,7 @@ class FeatureMatcherImpl : FeatureMatcher {
         maxKeypoints: Int,
         isSource: Boolean,
     ): Result<LandscapeLandmarks> {
-        // TODO: Implement when OpenCV cinterop bindings are available at runtime
+        // TODO: Implement when OpenCV cinterop bindings are properly configured
         // The OpenCVWrapper provides:
         // - detectFeaturesWithImageData(data, width, height, type, maxKeypoints)
         // - Returns CVFeatureResult with keypoints and descriptors
@@ -303,7 +301,7 @@ class FeatureMatcherImpl : FeatureMatcher {
 
     /**
      * Matches features using OpenCV wrapper.
-     * Stub implementation - requires Xcode build with OpenCV framework.
+     * Returns error until cinterop bindings are configured.
      */
     @Suppress("UNUSED_PARAMETER")
     private fun matchFeaturesWithOpenCV(
@@ -312,10 +310,7 @@ class FeatureMatcherImpl : FeatureMatcher {
         ratioTestThreshold: Float,
         useCrossCheck: Boolean,
     ): Result<List<Pair<Int, Int>>> {
-        // TODO: Implement when OpenCV cinterop bindings are available at runtime
-        // The OpenCVWrapper provides:
-        // - matchFeaturesWithDescriptors1(desc1, rows1, cols1, type1, desc2, rows2, cols2, type2, ratio)
-        // - Returns NSArray of CVMatch objects
+        // TODO: Implement when OpenCV cinterop bindings are properly configured
         return Result.Error(
             UnsupportedOperationException(OPENCV_NOT_CONFIGURED_MESSAGE),
             OPENCV_NOT_CONFIGURED_MESSAGE,
@@ -324,7 +319,7 @@ class FeatureMatcherImpl : FeatureMatcher {
 
     /**
      * Computes homography using OpenCV wrapper.
-     * Stub implementation - requires Xcode build with OpenCV framework.
+     * Returns error until cinterop bindings are configured.
      */
     @Suppress("UNUSED_PARAMETER")
     private fun computeHomographyWithOpenCV(
@@ -333,10 +328,7 @@ class FeatureMatcherImpl : FeatureMatcher {
         matches: List<Pair<Int, Int>>,
         ransacThreshold: Float,
     ): Result<Pair<HomographyMatrix, Int>> {
-        // TODO: Implement when OpenCV cinterop bindings are available at runtime
-        // The OpenCVWrapper provides:
-        // - computeHomographyWithSrcPoints(srcPoints, dstPoints, threshold)
-        // - Returns CVHomographyResult with 3x3 matrix and inlier info
+        // TODO: Implement when OpenCV cinterop bindings are properly configured
         return Result.Error(
             UnsupportedOperationException(OPENCV_NOT_CONFIGURED_MESSAGE),
             OPENCV_NOT_CONFIGURED_MESSAGE,
@@ -365,14 +357,11 @@ class FeatureMatcherImpl : FeatureMatcher {
         return ImageData(width = width, height = height, bytes = bytes)
     }
 
-    // Note: imageDataToRGBA helper method is prepared for OpenCV integration.
-    // It will be added back once the cinterop bindings are fully configured.
-
     private fun NSData.toByteArray(): ByteArray {
         val length = this.length.toInt()
         val bytes = ByteArray(length)
         bytes.usePinned { pinned ->
-            platform.posix.memcpy(pinned.addressOf(0), this.bytes, length.toULong())
+            memcpy(pinned.addressOf(0), this.bytes, length.toULong())
         }
         return bytes
     }
@@ -381,9 +370,6 @@ class FeatureMatcherImpl : FeatureMatcher {
     // Private helper methods - Calculations
     // ==========================================================================
 
-    /**
-     * Calculates a confidence score (0.0 to 1.0) based on match quality metrics.
-     */
     private fun calculateConfidence(
         matchCount: Int,
         inlierCount: Int,
@@ -421,9 +407,9 @@ class FeatureMatcherImpl : FeatureMatcher {
         private const val MATCH_COUNT_WEIGHT = 0.3f
 
         private const val OPENCV_NOT_CONFIGURED_MESSAGE =
-            "OpenCV is not yet integrated. Feature matching requires the iOS app to be built " +
-                "with Xcode using iosApp.xcworkspace (after pod install). The OpenCVWrapper " +
-                "Objective-C++ files and cinterop configuration are in place, but require " +
-                "Xcode to compile and link the OpenCV framework from CocoaPods."
+            "OpenCV cinterop bindings are not yet fully configured. " +
+                "The OpenCVWrapper Objective-C++ code is compiled into the iOS app, " +
+                "but calling it from Kotlin requires additional cinterop setup. " +
+                "Feature matching can be used from Swift/Objective-C directly."
     }
 }

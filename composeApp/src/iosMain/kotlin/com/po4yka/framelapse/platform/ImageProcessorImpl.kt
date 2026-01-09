@@ -221,11 +221,12 @@ class ImageProcessorImpl : ImageProcessor {
     /**
      * Applies a homography (perspective) transformation to an image.
      *
-     * This implementation uses OpenCV's warpPerspective for full perspective transformation
-     * when available. Falls back to Core Graphics affine approximation for near-affine
-     * homographies when OpenCV is not available.
+     * This implementation uses Core Graphics affine approximation for near-affine
+     * homographies. Full perspective transformation requires OpenCV integration
+     * which is available via the OpenCVWrapper when the iOS app is built with Xcode.
      *
-     * Note: Full OpenCV integration requires the iOS app to be built via Xcode.
+     * Note: Full OpenCV integration via cinterop is pending additional configuration.
+     * The OpenCVWrapper can be called from Swift directly for full homography support.
      */
     override suspend fun applyHomographyTransform(
         image: ImageData,
@@ -234,9 +235,6 @@ class ImageProcessorImpl : ImageProcessor {
         outputHeight: Int,
     ): Result<ImageData> = withContext(Dispatchers.IO) {
         try {
-            // OpenCV integration for full perspective transform requires Xcode build
-            // For now, fall back to affine approximation for near-affine homographies
-
             // Check if homography is approximately affine (no significant perspective distortion)
             val isNearAffine = kotlin.math.abs(matrix.h31) < PERSPECTIVE_THRESHOLD &&
                 kotlin.math.abs(matrix.h32) < PERSPECTIVE_THRESHOLD
@@ -265,10 +263,6 @@ class ImageProcessorImpl : ImageProcessor {
             Result.Error(e, "Failed to apply homography transform: ${e.message}")
         }
     }
-
-    // Note: The following helper methods are prepared for OpenCV integration.
-    // They will be used once the cinterop bindings are fully configured.
-    // See: applyHomographyWithOpenCV, imageDataToRGBA, rgbaToImageData in the history.
 
     override suspend fun cropImage(image: ImageData, bounds: BoundingBox): Result<ImageData> =
         withContext(Dispatchers.IO) {
@@ -541,7 +535,6 @@ class ImageProcessorImpl : ImageProcessor {
             "Full perspective (homography) transformation requires OpenCV integration. " +
                 "The provided transformation contains significant perspective distortion " +
                 "(h31 or h32 values exceed threshold) that cannot be handled by Core Graphics " +
-                "affine transforms. Please configure OpenCV iOS framework via cinterop for " +
-                "full homography support, or use a near-affine transformation."
+                "affine transforms. The OpenCVWrapper can be called from Swift for full support."
     }
 }
