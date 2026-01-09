@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.sqldelight)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
 }
@@ -51,6 +50,11 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core)
+            implementation(projects.domain)
+            implementation(projects.data)
+            implementation(projects.platform)
+
             // Compose Multiplatform
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -69,9 +73,6 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-
-            // Database
-            implementation(libs.sqldelight.coroutines)
 
             // Lifecycle
             implementation(libs.lifecycle.runtime.compose)
@@ -99,9 +100,6 @@ kotlin {
             // Dependency Injection
             implementation(libs.koin.android)
 
-            // Database
-            implementation(libs.sqldelight.android.driver)
-
             // CameraX
             implementation(libs.camerax.core)
             implementation(libs.camerax.camera2)
@@ -119,28 +117,20 @@ kotlin {
         }
 
         iosMain.dependencies {
-            // Database
-            implementation(libs.sqldelight.native.driver)
+        }
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine)
+            implementation(projects.testUtils)
         }
 
         // Unit tests for Android (host tests in new plugin terminology)
         getByName("androidHostTest").dependencies {
             implementation(libs.kotlin.test.junit)
             implementation(libs.mockk)
-        }
-    }
-}
-
-sqldelight {
-    databases {
-        create("FrameLapseDatabase") {
-            packageName.set("com.po4yka.framelapse.data.local")
         }
     }
 }

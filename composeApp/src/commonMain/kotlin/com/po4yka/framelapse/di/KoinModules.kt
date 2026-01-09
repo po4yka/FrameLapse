@@ -67,7 +67,7 @@ import com.po4yka.framelapse.domain.usecase.project.DeleteProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
-import com.po4yka.framelapse.platform.DatabaseDriverFactory
+import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
 import com.po4yka.framelapse.presentation.calibration.CalibrationViewModel
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel

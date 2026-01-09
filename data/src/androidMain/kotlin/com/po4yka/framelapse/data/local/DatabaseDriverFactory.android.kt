@@ -1,4 +1,4 @@
-package com.po4yka.framelapse.platform
+package com.po4yka.framelapse.data.local
 
 import android.content.Context
 import app.cash.sqldelight.db.SqlDriver

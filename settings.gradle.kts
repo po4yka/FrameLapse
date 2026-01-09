@@ -30,3 +30,8 @@ dependencyResolutionManagement {
 
 include(":composeApp")
 include(":androidApp")
+include(":core")
+include(":domain")
+include(":data")
+include(":platform")
+include(":test-utils")
