@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the settings screen.
@@ -86,14 +87,20 @@ sealed interface SettingsEvent : UiEvent {
  */
 sealed interface SettingsEffect : UiEffect {
     /**
-     * Show a success message.
+     * Show a success/informational message. Delegates to [CommonEffect.ShowSnackbar].
      */
-    data class ShowMessage(val message: String) : SettingsEffect
+    data class ShowMessage(val message: String) : SettingsEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowSnackbar = CommonEffect.ShowSnackbar(message)
+    }
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : SettingsEffect
+    data class ShowError(val message: String) : SettingsEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
      * Schedule daily reminder notification.

@@ -30,12 +30,7 @@ private val WEEK_BAR_HEIGHT_MULTIPLIER = 8
  * A card displaying a single statistic with label and value.
  */
 @Composable
-fun StatCard(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null,
-) {
+fun StatCard(label: String, value: String, modifier: Modifier = Modifier, subtitle: String? = null) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -74,12 +69,7 @@ fun StatCard(
  * A card displaying streak information with current and best values.
  */
 @Composable
-fun StreakCard(
-    currentStreak: Int,
-    bestStreak: Int,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
+fun StreakCard(currentStreak: Int, bestStreak: Int, label: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -134,11 +124,7 @@ fun StreakCard(
  * A card displaying weekly capture activity as bar indicators.
  */
 @Composable
-fun WeeklyActivityCard(
-    weeklyCounts: List<Int>,
-    modifier: Modifier = Modifier,
-    label: String = "Weekly Activity",
-) {
+fun WeeklyActivityCard(weeklyCounts: List<Int>, modifier: Modifier = Modifier, label: String = "Weekly Activity") {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -212,10 +198,7 @@ private fun WeekBar(count: Int) {
  * Card showing content type breakdown for global stats.
  */
 @Composable
-fun ContentTypeBreakdownCard(
-    breakdown: Map<ContentType, Int>,
-    modifier: Modifier = Modifier,
-) {
+fun ContentTypeBreakdownCard(breakdown: Map<ContentType, Int>, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(

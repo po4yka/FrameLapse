@@ -6,7 +6,7 @@
 
 package com.po4yka.framelapse.core.notification
 
-import com.po4yka.framelapse.platform.currentInstant
+import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -60,7 +60,7 @@ object NotificationUtils {
     fun adjustToFuture(config: NotificationConfig): NotificationConfig {
         val scheduledDateTime = config.scheduledDateTime ?: return config
 
-        val now = currentInstant().toLocalDateTime(config.timeZone)
+        val now = Clock.System.now().toLocalDateTime(config.timeZone)
         var adjusted = scheduledDateTime
 
         // If already in the future, no adjustment needed

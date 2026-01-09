@@ -7,11 +7,11 @@ import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.StabilizationProgress
-import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
+import com.po4yka.framelapse.domain.util.ConfidenceCalculator
 import com.po4yka.framelapse.domain.util.Result
 
 /**
@@ -135,7 +135,7 @@ class AlignBodyUseCase(
         }
 
         // Calculate confidence from stabilization result
-        val confidence = calculateConfidenceFromStabilization(stabResult)
+        val confidence = ConfidenceCalculator.fromStabilizationResult(stabResult)
 
         // Update frame in database with stabilization result
         val stabilizedResult = stabResult.copy(diagnostics = diagnostics)
@@ -256,22 +256,5 @@ class AlignBodyUseCase(
             boundingBox = BoundingBox(0f, 0f, 1f, 1f),
             confidence = 0.5f,
         )
-    }
-
-    /**
-     * Calculates confidence score from stabilization result.
-     *
-     * Uses the final stabilization score:
-     * - Score < 0.5: 1.0 confidence (perfect)
-     * - Score < 20.0: 0.7-0.99 confidence (good)
-     * - Score >= 20.0: 0.3-0.7 confidence (poor)
-     */
-    private fun calculateConfidenceFromStabilization(result: StabilizationResult): Float {
-        val score = result.finalScore.value
-        return when {
-            score < 0.5f -> 1.0f
-            score < 20.0f -> 0.7f + (20.0f - score) / 20.0f * 0.29f
-            else -> (0.7f - (score - 20.0f) / 100.0f * 0.4f).coerceAtLeast(0.3f)
-        }
     }
 }

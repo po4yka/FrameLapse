@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * Calibration flow phases.
@@ -150,9 +151,12 @@ sealed interface CalibrationEffect : UiEffect {
     data object TriggerCapture : CalibrationEffect
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : CalibrationEffect
+    data class ShowError(val message: String) : CalibrationEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
      * Play capture sound/haptic feedback.
@@ -160,7 +164,10 @@ sealed interface CalibrationEffect : UiEffect {
     data object PlayCaptureSound : CalibrationEffect
 
     /**
-     * Show success message after saving calibration.
+     * Show success message after saving calibration. Delegates to [CommonEffect.ShowSuccess].
      */
-    data class ShowSuccess(val message: String) : CalibrationEffect
+    data class ShowSuccess(val message: String) : CalibrationEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowSuccess = CommonEffect.ShowSuccess(message)
+    }
 }

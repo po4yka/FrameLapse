@@ -32,8 +32,8 @@ class CalculateStreakUseCase {
         // Normalize all timestamps to day index (days since epoch)
         val captureDays = capturedAtTimestamps
             .map { it / MILLIS_PER_DAY }
-            .toSortedSet()
-            .toList()
+            .distinct()
+            .sorted()
 
         val today = currentTimeMillis() / MILLIS_PER_DAY
         val lastCaptureDay = captureDays.last()

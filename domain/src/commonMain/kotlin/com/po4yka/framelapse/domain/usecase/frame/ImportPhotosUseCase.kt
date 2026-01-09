@@ -142,23 +142,6 @@ class ImportPhotosUseCase(
         )
     }
 
-    /**
-     * Legacy method for backwards compatibility.
-     */
-    @Suppress("UNUSED_PARAMETER")
-    suspend fun invokeSimple(
-        projectId: String,
-        photoPaths: List<String>,
-        alignFaces: Boolean = true,
-        onProgress: (current: Int, total: Int) -> Unit = { _, _ -> },
-    ): Result<List<Frame>> {
-        val result = invoke(projectId, photoPaths, alignFaces) { progress ->
-            onProgress(progress.currentIndex, progress.totalCount)
-        }
-
-        return result.map { it.importedFrames }
-    }
-
     private fun categorizeError(exception: Throwable?): ImportErrorType {
         if (exception == null) return ImportErrorType.UNKNOWN
 

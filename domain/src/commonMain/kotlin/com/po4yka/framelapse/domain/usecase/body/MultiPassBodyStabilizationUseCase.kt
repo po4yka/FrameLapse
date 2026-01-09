@@ -14,6 +14,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.util.FiveTuple
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlin.math.sqrt
@@ -507,7 +508,4 @@ class MultiPassBodyStabilizationUseCase(
             rightEyeDistance = rightDistance, // Reusing field for right shoulder distance
         )
     }
-
-    // Helper tuple class
-    private data class FiveTuple<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E)
 }

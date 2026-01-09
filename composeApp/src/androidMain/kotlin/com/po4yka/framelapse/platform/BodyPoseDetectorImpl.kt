@@ -11,11 +11,11 @@ import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import com.po4yka.framelapse.domain.entity.BodyKeypoint
 import com.po4yka.framelapse.domain.entity.BodyKeypointType
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
-import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
+import com.po4yka.framelapse.platform.util.calculateBoundingBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -277,14 +277,8 @@ class BodyPoseDetectorImpl(private val context: Context) : BodyPoseDetector {
             z = (leftShoulder.z + rightShoulder.z) / 2,
         )
 
-        // Calculate bounding box from upper body landmarks
-        var minX = Float.MAX_VALUE
-        var minY = Float.MAX_VALUE
-        var maxX = Float.MIN_VALUE
-        var maxY = Float.MIN_VALUE
-
-        // Include head, shoulders, and hips in bounding box
-        val boundingLandmarks = listOf(
+        // Calculate bounding box from upper body landmarks (head, shoulders, and hips)
+        val boundingLandmarkIndices = listOf(
             NOSE_INDEX,
             LEFT_SHOULDER_INDEX,
             RIGHT_SHOULDER_INDEX,
@@ -293,25 +287,12 @@ class BodyPoseDetectorImpl(private val context: Context) : BodyPoseDetector {
             LEFT_EAR_INDEX,
             RIGHT_EAR_INDEX,
         )
-        for (index in boundingLandmarks) {
-            val lm = landmarks.getOrNull(index) ?: continue
-            if (lm.x() < minX) minX = lm.x()
-            if (lm.y() < minY) minY = lm.y()
-            if (lm.x() > maxX) maxX = lm.x()
-            if (lm.y() > maxY) maxY = lm.y()
+        val boundingPoints = boundingLandmarkIndices.mapNotNull { index ->
+            landmarks.getOrNull(index)?.let { lm ->
+                LandmarkPoint(lm.x(), lm.y(), lm.z())
+            }
         }
-
-        // Add padding to bounding box
-        val padding = 0.15f
-        val paddingX = (maxX - minX) * padding
-        val paddingY = (maxY - minY) * padding
-
-        val boundingBox = BoundingBox(
-            left = (minX - paddingX).coerceAtLeast(0f),
-            top = (minY - paddingY).coerceAtLeast(0f),
-            right = (maxX + paddingX).coerceAtMost(1f),
-            bottom = (maxY + paddingY).coerceAtMost(1f),
-        )
+        val boundingBox = calculateBoundingBox(boundingPoints, padding = BOUNDING_BOX_PADDING)
 
         // Calculate overall confidence from key landmarks
         val confidence = listOf(
@@ -354,6 +335,9 @@ class BodyPoseDetectorImpl(private val context: Context) : BodyPoseDetector {
 
         // Offset for neck center calculation (fraction of shoulder distance)
         private const val NECK_OFFSET = 0.05f
+
+        // Bounding box padding as a fraction of box dimensions
+        private const val BOUNDING_BOX_PADDING = 0.15f
 
         // MediaPipe Pose Landmarker indices
         private const val NOSE_INDEX = 0

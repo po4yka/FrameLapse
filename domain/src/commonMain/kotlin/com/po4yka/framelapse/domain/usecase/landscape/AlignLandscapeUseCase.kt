@@ -1,9 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.landscape
 
 import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
-import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.EarlyStopReason
-import com.po4yka.framelapse.domain.entity.FeatureDetectorType
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandscapeAlignmentSettings
 import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
@@ -671,19 +669,6 @@ class AlignLandscapeUseCase(
         cachedReferenceFrameId = null
         cachedReferenceLandmarks = null
     }
-
-    /**
-     * Creates minimal landscape landmarks for storage when detection fails.
-     */
-    @Suppress("unused")
-    private fun createMinimalLandmarks(outputSize: Int, detectorType: FeatureDetectorType): LandscapeLandmarks =
-        LandscapeLandmarks(
-            keypoints = emptyList(),
-            detectorType = detectorType,
-            keypointCount = 0,
-            boundingBox = BoundingBox(0f, 0f, 1f, 1f),
-            qualityScore = 0f,
-        )
 
     /**
      * Checks if landscape alignment is available.

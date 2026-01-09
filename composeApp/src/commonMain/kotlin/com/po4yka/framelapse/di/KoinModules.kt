@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.di
 
+import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.data.local.FrameLapseDatabase
 import com.po4yka.framelapse.data.local.FrameLocalDataSource
 import com.po4yka.framelapse.data.local.ManualAdjustmentLocalDataSource
@@ -70,7 +71,6 @@ import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.CalculateStreakUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.GetGlobalStatisticsUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.GetProjectStatisticsUseCase
-import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
 import com.po4yka.framelapse.presentation.calibration.CalibrationViewModel
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel

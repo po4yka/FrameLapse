@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the capture screen.
@@ -81,9 +82,12 @@ sealed interface CaptureEffect : UiEffect {
     data object TriggerCapture : CaptureEffect
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : CaptureEffect
+    data class ShowError(val message: String) : CaptureEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
      * Navigate to gallery screen.

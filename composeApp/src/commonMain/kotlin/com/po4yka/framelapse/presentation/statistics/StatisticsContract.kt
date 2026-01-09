@@ -6,6 +6,7 @@ import com.po4yka.framelapse.domain.entity.ProjectStatistics
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * Statistics display mode.
@@ -69,7 +70,10 @@ sealed interface StatisticsEvent : UiEvent {
  */
 sealed interface StatisticsEffect : UiEffect {
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : StatisticsEffect
+    data class ShowError(val message: String) : StatisticsEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 }

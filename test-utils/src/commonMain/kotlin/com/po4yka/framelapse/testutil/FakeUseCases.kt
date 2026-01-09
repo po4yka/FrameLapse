@@ -11,6 +11,7 @@ import com.po4yka.framelapse.domain.service.FeatureMatchResult
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.service.ReprojectionErrorResult
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlinx.coroutines.flow.Flow
@@ -227,12 +228,16 @@ class FakeFeatureMatcher : FeatureMatcher {
     /** Configurable result for findHomography() */
     var featureMatchResult: FeatureMatchResult? = null
 
+    /** Configurable result for calculateReprojectionError() */
+    var reprojectionErrorResult: ReprojectionErrorResult? = null
+
     /** Track method invocations */
     var detectFeaturesCallCount = 0
     var detectFeaturesFromPathCallCount = 0
     var matchFeaturesCallCount = 0
     var computeHomographyCallCount = 0
     var findHomographyCallCount = 0
+    var calculateReprojectionErrorCallCount = 0
     var releaseCallCount = 0
 
     /** Last parameters passed to methods */
@@ -324,6 +329,32 @@ class FakeFeatureMatcher : FeatureMatcher {
             ?: Result.Error(RuntimeException("No feature match result configured"))
     }
 
+    override suspend fun calculateReprojectionError(
+        sourceKeypoints: List<FeatureKeypoint>,
+        referenceKeypoints: List<FeatureKeypoint>,
+        matches: List<Pair<Int, Int>>,
+        homography: HomographyMatrix,
+        imageWidth: Int,
+        imageHeight: Int,
+    ): Result<ReprojectionErrorResult> {
+        calculateReprojectionErrorCallCount++
+
+        if (shouldFail) return Result.Error(failureException)
+
+        return reprojectionErrorResult?.let { Result.Success(it) }
+            ?: Result.Success(
+                ReprojectionErrorResult(
+                    meanError = 1.0f,
+                    medianError = 0.8f,
+                    maxError = 3.0f,
+                    inlierCount = matches.size,
+                    totalMatches = matches.size,
+                    inlierThreshold = 2.0f,
+                    errors = matches.map { 1.0f },
+                ),
+            )
+    }
+
     override fun release() {
         releaseCallCount++
     }
@@ -339,11 +370,13 @@ class FakeFeatureMatcher : FeatureMatcher {
         matchResult = emptyList()
         homographyResult = null
         featureMatchResult = null
+        reprojectionErrorResult = null
         detectFeaturesCallCount = 0
         detectFeaturesFromPathCallCount = 0
         matchFeaturesCallCount = 0
         computeHomographyCallCount = 0
         findHomographyCallCount = 0
+        calculateReprojectionErrorCallCount = 0
         releaseCallCount = 0
         lastDetectorType = null
         lastMaxKeypoints = null

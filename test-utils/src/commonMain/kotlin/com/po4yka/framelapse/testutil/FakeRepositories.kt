@@ -104,6 +104,53 @@ class FakeProjectRepository : ProjectRepository {
         projects.map { it.values.sortedByDescending { p -> p.updatedAt } }
 
     override fun observeProject(id: String): Flow<Project?> = projects.map { it[id] }
+
+    override suspend fun updateCalibration(
+        projectId: String,
+        imagePath: String,
+        leftEyeX: Float,
+        leftEyeY: Float,
+        rightEyeX: Float,
+        rightEyeY: Float,
+        offsetX: Float,
+        offsetY: Float,
+    ): Result<Unit> {
+        if (shouldFail) return Result.Error(failureException)
+
+        val project = projects.value[projectId]
+            ?: return Result.Error(NoSuchElementException("Project not found: $projectId"))
+        val updated = project.copy(
+            calibrationImagePath = imagePath,
+            calibrationLeftEyeX = leftEyeX,
+            calibrationLeftEyeY = leftEyeY,
+            calibrationRightEyeX = rightEyeX,
+            calibrationRightEyeY = rightEyeY,
+            calibrationOffsetX = offsetX,
+            calibrationOffsetY = offsetY,
+            updatedAt = currentTimeMillis(),
+        )
+        projects.update { it + (projectId to updated) }
+        return Result.Success(Unit)
+    }
+
+    override suspend fun clearCalibration(projectId: String): Result<Unit> {
+        if (shouldFail) return Result.Error(failureException)
+
+        val project = projects.value[projectId]
+            ?: return Result.Error(NoSuchElementException("Project not found: $projectId"))
+        val updated = project.copy(
+            calibrationImagePath = null,
+            calibrationLeftEyeX = null,
+            calibrationLeftEyeY = null,
+            calibrationRightEyeX = null,
+            calibrationRightEyeY = null,
+            calibrationOffsetX = 0f,
+            calibrationOffsetY = 0f,
+            updatedAt = currentTimeMillis(),
+        )
+        projects.update { it + (projectId to updated) }
+        return Result.Success(Unit)
+    }
 }
 
 /**

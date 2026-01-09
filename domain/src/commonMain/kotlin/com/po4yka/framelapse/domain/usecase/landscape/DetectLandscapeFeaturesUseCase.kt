@@ -40,20 +40,8 @@ class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher)
             )
         }
 
-        if (maxKeypoints < MIN_KEYPOINTS_REQUIRED) {
-            return Result.Error(
-                IllegalArgumentException("Max keypoints must be at least $MIN_KEYPOINTS_REQUIRED"),
-                "Max keypoints too low",
-            )
-        }
-
-        // Check if feature detection is available
-        if (!featureMatcher.isAvailable) {
-            return Result.Error(
-                UnsupportedOperationException("Feature detection is not available on this device"),
-                "Feature detection not available",
-            )
-        }
+        // Validate common parameters
+        validateCommonParameters(maxKeypoints)?.let { return it }
 
         // Detect features
         val detectResult = featureMatcher.detectFeatures(
@@ -62,24 +50,7 @@ class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher)
             maxKeypoints = maxKeypoints,
         )
 
-        if (detectResult.isError) {
-            return detectResult
-        }
-
-        val landmarks = detectResult.getOrNull()!!
-
-        // Validate minimum keypoint count
-        if (!landmarks.hasEnoughKeypoints()) {
-            return Result.Error(
-                IllegalStateException(
-                    "Insufficient keypoints detected: ${landmarks.keypointCount} " +
-                        "(minimum required: $MIN_KEYPOINTS_REQUIRED)",
-                ),
-                "Not enough features detected in image",
-            )
-        }
-
-        return Result.Success(landmarks)
+        return validateAndReturnLandmarks(detectResult)
     }
 
     /**
@@ -103,20 +74,8 @@ class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher)
             )
         }
 
-        if (maxKeypoints < MIN_KEYPOINTS_REQUIRED) {
-            return Result.Error(
-                IllegalArgumentException("Max keypoints must be at least $MIN_KEYPOINTS_REQUIRED"),
-                "Max keypoints too low",
-            )
-        }
-
-        // Check if feature detection is available
-        if (!featureMatcher.isAvailable) {
-            return Result.Error(
-                UnsupportedOperationException("Feature detection is not available on this device"),
-                "Feature detection not available",
-            )
-        }
+        // Validate common parameters
+        validateCommonParameters(maxKeypoints)?.let { return it }
 
         // Detect features from path
         val detectResult = featureMatcher.detectFeaturesFromPath(
@@ -125,13 +84,46 @@ class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher)
             maxKeypoints = maxKeypoints,
         )
 
+        return validateAndReturnLandmarks(detectResult)
+    }
+
+    /**
+     * Validates common parameters shared between invoke() and fromPath().
+     *
+     * @param maxKeypoints Maximum keypoints parameter to validate.
+     * @return Error Result if validation fails, null if validation passes.
+     */
+    private fun validateCommonParameters(maxKeypoints: Int): Result<LandscapeLandmarks>? {
+        if (maxKeypoints < MIN_KEYPOINTS_REQUIRED) {
+            return Result.Error(
+                IllegalArgumentException("Max keypoints must be at least $MIN_KEYPOINTS_REQUIRED"),
+                "Max keypoints too low",
+            )
+        }
+
+        if (!featureMatcher.isAvailable) {
+            return Result.Error(
+                UnsupportedOperationException("Feature detection is not available on this device"),
+                "Feature detection not available",
+            )
+        }
+
+        return null
+    }
+
+    /**
+     * Validates detection result and returns landmarks if successful.
+     *
+     * @param detectResult The result from feature detection.
+     * @return Result containing validated LandscapeLandmarks or an error.
+     */
+    private fun validateAndReturnLandmarks(detectResult: Result<LandscapeLandmarks>): Result<LandscapeLandmarks> {
         if (detectResult.isError) {
             return detectResult
         }
 
         val landmarks = detectResult.getOrNull()!!
 
-        // Validate minimum keypoint count
         if (!landmarks.hasEnoughKeypoints()) {
             return Result.Error(
                 IllegalStateException(

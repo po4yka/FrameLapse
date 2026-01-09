@@ -4,6 +4,7 @@ import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * Combined project data with frame count and thumbnail for display.
@@ -79,7 +80,10 @@ sealed interface ProjectListEffect : UiEffect {
     data class NavigateToGallery(val projectId: String) : ProjectListEffect
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : ProjectListEffect
+    data class ShowError(val message: String) : ProjectListEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 }

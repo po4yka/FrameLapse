@@ -150,8 +150,9 @@ class NotificationSchedulerImpl(private val context: Context) : NotificationSche
             NotificationUtils.run { it.toEpochMillis(adjustedConfig.timeZone) }
         } ?: System.currentTimeMillis()
 
-        if (adjustedConfig.repeatInterval != null) {
-            scheduleRepeating(triggerTimeMillis, adjustedConfig.repeatInterval, pendingIntent)
+        val repeatInterval = adjustedConfig.repeatInterval
+        if (repeatInterval != null) {
+            scheduleRepeating(triggerTimeMillis, repeatInterval, pendingIntent)
         } else {
             scheduleOneTime(triggerTimeMillis, pendingIntent)
         }

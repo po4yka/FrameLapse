@@ -5,7 +5,7 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ReprojectionErrorResult
 import kotlin.math.sqrt
 
-internal object ReprojectionErrorCalculator {
+object ReprojectionErrorCalculator {
     private const val DEFAULT_INLIER_THRESHOLD = 5.0f
 
     fun calculate(

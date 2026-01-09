@@ -179,10 +179,7 @@ private fun StatisticsModeToggle(
 }
 
 @Composable
-private fun ProjectStatsContent(
-    stats: ProjectStatistics,
-    modifier: Modifier = Modifier,
-) {
+private fun ProjectStatsContent(stats: ProjectStatistics, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(CONTENT_PADDING),
         verticalArrangement = Arrangement.spacedBy(CARD_SPACING),
@@ -238,10 +235,7 @@ private fun ProjectStatsContent(
 }
 
 @Composable
-private fun GlobalStatsContent(
-    stats: GlobalStatistics,
-    modifier: Modifier = Modifier,
-) {
+private fun GlobalStatsContent(stats: GlobalStatistics, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(CONTENT_PADDING),
         verticalArrangement = Arrangement.spacedBy(CARD_SPACING),
@@ -296,10 +290,7 @@ private fun GlobalStatsContent(
 }
 
 @Composable
-private fun EmptyStatsContent(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
+private fun EmptyStatsContent(message: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()

@@ -1,13 +1,12 @@
 package com.po4yka.framelapse.platform
 
-import android.content.Context
 import android.media.MediaActionSound
 import com.po4yka.framelapse.domain.service.SoundPlayer
 
 /**
  * Android implementation of SoundPlayer using MediaActionSound.
  */
-class SoundPlayerImpl(context: Context) : SoundPlayer {
+class SoundPlayerImpl : SoundPlayer {
 
     private val mediaActionSound = MediaActionSound().apply {
         load(MediaActionSound.SHUTTER_CLICK)

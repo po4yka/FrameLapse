@@ -72,19 +72,47 @@ class StorageCleanupManager(
     }
 
     /**
-     * Gets the storage usage for the app.
+     * Gets the storage usage for the app by scanning the file system.
      *
-     * @return StorageUsage data.
+     * @return StorageUsage data with actual byte counts by category.
      */
     fun getStorageUsage(): StorageUsage {
-        // Note: This is a simplified implementation.
-        // A full implementation would walk the directory tree and calculate actual sizes.
-        // For now, we return placeholder values.
+        val appDir = fileManager.getAppDirectory()
+        val allFiles = fileManager.listFilesRecursively(appDir)
+
+        var imageBytes = 0L
+        var videoBytes = 0L
+        var thumbnailBytes = 0L
+
+        for (file in allFiles) {
+            val size = fileManager.getFileSizeBytes(file)
+            val lowerPath = file.lowercase()
+
+            when {
+                lowerPath.contains("/thumbnails/") || lowerPath.contains("_thumb") -> {
+                    thumbnailBytes += size
+                }
+                lowerPath.endsWith(".mp4") ||
+                    lowerPath.endsWith(".mov") ||
+                    lowerPath.contains("/exports/") -> {
+                    videoBytes += size
+                }
+                lowerPath.endsWith(".jpg") ||
+                    lowerPath.endsWith(".jpeg") ||
+                    lowerPath.endsWith(".png") ||
+                    lowerPath.endsWith(".heic") -> {
+                    imageBytes += size
+                }
+            }
+        }
+
+        val totalBytes = imageBytes + videoBytes + thumbnailBytes
+
         return StorageUsage(
-            totalBytes = 0L,
-            imageBytes = 0L,
-            videoBytes = 0L,
-            thumbnailBytes = 0L,
+            totalBytes = totalBytes,
+            imageBytes = imageBytes,
+            videoBytes = videoBytes,
+            thumbnailBytes = thumbnailBytes,
         )
     }
 

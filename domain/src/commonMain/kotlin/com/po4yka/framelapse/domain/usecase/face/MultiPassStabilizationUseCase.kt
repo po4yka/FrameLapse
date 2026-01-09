@@ -128,11 +128,11 @@ class MultiPassStabilizationUseCase(
                     passes = passes,
                     onProgress = onProgress,
                 )
-                currentImage = result.first
-                currentMatrix = result.second
-                bestImage = result.third
-                bestScore = result.fourth
-                earlyStopReason = result.fifth
+                currentImage = result.currentImage
+                currentMatrix = result.currentMatrix
+                bestImage = result.bestImage
+                bestScore = result.bestScore
+                earlyStopReason = result.earlyStopReason
                 passNumber = passes.size
             }
             StabilizationMode.SLOW -> {
@@ -147,11 +147,11 @@ class MultiPassStabilizationUseCase(
                     passes = passes,
                     onProgress = onProgress,
                 )
-                currentImage = result.first
-                currentMatrix = result.second
-                bestImage = result.third
-                bestScore = result.fourth
-                earlyStopReason = result.fifth
+                currentImage = result.currentImage
+                currentMatrix = result.currentMatrix
+                bestImage = result.bestImage
+                bestScore = result.bestScore
+                earlyStopReason = result.earlyStopReason
                 passNumber = passes.size
             }
         }
@@ -205,7 +205,7 @@ class MultiPassStabilizationUseCase(
         outputSize: Int,
         passes: MutableList<StabilizationPass>,
         onProgress: ((StabilizationProgress) -> Unit)?,
-    ): FiveTuple<ImageData, AlignmentMatrix, ImageData, StabilizationScore?, EarlyStopReason?> {
+    ): ExecutionResult {
         var image = currentImage
         var matrix = currentMatrix
         var bestImage = currentImage
@@ -341,7 +341,7 @@ class MultiPassStabilizationUseCase(
             earlyStopReason = EarlyStopReason.MAX_PASSES_REACHED
         }
 
-        return FiveTuple(image, matrix, bestImage, bestScore, earlyStopReason)
+        return ExecutionResult(image, matrix, bestImage, bestScore, earlyStopReason)
     }
 
     /**
@@ -357,7 +357,7 @@ class MultiPassStabilizationUseCase(
         outputSize: Int,
         passes: MutableList<StabilizationPass>,
         onProgress: ((StabilizationProgress) -> Unit)?,
-    ): FiveTuple<ImageData, AlignmentMatrix, ImageData, StabilizationScore?, EarlyStopReason?> {
+    ): ExecutionResult {
         var image = currentImage
         var matrix = currentMatrix
         var bestImage = currentImage
@@ -380,13 +380,13 @@ class MultiPassStabilizationUseCase(
             passes = passes,
             onProgress = onProgress,
         )
-        image = initialResult.first
-        matrix = initialResult.second
-        bestImage = initialResult.third
-        bestScore = initialResult.fourth
+        image = initialResult.currentImage
+        matrix = initialResult.currentMatrix
+        bestImage = initialResult.bestImage
+        bestScore = initialResult.bestScore
 
         if (!bestScore!!.needsCorrection) {
-            return FiveTuple(image, matrix, bestImage, bestScore, EarlyStopReason.SCORE_BELOW_THRESHOLD)
+            return ExecutionResult(image, matrix, bestImage, bestScore, EarlyStopReason.SCORE_BELOW_THRESHOLD)
         }
 
         // Stage 2: Rotation refinement (passes 2-4)
@@ -447,7 +447,7 @@ class MultiPassStabilizationUseCase(
         }
 
         if (earlyStopReason != null) {
-            return FiveTuple(image, matrix, bestImage, bestScore, earlyStopReason)
+            return ExecutionResult(image, matrix, bestImage, bestScore, earlyStopReason)
         }
 
         // Stage 3: Scale refinement (passes 5-7)
@@ -509,7 +509,7 @@ class MultiPassStabilizationUseCase(
         }
 
         if (earlyStopReason != null && earlyStopReason != EarlyStopReason.SCALE_CONVERGED) {
-            return FiveTuple(image, matrix, bestImage, bestScore, earlyStopReason)
+            return ExecutionResult(image, matrix, bestImage, bestScore, earlyStopReason)
         }
         earlyStopReason = null
 
@@ -530,11 +530,11 @@ class MultiPassStabilizationUseCase(
                 passes = passes,
                 onProgress = onProgress,
             )
-            image = result.first
-            matrix = result.second
-            if (result.fourth != null && (bestScore == null || result.fourth!!.value < bestScore.value)) {
-                bestImage = result.third
-                bestScore = result.fourth
+            image = result.currentImage
+            matrix = result.currentMatrix
+            if (result.bestScore != null && (bestScore == null || result.bestScore.value < bestScore.value)) {
+                bestImage = result.bestImage
+                bestScore = result.bestScore
             }
 
             // Check convergence
@@ -550,7 +550,7 @@ class MultiPassStabilizationUseCase(
             earlyStopReason = EarlyStopReason.MAX_PASSES_REACHED
         }
 
-        return FiveTuple(image, matrix, bestImage, bestScore, earlyStopReason)
+        return ExecutionResult(image, matrix, bestImage, bestScore, earlyStopReason)
     }
 
     /**
@@ -568,13 +568,13 @@ class MultiPassStabilizationUseCase(
         bestScore: StabilizationScore?,
         passes: MutableList<StabilizationPass>,
         onProgress: ((StabilizationProgress) -> Unit)?,
-    ): FourTuple<ImageData, AlignmentMatrix, ImageData, StabilizationScore?> {
+    ): PassResult {
         val passStartTime = currentTimeMillis()
 
         // Detect face
         val detectResult = faceDetector.detectFace(image)
         if (detectResult.isError || detectResult.getOrNull() == null) {
-            return FourTuple(image, matrix, image, bestScore)
+            return PassResult(image, matrix, image, bestScore)
         }
         val landmarks = detectResult.getOrNull()!!
 
@@ -619,7 +619,7 @@ class MultiPassStabilizationUseCase(
         val newBestScore = if (bestScore == null || score.value < bestScore.value) score else bestScore
         val newBestImage = if (bestScore == null || score.value < bestScore.value) image else image
 
-        return FourTuple(image, matrix, newBestImage, newBestScore)
+        return PassResult(image, matrix, newBestImage, newBestScore)
     }
 
     private fun toPixelCoordinates(point: LandmarkPoint, width: Int, height: Int): LandmarkPoint =
@@ -631,7 +631,35 @@ class MultiPassStabilizationUseCase(
         return sqrt(dx * dx + dy * dy)
     }
 
-    // Helper tuple classes
-    private data class FourTuple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
-    private data class FiveTuple<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E)
+    /**
+     * Result of executing a single stabilization pass.
+     *
+     * @property currentImage The image after this pass.
+     * @property currentMatrix The alignment matrix after this pass.
+     * @property bestImage The best image found so far.
+     * @property bestScore The best stabilization score found so far.
+     */
+    private data class PassResult(
+        val currentImage: ImageData,
+        val currentMatrix: AlignmentMatrix,
+        val bestImage: ImageData,
+        val bestScore: StabilizationScore?,
+    )
+
+    /**
+     * Result of executing a complete stabilization mode (FAST or SLOW).
+     *
+     * @property currentImage The image after all passes.
+     * @property currentMatrix The alignment matrix after all passes.
+     * @property bestImage The best image found across all passes.
+     * @property bestScore The best stabilization score found.
+     * @property earlyStopReason Reason for early termination, if applicable.
+     */
+    private data class ExecutionResult(
+        val currentImage: ImageData,
+        val currentMatrix: AlignmentMatrix,
+        val bestImage: ImageData,
+        val bestScore: StabilizationScore?,
+        val earlyStopReason: EarlyStopReason?,
+    )
 }

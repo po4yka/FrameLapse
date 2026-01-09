@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the gallery screen.
@@ -146,9 +147,12 @@ sealed interface GalleryEffect : UiEffect {
     data class NavigateToExport(val projectId: String) : GalleryEffect
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : GalleryEffect
+    data class ShowError(val message: String) : GalleryEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
      * Open the system photo picker.
@@ -161,9 +165,12 @@ sealed interface GalleryEffect : UiEffect {
     data class ShowDeleteConfirmation(val count: Int) : GalleryEffect
 
     /**
-     * Show a success message.
+     * Show a success/informational message. Delegates to [CommonEffect.ShowSnackbar].
      */
-    data class ShowMessage(val message: String) : GalleryEffect
+    data class ShowMessage(val message: String) : GalleryEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowSnackbar = CommonEffect.ShowSnackbar(message)
+    }
 
     /**
      * Navigate to manual adjustment screen.

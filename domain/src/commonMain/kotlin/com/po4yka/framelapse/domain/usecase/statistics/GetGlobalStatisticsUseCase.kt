@@ -1,6 +1,5 @@
 package com.po4yka.framelapse.domain.usecase.statistics
 
-import com.po4yka.framelapse.domain.entity.ContentType
 import com.po4yka.framelapse.domain.entity.GlobalStatistics
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.ProjectActivitySummary

@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.di
 
+import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.FeatureMatcher
@@ -11,7 +12,6 @@ import com.po4yka.framelapse.domain.service.ShareHandler
 import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.domain.service.VideoEncoder
 import com.po4yka.framelapse.platform.BodyPoseDetectorImpl
-import com.po4yka.framelapse.data.local.DatabaseDriverFactory
 import com.po4yka.framelapse.platform.FaceDetectorImpl
 import com.po4yka.framelapse.platform.FeatureMatcherImpl
 import com.po4yka.framelapse.platform.FileManager

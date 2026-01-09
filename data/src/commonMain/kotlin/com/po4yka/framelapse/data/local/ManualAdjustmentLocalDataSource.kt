@@ -52,27 +52,6 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
         queries.existsByFrameId(frameId).executeAsOne()
     }
 
-    /** Inserts a new adjustment. */
-    suspend fun insert(
-        id: String,
-        frameId: String,
-        contentType: String,
-        adjustmentJson: String,
-        isActive: Boolean,
-        createdAt: Long,
-        updatedAt: Long,
-    ): Unit = withContext(Dispatchers.IO) {
-        queries.insert(
-            id = id,
-            frameId = frameId,
-            contentType = contentType,
-            adjustmentJson = adjustmentJson,
-            isActive = if (isActive) 1L else 0L,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
-    }
-
     /** Inserts or replaces an adjustment (upsert). */
     suspend fun insertOrReplace(
         id: String,
@@ -93,28 +72,6 @@ class ManualAdjustmentLocalDataSource(private val queries: ManualAdjustmentQueri
             updatedAt = updatedAt,
         )
     }
-
-    /** Updates an existing adjustment. */
-    suspend fun update(id: String, adjustmentJson: String, isActive: Boolean, updatedAt: Long): Unit =
-        withContext(Dispatchers.IO) {
-            queries.update(
-                adjustmentJson = adjustmentJson,
-                isActive = if (isActive) 1L else 0L,
-                updatedAt = updatedAt,
-                id = id,
-            )
-        }
-
-    /** Updates an adjustment by frame ID. */
-    suspend fun updateByFrameId(frameId: String, adjustmentJson: String, isActive: Boolean, updatedAt: Long): Unit =
-        withContext(Dispatchers.IO) {
-            queries.updateByFrameId(
-                adjustmentJson = adjustmentJson,
-                isActive = if (isActive) 1L else 0L,
-                updatedAt = updatedAt,
-                frameId = frameId,
-            )
-        }
 
     /** Toggles the active state of an adjustment. */
     suspend fun toggleActive(frameId: String, isActive: Boolean, updatedAt: Long): Unit = withContext(Dispatchers.IO) {

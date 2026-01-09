@@ -133,8 +133,15 @@ class VideoEncoderImpl(private val context: Context) : VideoEncoder {
             // Signal end of stream
             encoder.signalEndOfInputStream()
 
-            // Drain remaining output
-            drainEncoderToEnd(encoder, bufferInfo, muxer, trackIndex, muxerStarted) { track, started ->
+            // Drain remaining output with longer timeout for end of stream
+            drainEncoder(
+                encoder,
+                bufferInfo,
+                muxer,
+                trackIndex,
+                muxerStarted,
+                timeoutUs = DRAIN_TIMEOUT_US,
+            ) { track, started ->
                 trackIndex = track
                 muxerStarted = started
             }
@@ -260,58 +267,14 @@ class VideoEncoderImpl(private val context: Context) : VideoEncoder {
         muxer: MediaMuxer,
         trackIndex: Int,
         muxerStarted: Boolean,
+        timeoutUs: Long = TIMEOUT_US,
         onTrackChanged: (Int, Boolean) -> Unit,
     ) {
         var currentTrackIndex = trackIndex
         var currentMuxerStarted = muxerStarted
 
         while (true) {
-            val outputBufferIndex = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_US)
-            when {
-                outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                    val newFormat = encoder.outputFormat
-                    currentTrackIndex = muxer.addTrack(newFormat)
-                    muxer.start()
-                    currentMuxerStarted = true
-                    onTrackChanged(currentTrackIndex, currentMuxerStarted)
-                }
-                outputBufferIndex >= 0 -> {
-                    val encodedData = encoder.getOutputBuffer(outputBufferIndex) ?: continue
-
-                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                        bufferInfo.size = 0
-                    }
-
-                    if (bufferInfo.size != 0 && currentMuxerStarted) {
-                        encodedData.position(bufferInfo.offset)
-                        encodedData.limit(bufferInfo.offset + bufferInfo.size)
-                        muxer.writeSampleData(currentTrackIndex, encodedData, bufferInfo)
-                    }
-
-                    encoder.releaseOutputBuffer(outputBufferIndex, false)
-
-                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                        break
-                    }
-                }
-                else -> break
-            }
-        }
-    }
-
-    private fun drainEncoderToEnd(
-        encoder: MediaCodec,
-        bufferInfo: MediaCodec.BufferInfo,
-        muxer: MediaMuxer,
-        trackIndex: Int,
-        muxerStarted: Boolean,
-        onTrackChanged: (Int, Boolean) -> Unit,
-    ) {
-        var currentTrackIndex = trackIndex
-        var currentMuxerStarted = muxerStarted
-
-        while (true) {
-            val outputBufferIndex = encoder.dequeueOutputBuffer(bufferInfo, DRAIN_TIMEOUT_US)
+            val outputBufferIndex = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
             when {
                 outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                     val newFormat = encoder.outputFormat

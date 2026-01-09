@@ -1,7 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.export
 
-import com.po4yka.framelapse.data.storage.StorageError
 import com.po4yka.framelapse.domain.entity.ExportSettings
+import com.po4yka.framelapse.domain.error.StorageError
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.service.VideoEncoder

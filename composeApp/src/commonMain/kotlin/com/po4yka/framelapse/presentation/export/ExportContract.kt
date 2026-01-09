@@ -9,6 +9,7 @@ import com.po4yka.framelapse.domain.entity.VideoCodec
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the export screen.
@@ -87,9 +88,12 @@ sealed interface ExportEvent : UiEvent {
  */
 sealed interface ExportEffect : UiEffect {
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : ExportEffect
+    data class ShowError(val message: String) : ExportEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
      * Share the exported video file.
@@ -107,7 +111,10 @@ sealed interface ExportEffect : UiEffect {
     data object ExportComplete : ExportEffect
 
     /**
-     * Show a success message.
+     * Show a success/informational message. Delegates to [CommonEffect.ShowSnackbar].
      */
-    data class ShowMessage(val message: String) : ExportEffect
+    data class ShowMessage(val message: String) : ExportEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowSnackbar = CommonEffect.ShowSnackbar(message)
+    }
 }

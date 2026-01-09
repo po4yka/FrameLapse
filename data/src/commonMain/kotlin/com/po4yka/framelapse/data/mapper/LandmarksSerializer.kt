@@ -49,17 +49,12 @@ object LandmarksSerializer {
     }.getOrNull()
 
     /**
-     * Serializes FaceLandmarks to a JSON string.
-     * @deprecated Use serializeLandmarks() for polymorphic serialization.
-     */
-    fun serialize(landmarks: FaceLandmarks): String = json.encodeToString(landmarks)
-
-    /**
      * Deserializes a JSON string to FaceLandmarks.
      * Returns null if parsing fails.
      *
      * Note: This method attempts both direct FaceLandmarks deserialization
-     * and polymorphic Landmarks deserialization for backward compatibility.
+     * and polymorphic Landmarks deserialization for backward compatibility
+     * with legacy data that may not have type discriminators.
      */
     fun deserialize(jsonString: String): FaceLandmarks? = runCatching {
         // First try direct FaceLandmarks deserialization (for legacy data without type discriminator)
@@ -67,21 +62,6 @@ object LandmarksSerializer {
     }.getOrElse {
         // Fall back to polymorphic deserialization
         deserializeLandmarks(jsonString) as? FaceLandmarks
-    }
-
-    /**
-     * Serializes BodyLandmarks to a JSON string.
-     */
-    fun serializeBodyLandmarks(landmarks: BodyLandmarks): String = json.encodeToString(landmarks)
-
-    /**
-     * Deserializes a JSON string to BodyLandmarks.
-     * Returns null if parsing fails.
-     */
-    fun deserializeBodyLandmarks(jsonString: String): BodyLandmarks? = runCatching {
-        json.decodeFromString<BodyLandmarks>(jsonString)
-    }.getOrElse {
-        deserializeLandmarks(jsonString) as? BodyLandmarks
     }
 
     /**

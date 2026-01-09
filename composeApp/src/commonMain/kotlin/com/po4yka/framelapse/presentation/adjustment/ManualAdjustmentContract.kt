@@ -11,6 +11,7 @@ import com.po4yka.framelapse.domain.usecase.adjustment.SuggestSimilarFramesUseCa
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the manual adjustment screen.
@@ -254,14 +255,20 @@ sealed interface ManualAdjustmentEffect : UiEffect {
     data object NavigateBack : ManualAdjustmentEffect
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : ManualAdjustmentEffect
+    data class ShowError(val message: String) : ManualAdjustmentEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 
     /**
-     * Show a success message.
+     * Show a success message. Delegates to [CommonEffect.ShowSuccess].
      */
-    data class ShowSuccess(val message: String) : ManualAdjustmentEffect
+    data class ShowSuccess(val message: String) : ManualAdjustmentEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowSuccess = CommonEffect.ShowSuccess(message)
+    }
 
     /**
      * Navigate to a different frame.

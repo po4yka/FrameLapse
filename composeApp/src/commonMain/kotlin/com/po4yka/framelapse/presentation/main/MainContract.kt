@@ -3,6 +3,7 @@ package com.po4yka.framelapse.presentation.main
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
+import com.po4yka.framelapse.presentation.common.CommonEffect
 
 /**
  * UI state for the main app screen.
@@ -43,12 +44,18 @@ sealed interface MainEffect : UiEffect {
     data object RequestPermissions : MainEffect
 
     /**
-     * Navigate to a specific route.
+     * Navigate to a specific route. Delegates to [CommonEffect.NavigateTo].
      */
-    data class NavigateTo(val route: String) : MainEffect
+    data class NavigateTo(val route: String) : MainEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.NavigateTo = CommonEffect.NavigateTo(route)
+    }
 
     /**
-     * Show an error message.
+     * Show an error message. Delegates to [CommonEffect.ShowError].
      */
-    data class ShowError(val message: String) : MainEffect
+    data class ShowError(val message: String) : MainEffect {
+        /** Convert to common effect for unified handling. */
+        fun toCommon(): CommonEffect.ShowError = CommonEffect.ShowError(message)
+    }
 }

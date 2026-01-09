@@ -31,6 +31,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.domain)
             implementation(projects.core)
+            implementation(projects.platform)
+            implementation(projects.data)
             implementation(libs.kotlinx.coroutines.core)
         }
 
