@@ -15,6 +15,7 @@ import com.po4yka.framelapse.ui.navigation.dialogs.CreateProjectDialogContent
 import com.po4yka.framelapse.ui.navigation.dialogs.DeleteFramesDialogContent
 import com.po4yka.framelapse.ui.navigation.dialogs.DeleteProjectDialogContent
 import com.po4yka.framelapse.ui.navigation.sheets.FrameFilterSheetContent
+import com.po4yka.framelapse.ui.screens.adjustment.ManualAdjustmentScreen
 import com.po4yka.framelapse.ui.screens.capture.CaptureScreen
 import com.po4yka.framelapse.ui.screens.export.ExportScreen
 import com.po4yka.framelapse.ui.screens.gallery.GalleryScreen
@@ -88,6 +89,9 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         onShowFilterSheet = {
                             backStack.add(FrameFilterSheetKey(key.projectId))
                         },
+                        onNavigateToManualAdjustment = { frameId ->
+                            backStack.add(ManualAdjustmentKey(frameId, key.projectId))
+                        },
                     )
                 }
 
@@ -104,6 +108,20 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                     SettingsScreen(
                         onNavigateBack = {
                             backStack.removeLastOrNull()
+                        },
+                    )
+                }
+
+                is ManualAdjustmentKey -> NavEntry(key) {
+                    ManualAdjustmentScreen(
+                        frameId = key.frameId,
+                        projectId = key.projectId,
+                        onNavigateBack = {
+                            backStack.removeLastOrNull()
+                        },
+                        onNavigateToFrame = { newFrameId ->
+                            backStack.removeLastOrNull()
+                            backStack.add(ManualAdjustmentKey(newFrameId, key.projectId))
                         },
                     )
                 }

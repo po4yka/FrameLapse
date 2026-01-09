@@ -75,6 +75,11 @@ sealed interface GalleryEvent : UiEvent {
      * Import photos from gallery.
      */
     data object ImportPhotos : GalleryEvent
+
+    /**
+     * Open manual adjustment screen for a frame.
+     */
+    data class OpenManualAdjustment(val frameId: String) : GalleryEvent
 }
 
 /**
@@ -110,4 +115,9 @@ sealed interface GalleryEffect : UiEffect {
      * Show a success message.
      */
     data class ShowMessage(val message: String) : GalleryEffect
+
+    /**
+     * Navigate to manual adjustment screen.
+     */
+    data class NavigateToManualAdjustment(val frameId: String, val projectId: String) : GalleryEffect
 }

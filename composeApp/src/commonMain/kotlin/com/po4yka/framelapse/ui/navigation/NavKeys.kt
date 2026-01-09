@@ -44,6 +44,12 @@ data class ExportKey(val projectId: String) : NavKey
 @Serializable
 data object SettingsKey : NavKey
 
+/**
+ * Manual adjustment screen for refining stabilization landmarks.
+ */
+@Serializable
+data class ManualAdjustmentKey(val frameId: String, val projectId: String) : NavKey
+
 // ==================== Dialog NavKeys ====================
 
 /**
@@ -90,6 +96,7 @@ val navKeySavedStateConfig: SavedStateConfiguration = SavedStateConfiguration {
             subclass(GalleryKey::class, GalleryKey.serializer())
             subclass(ExportKey::class, ExportKey.serializer())
             subclass(SettingsKey::class, SettingsKey.serializer())
+            subclass(ManualAdjustmentKey::class, ManualAdjustmentKey.serializer())
             subclass(CreateProjectDialogKey::class, CreateProjectDialogKey.serializer())
             subclass(DeleteFramesDialogKey::class, DeleteFramesDialogKey.serializer())
             subclass(DeleteProjectDialogKey::class, DeleteProjectDialogKey.serializer())

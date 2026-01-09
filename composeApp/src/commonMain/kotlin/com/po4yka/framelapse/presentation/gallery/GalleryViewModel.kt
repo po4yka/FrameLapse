@@ -33,6 +33,7 @@ class GalleryViewModel(
             is GalleryEvent.NavigateToCapture -> navigateToCapture()
             is GalleryEvent.NavigateToExport -> navigateToExport()
             is GalleryEvent.ImportPhotos -> importPhotos()
+            is GalleryEvent.OpenManualAdjustment -> openManualAdjustment(event.frameId)
         }
     }
 
@@ -165,6 +166,15 @@ class GalleryViewModel(
 
     private fun importPhotos() {
         sendEffect(GalleryEffect.OpenPhotoPicker)
+    }
+
+    private fun openManualAdjustment(frameId: String) {
+        sendEffect(
+            GalleryEffect.NavigateToManualAdjustment(
+                frameId = frameId,
+                projectId = currentState.projectId,
+            ),
+        )
     }
 
     /**

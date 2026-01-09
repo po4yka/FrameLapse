@@ -1,0 +1,129 @@
+-- ManualAdjustment table for storing manual stabilization overrides.
+-- Allows users to manually adjust landmark positions when automatic detection
+-- fails or produces suboptimal results.
+
+CREATE TABLE ManualAdjustment (
+    -- Unique identifier for this adjustment
+    id TEXT NOT NULL PRIMARY KEY,
+
+    -- Reference to the frame this adjustment belongs to
+    frameId TEXT NOT NULL,
+
+    -- Content type (FACE, BODY, MUSCLE, LANDSCAPE)
+    contentType TEXT NOT NULL,
+
+    -- JSON-serialized ManualAdjustment polymorphic data
+    adjustmentJson TEXT NOT NULL,
+
+    -- Whether this adjustment is currently active (1) or using auto-detected (0)
+    isActive INTEGER NOT NULL DEFAULT 1,
+
+    -- Timestamp when adjustment was first created
+    createdAt INTEGER NOT NULL,
+
+    -- Timestamp when adjustment was last modified
+    updatedAt INTEGER NOT NULL,
+
+    -- Foreign key constraint with cascade delete
+    FOREIGN KEY (frameId) REFERENCES Frame(id) ON DELETE CASCADE
+);
+
+-- Index for fast lookup by frame ID
+CREATE INDEX manual_adjustment_frame_id ON ManualAdjustment(frameId);
+
+-- Index for finding active adjustments by project (via frames)
+CREATE INDEX manual_adjustment_active ON ManualAdjustment(isActive);
+
+-- Get adjustment for a specific frame (most recent if multiple exist)
+selectByFrameId:
+SELECT * FROM ManualAdjustment
+WHERE frameId = ?
+ORDER BY updatedAt DESC
+LIMIT 1;
+
+-- Get all adjustments for a project (via frame join)
+selectByProject:
+SELECT ma.* FROM ManualAdjustment ma
+INNER JOIN Frame f ON ma.frameId = f.id
+WHERE f.projectId = ?
+ORDER BY f.sortOrder ASC;
+
+-- Get all active adjustments for a project
+selectActiveByProject:
+SELECT ma.* FROM ManualAdjustment ma
+INNER JOIN Frame f ON ma.frameId = f.id
+WHERE f.projectId = ? AND ma.isActive = 1
+ORDER BY f.sortOrder ASC;
+
+-- Get frame IDs that have manual adjustments in a project
+selectFrameIdsWithAdjustments:
+SELECT f.id FROM Frame f
+INNER JOIN ManualAdjustment ma ON f.id = ma.frameId
+WHERE f.projectId = ? AND ma.isActive = 1;
+
+-- Count active adjustments for a project
+countActiveByProject:
+SELECT COUNT(*) FROM ManualAdjustment ma
+INNER JOIN Frame f ON ma.frameId = f.id
+WHERE f.projectId = ? AND ma.isActive = 1;
+
+-- Check if a frame has a manual adjustment
+existsByFrameId:
+SELECT EXISTS(SELECT 1 FROM ManualAdjustment WHERE frameId = ?);
+
+-- Insert new adjustment
+insert:
+INSERT INTO ManualAdjustment (id, frameId, contentType, adjustmentJson, isActive, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- Insert or replace adjustment (upsert)
+insertOrReplace:
+INSERT OR REPLACE INTO ManualAdjustment (id, frameId, contentType, adjustmentJson, isActive, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- Update existing adjustment
+update:
+UPDATE ManualAdjustment
+SET adjustmentJson = ?, isActive = ?, updatedAt = ?
+WHERE id = ?;
+
+-- Update adjustment by frame ID
+updateByFrameId:
+UPDATE ManualAdjustment
+SET adjustmentJson = ?, isActive = ?, updatedAt = ?
+WHERE frameId = ?;
+
+-- Toggle active state for a frame
+toggleActive:
+UPDATE ManualAdjustment
+SET isActive = ?, updatedAt = ?
+WHERE frameId = ?;
+
+-- Activate manual adjustment for a frame
+activate:
+UPDATE ManualAdjustment
+SET isActive = 1, updatedAt = ?
+WHERE frameId = ?;
+
+-- Deactivate manual adjustment for a frame (revert to auto-detected)
+deactivate:
+UPDATE ManualAdjustment
+SET isActive = 0, updatedAt = ?
+WHERE frameId = ?;
+
+-- Delete adjustment by ID
+delete:
+DELETE FROM ManualAdjustment WHERE id = ?;
+
+-- Delete adjustment by frame ID
+deleteByFrame:
+DELETE FROM ManualAdjustment WHERE frameId = ?;
+
+-- Delete all adjustments for a project
+deleteByProject:
+DELETE FROM ManualAdjustment
+WHERE frameId IN (SELECT id FROM Frame WHERE projectId = ?);
+
+-- Get all adjustments (for migration/debugging)
+selectAll:
+SELECT * FROM ManualAdjustment ORDER BY updatedAt DESC;

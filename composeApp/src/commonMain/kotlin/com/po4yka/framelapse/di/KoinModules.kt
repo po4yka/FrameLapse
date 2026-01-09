@@ -2,9 +2,11 @@ package com.po4yka.framelapse.di
 
 import com.po4yka.framelapse.data.local.FrameLapseDatabase
 import com.po4yka.framelapse.data.local.FrameLocalDataSource
+import com.po4yka.framelapse.data.local.ManualAdjustmentLocalDataSource
 import com.po4yka.framelapse.data.local.ProjectLocalDataSource
 import com.po4yka.framelapse.data.local.SettingsLocalDataSource
 import com.po4yka.framelapse.data.repository.FrameRepositoryImpl
+import com.po4yka.framelapse.data.repository.ManualAdjustmentRepositoryImpl
 import com.po4yka.framelapse.data.repository.ProjectRepositoryImpl
 import com.po4yka.framelapse.data.repository.SettingsRepositoryImpl
 import com.po4yka.framelapse.data.storage.ImageStorageManager
@@ -12,8 +14,12 @@ import com.po4yka.framelapse.data.storage.StorageCleanupManager
 import com.po4yka.framelapse.data.storage.ThumbnailGenerator
 import com.po4yka.framelapse.data.storage.VideoStorageManager
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
+import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseCase
+import com.po4yka.framelapse.domain.usecase.adjustment.BatchApplyAdjustmentUseCase
+import com.po4yka.framelapse.domain.usecase.adjustment.SuggestSimilarFramesUseCase
 import com.po4yka.framelapse.domain.usecase.alignment.AlignContentUseCase
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
@@ -55,6 +61,7 @@ import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.platform.DatabaseDriverFactory
+import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel
 import com.po4yka.framelapse.presentation.export.ExportViewModel
 import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
@@ -81,11 +88,13 @@ val dataModule = module {
     single { get<FrameLapseDatabase>().projectQueries }
     single { get<FrameLapseDatabase>().frameQueries }
     single { get<FrameLapseDatabase>().settingsQueries }
+    single { get<FrameLapseDatabase>().manualAdjustmentQueries }
 
     // Local Data Sources
     single { ProjectLocalDataSource(get()) }
     single { FrameLocalDataSource(get()) }
     single { SettingsLocalDataSource(get()) }
+    single { ManualAdjustmentLocalDataSource(get()) }
 
     // Storage Managers
     single { ImageStorageManager(get()) }
@@ -97,6 +106,7 @@ val dataModule = module {
     single<ProjectRepository> { ProjectRepositoryImpl(get(), get()) }
     single<FrameRepository> { FrameRepositoryImpl(get(), get()) }
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
+    single<ManualAdjustmentRepository> { ManualAdjustmentRepositoryImpl(get()) }
 }
 
 /**
@@ -245,6 +255,21 @@ val domainModule = module {
 
     // Capture Use Cases (CameraController passed at runtime from UI layer)
     factory { CaptureImageUseCase(get(), get(), get()) }
+
+    // Manual Adjustment Use Cases
+    factory {
+        ApplyManualAdjustmentUseCase(
+            frameRepository = get(),
+            adjustmentRepository = get(),
+            imageProcessor = get(),
+            calculateFaceMatrix = get(),
+            calculateBodyMatrix = get(),
+            calculateHomography = get(),
+            fileManager = get(),
+        )
+    }
+    factory { SuggestSimilarFramesUseCase(get()) }
+    factory { BatchApplyAdjustmentUseCase(get(), get(), get()) }
 }
 
 /**
@@ -258,6 +283,7 @@ val presentationModule = module {
     factory { GalleryViewModel(get(), get(), get(), get(), get()) }
     factory { ExportViewModel(get(), get(), get()) }
     factory { SettingsViewModel(get(), get()) }
+    factory { ManualAdjustmentViewModel(get(), get(), get(), get()) }
 }
 
 /**

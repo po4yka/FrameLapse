@@ -74,6 +74,7 @@ fun GalleryScreen(
     onNavigateBack: () -> Unit,
     onShowDeleteDialog: (Int) -> Unit = {},
     onShowFilterSheet: () -> Unit = {},
+    onNavigateToManualAdjustment: (frameId: String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GalleryViewModel = koinViewModel<GalleryViewModel>(),
 ) {
@@ -103,6 +104,7 @@ fun GalleryScreen(
             is GalleryEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.message)
             is GalleryEffect.OpenPhotoPicker -> photoPickerLauncher.launch(maxItems = 0)
             is GalleryEffect.ShowDeleteConfirmation -> onShowDeleteDialog(effect.count)
+            is GalleryEffect.NavigateToManualAdjustment -> onNavigateToManualAdjustment(effect.frameId)
         }
     }
 
@@ -205,6 +207,8 @@ private fun GalleryContent(
                                 onClick = {
                                     if (state.isSelectionMode) {
                                         onEvent(GalleryEvent.ToggleFrameSelection(frame.id))
+                                    } else {
+                                        onEvent(GalleryEvent.OpenManualAdjustment(frame.id))
                                     }
                                 },
                                 onLongClick = {
