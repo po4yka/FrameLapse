@@ -6,126 +6,23 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.opencv.OpenCVWrapper
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.useContents
-import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import platform.CoreGraphics.CGAffineTransformMake
-import platform.CoreGraphics.CGBitmapContextCreate
-import platform.CoreGraphics.CGBitmapContextCreateImage
-import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
-import platform.CoreGraphics.CGContextConcatCTM
-import platform.CoreGraphics.CGContextDrawImage
-import platform.CoreGraphics.CGContextRelease
-import platform.CoreGraphics.CGContextSetInterpolationQuality
-import platform.CoreGraphics.CGImageAlphaInfo
-import platform.CoreGraphics.CGImageGetHeight
-import platform.CoreGraphics.CGImageGetWidth
-import platform.CoreGraphics.CGImageRelease
-import platform.CoreGraphics.CGRectMake
-import platform.CoreGraphics.CGSizeMake
-import platform.CoreGraphics.kCGInterpolationHigh
-import platform.Foundation.NSData
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSNumber
-import platform.Foundation.create
-import platform.UIKit.UIGraphicsBeginImageContextWithOptions
-import platform.UIKit.UIGraphicsEndImageContext
-import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
-import platform.UIKit.UIImage
-import platform.UIKit.UIImageJPEGRepresentation
-import platform.UIKit.UIImagePNGRepresentation
-import platform.posix.memcpy
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class ImageProcessorImpl : ImageProcessor {
+    private val codec = IosImageCodec()
+    private val imageStore = IosImageStore(codec)
+    private val transformer = IosImageTransformer(codec)
+    private val homographyTransformer = IosHomographyTransformer(codec)
 
     override suspend fun loadImage(path: String): Result<ImageData> = withContext(Dispatchers.IO) {
-        try {
-            val fileManager = NSFileManager.defaultManager
-            if (!fileManager.fileExistsAtPath(path)) {
-                return@withContext Result.Error(
-                    IllegalArgumentException("File not found: $path"),
-                    "File not found",
-                )
-            }
-
-            val image = UIImage.imageWithContentsOfFile(path)
-                ?: return@withContext Result.Error(
-                    IllegalArgumentException("Failed to load image: $path"),
-                    "Failed to load image",
-                )
-
-            val imageSize = image.size
-            val width = imageSize.useContents { this.width.toInt() }
-            val height = imageSize.useContents { this.height.toInt() }
-
-            val data = UIImagePNGRepresentation(image)
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to convert image to PNG"),
-                    "Failed to convert image",
-                )
-
-            val bytes = data.toByteArray()
-
-            Result.Success(
-                ImageData(
-                    width = width,
-                    height = height,
-                    bytes = bytes,
-                ),
-            )
-        } catch (e: Exception) {
-            Result.Error(e, "Failed to load image: ${e.message}")
-        }
+        imageStore.loadImage(path)
     }
 
     override suspend fun saveImage(data: ImageData, path: String, quality: Int): Result<String> =
         withContext(Dispatchers.IO) {
-            try {
-                val uiImage = byteArrayToUIImage(data.bytes)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to create image from data"),
-                        "Failed to create image",
-                    )
-
-                val imageData = if (path.endsWith(".png", ignoreCase = true)) {
-                    UIImagePNGRepresentation(uiImage)
-                } else {
-                    val jpegQuality = quality.coerceIn(0, 100) / 100.0
-                    UIImageJPEGRepresentation(uiImage, jpegQuality)
-                }
-
-                if (imageData == null) {
-                    return@withContext Result.Error(
-                        IllegalStateException("Failed to encode image"),
-                        "Failed to encode image",
-                    )
-                }
-
-                // Write using NSFileManager
-                val fileManager = NSFileManager.defaultManager
-                val success = fileManager.createFileAtPath(
-                    path = path,
-                    contents = imageData,
-                    attributes = null,
-                )
-                if (!success) {
-                    return@withContext Result.Error(
-                        IllegalStateException("Failed to write image to file"),
-                        "Failed to write image",
-                    )
-                }
-
-                Result.Success(path)
-            } catch (e: Exception) {
-                Result.Error(e, "Failed to save image: ${e.message}")
-            }
+            imageStore.saveImage(data, path, quality)
         }
 
     override suspend fun applyAffineTransform(
@@ -134,250 +31,29 @@ class ImageProcessorImpl : ImageProcessor {
         outputWidth: Int,
         outputHeight: Int,
     ): Result<ImageData> = withContext(Dispatchers.IO) {
-        try {
-            val uiImage = byteArrayToUIImage(image.bytes)
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to create image from data"),
-                    "Failed to create image",
-                )
-
-            val cgImage = uiImage.CGImage
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to get CGImage"),
-                    "Failed to get CGImage",
-                )
-
-            val colorSpace = CGColorSpaceCreateDeviceRGB()
-            val bytesPerPixel = 4
-            val bytesPerRow = bytesPerPixel * outputWidth
-
-            val context = CGBitmapContextCreate(
-                data = null,
-                width = outputWidth.toULong(),
-                height = outputHeight.toULong(),
-                bitsPerComponent = 8u,
-                bytesPerRow = bytesPerRow.toULong(),
-                space = colorSpace,
-                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value,
-            )
-
-            if (context == null) {
-                return@withContext Result.Error(
-                    IllegalStateException("Failed to create bitmap context"),
-                    "Failed to create context",
-                )
-            }
-
-            CGContextSetInterpolationQuality(context, kCGInterpolationHigh)
-
-            val transform = CGAffineTransformMake(
-                a = matrix.scaleX.toDouble(),
-                b = matrix.skewY.toDouble(),
-                c = matrix.skewX.toDouble(),
-                d = matrix.scaleY.toDouble(),
-                tx = matrix.translateX.toDouble(),
-                ty = matrix.translateY.toDouble(),
-            )
-
-            CGContextConcatCTM(context, transform)
-
-            val rect = CGRectMake(
-                x = 0.0,
-                y = 0.0,
-                width = CGImageGetWidth(cgImage).toDouble(),
-                height = CGImageGetHeight(cgImage).toDouble(),
-            )
-            CGContextDrawImage(context, rect, cgImage)
-
-            val resultImage = CGBitmapContextCreateImage(context)
-            CGContextRelease(context)
-
-            if (resultImage == null) {
-                return@withContext Result.Error(
-                    IllegalStateException("Failed to create result image"),
-                    "Failed to create result",
-                )
-            }
-
-            val resultUIImage = UIImage.imageWithCGImage(resultImage)
-            CGImageRelease(resultImage)
-
-            val resultData = UIImagePNGRepresentation(resultUIImage)
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to encode result image"),
-                    "Failed to encode result",
-                )
-
-            Result.Success(
-                ImageData(
-                    width = outputWidth,
-                    height = outputHeight,
-                    bytes = resultData.toByteArray(),
-                ),
-            )
-        } catch (e: Exception) {
-            Result.Error(e, "Failed to apply transform: ${e.message}")
-        }
+        transformer.applyAffineTransform(image, matrix, outputWidth, outputHeight)
     }
 
-    /**
-     * Applies a homography (perspective) transformation to an image.
-     *
-     * Uses Core Graphics affine approximation for near-affine homographies and
-     * OpenCVWrapper for full perspective transforms.
-     */
     override suspend fun applyHomographyTransform(
         image: ImageData,
         matrix: HomographyMatrix,
         outputWidth: Int,
         outputHeight: Int,
     ): Result<ImageData> = withContext(Dispatchers.IO) {
-        try {
-            // Check if homography is approximately affine (no significant perspective distortion)
-            val isNearAffine = kotlin.math.abs(matrix.h31) < PERSPECTIVE_THRESHOLD &&
-                kotlin.math.abs(matrix.h32) < PERSPECTIVE_THRESHOLD
-
-            if (!isNearAffine) {
-                if (!OpenCVWrapper.isAvailable()) {
-                    return@withContext Result.Error(
-                        UnsupportedOperationException(HOMOGRAPHY_NOT_SUPPORTED_MESSAGE),
-                        HOMOGRAPHY_NOT_SUPPORTED_MESSAGE,
-                    )
-                }
-
-                val rgbaResult = imageDataToRgbaBytes(image)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to convert image to RGBA"),
-                        "Failed to convert image for OpenCV",
-                    )
-                val (rgbaBytes, inputWidth, inputHeight) = rgbaResult
-
-                val inputData = rgbaBytes.usePinned { pinned ->
-                    NSData.create(bytes = pinned.addressOf(0), length = rgbaBytes.size.toULong())
-                }
-
-                val homographyValues = listOf(
-                    NSNumber.numberWithDouble(matrix.h11.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h12.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h13.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h21.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h22.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h23.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h31.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h32.toDouble()),
-                    NSNumber.numberWithDouble(matrix.h33.toDouble()),
-                )
-
-                val outputData = OpenCVWrapper.warpPerspectiveWithImageData(
-                    imageData = inputData,
-                    width = inputWidth,
-                    height = inputHeight,
-                    homography = homographyValues,
-                    outputWidth = outputWidth,
-                    outputHeight = outputHeight,
-                ) ?: return@withContext Result.Error(
-                    IllegalStateException("OpenCV warpPerspective returned null"),
-                    "Failed to apply homography",
-                )
-
-                val outputBytes = outputData.toByteArray()
-                val outputImage = rgbaBytesToUIImage(outputBytes, outputWidth, outputHeight)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to build output image"),
-                        "Failed to convert OpenCV output",
-                    )
-
-                val resultData = UIImagePNGRepresentation(outputImage)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to encode result image"),
-                        "Failed to encode result",
-                    )
-
-                return@withContext Result.Success(
-                    ImageData(
-                        width = outputWidth,
-                        height = outputHeight,
-                        bytes = resultData.toByteArray(),
-                    ),
-                )
-            }
-
-            // For near-affine homographies, approximate using CGAffineTransform
-            val h33 = if (kotlin.math.abs(matrix.h33) > EPSILON) matrix.h33 else 1f
-
-            val affineMatrix = AlignmentMatrix(
-                scaleX = matrix.h11 / h33,
-                skewX = matrix.h12 / h33,
-                translateX = matrix.h13 / h33,
-                skewY = matrix.h21 / h33,
-                scaleY = matrix.h22 / h33,
-                translateY = matrix.h23 / h33,
-            )
-
-            applyAffineTransform(image, affineMatrix, outputWidth, outputHeight)
-        } catch (e: Exception) {
-            Result.Error(e, "Failed to apply homography transform: ${e.message}")
-        }
+        homographyTransformer.applyHomographyTransform(
+            image = image,
+            matrix = matrix,
+            outputWidth = outputWidth,
+            outputHeight = outputHeight,
+            applyAffineFallback = { affineMatrix ->
+                transformer.applyAffineTransform(image, affineMatrix, outputWidth, outputHeight)
+            },
+        )
     }
 
     override suspend fun cropImage(image: ImageData, bounds: BoundingBox): Result<ImageData> =
         withContext(Dispatchers.IO) {
-            try {
-                val uiImage = byteArrayToUIImage(image.bytes)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to create image from data"),
-                        "Failed to create image",
-                    )
-
-                val cgImage = uiImage.CGImage
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to get CGImage"),
-                        "Failed to get CGImage",
-                    )
-
-                val imageWidth = CGImageGetWidth(cgImage).toInt()
-                val imageHeight = CGImageGetHeight(cgImage).toInt()
-
-                val left = (bounds.left * imageWidth).toInt().coerceIn(0, imageWidth - 1)
-                val top = (bounds.top * imageHeight).toInt().coerceIn(0, imageHeight - 1)
-                val right = (bounds.right * imageWidth).toInt().coerceIn(left + 1, imageWidth)
-                val bottom = (bounds.bottom * imageHeight).toInt().coerceIn(top + 1, imageHeight)
-
-                val cropWidth = right - left
-                val cropHeight = bottom - top
-
-                val cropRect = CGRectMake(
-                    x = left.toDouble(),
-                    y = top.toDouble(),
-                    width = cropWidth.toDouble(),
-                    height = cropHeight.toDouble(),
-                )
-
-                val croppedCGImage = platform.CoreGraphics.CGImageCreateWithImageInRect(cgImage, cropRect)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to crop image"),
-                        "Failed to crop image",
-                    )
-
-                val croppedUIImage = UIImage.imageWithCGImage(croppedCGImage)
-                CGImageRelease(croppedCGImage)
-
-                val resultData = UIImagePNGRepresentation(croppedUIImage)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to encode cropped image"),
-                        "Failed to encode result",
-                    )
-
-                Result.Success(
-                    ImageData(
-                        width = cropWidth,
-                        height = cropHeight,
-                        bytes = resultData.toByteArray(),
-                    ),
-                )
-            } catch (e: Exception) {
-                Result.Error(e, "Failed to crop image: ${e.message}")
-            }
+            transformer.cropImage(image, bounds)
         }
 
     override suspend fun resizeImage(
@@ -386,268 +62,15 @@ class ImageProcessorImpl : ImageProcessor {
         height: Int,
         maintainAspectRatio: Boolean,
     ): Result<ImageData> = withContext(Dispatchers.IO) {
-        try {
-            val uiImage = byteArrayToUIImage(image.bytes)
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to create image from data"),
-                    "Failed to create image",
-                )
-
-            val (targetWidth, targetHeight) = if (maintainAspectRatio) {
-                calculateAspectRatioSize(image.width, image.height, width, height)
-            } else {
-                Pair(width, height)
-            }
-
-            val size = CGSizeMake(
-                width = targetWidth.toDouble(),
-                height = targetHeight.toDouble(),
-            )
-
-            UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
-            uiImage.drawInRect(
-                CGRectMake(
-                    x = 0.0,
-                    y = 0.0,
-                    width = targetWidth.toDouble(),
-                    height = targetHeight.toDouble(),
-                ),
-            )
-            val resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-
-            if (resizedImage == null) {
-                return@withContext Result.Error(
-                    IllegalStateException("Failed to resize image"),
-                    "Failed to resize image",
-                )
-            }
-
-            val resultData = UIImagePNGRepresentation(resizedImage)
-                ?: return@withContext Result.Error(
-                    IllegalStateException("Failed to encode resized image"),
-                    "Failed to encode result",
-                )
-
-            Result.Success(
-                ImageData(
-                    width = targetWidth,
-                    height = targetHeight,
-                    bytes = resultData.toByteArray(),
-                ),
-            )
-        } catch (e: Exception) {
-            Result.Error(e, "Failed to resize image: ${e.message}")
-        }
+        transformer.resizeImage(image, width, height, maintainAspectRatio)
     }
 
     override suspend fun rotateImage(image: ImageData, degrees: Float): Result<ImageData> =
         withContext(Dispatchers.IO) {
-            try {
-                val uiImage = byteArrayToUIImage(image.bytes)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to create image from data"),
-                        "Failed to create image",
-                    )
-
-                val radians = degrees * kotlin.math.PI / 180.0
-                val originalSize = uiImage.size
-                val originalWidth = originalSize.useContents { this.width }
-                val originalHeight = originalSize.useContents { this.height }
-
-                val absRadians = kotlin.math.abs(radians)
-                val sinVal = kotlin.math.sin(absRadians)
-                val cosVal = kotlin.math.cos(absRadians)
-                val newWidth = (originalWidth * cosVal + originalHeight * sinVal).toInt()
-                val newHeight = (originalWidth * sinVal + originalHeight * cosVal).toInt()
-
-                val newSize = CGSizeMake(
-                    width = newWidth.toDouble(),
-                    height = newHeight.toDouble(),
-                )
-
-                UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-                val context = platform.UIKit.UIGraphicsGetCurrentContext()
-
-                if (context != null) {
-                    platform.CoreGraphics.CGContextTranslateCTM(
-                        context,
-                        newWidth / 2.0,
-                        newHeight / 2.0,
-                    )
-                    platform.CoreGraphics.CGContextRotateCTM(context, radians)
-                    uiImage.drawInRect(
-                        CGRectMake(
-                            x = -originalWidth / 2.0,
-                            y = -originalHeight / 2.0,
-                            width = originalWidth,
-                            height = originalHeight,
-                        ),
-                    )
-                }
-
-                val rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
-                UIGraphicsEndImageContext()
-
-                if (rotatedImage == null) {
-                    return@withContext Result.Error(
-                        IllegalStateException("Failed to rotate image"),
-                        "Failed to rotate image",
-                    )
-                }
-
-                val resultData = UIImagePNGRepresentation(rotatedImage)
-                    ?: return@withContext Result.Error(
-                        IllegalStateException("Failed to encode rotated image"),
-                        "Failed to encode result",
-                    )
-
-                Result.Success(
-                    ImageData(
-                        width = newWidth,
-                        height = newHeight,
-                        bytes = resultData.toByteArray(),
-                    ),
-                )
-            } catch (e: Exception) {
-                Result.Error(e, "Failed to rotate image: ${e.message}")
-            }
+            transformer.rotateImage(image, degrees)
         }
 
     override suspend fun getImageDimensions(path: String): Result<Pair<Int, Int>> = withContext(Dispatchers.IO) {
-        try {
-            val fileManager = NSFileManager.defaultManager
-            if (!fileManager.fileExistsAtPath(path)) {
-                return@withContext Result.Error(
-                    IllegalArgumentException("File not found: $path"),
-                    "File not found",
-                )
-            }
-
-            val image = UIImage.imageWithContentsOfFile(path)
-                ?: return@withContext Result.Error(
-                    IllegalArgumentException("Failed to load image: $path"),
-                    "Failed to load image",
-                )
-
-            val imageSize = image.size
-            val width = imageSize.useContents { this.width.toInt() }
-            val height = imageSize.useContents { this.height.toInt() }
-
-            Result.Success(Pair(width, height))
-        } catch (e: Exception) {
-            Result.Error(e, "Failed to get image dimensions: ${e.message}")
-        }
-    }
-
-    private fun NSData.toByteArray(): ByteArray {
-        val length = this.length.toInt()
-        val bytes = ByteArray(length)
-        bytes.usePinned { pinned ->
-            memcpy(pinned.addressOf(0), this.bytes, length.toULong())
-        }
-        return bytes
-    }
-
-    private fun byteArrayToUIImage(bytes: ByteArray): UIImage? {
-        val data = bytes.usePinned { pinned ->
-            NSData.create(bytes = pinned.addressOf(0), length = bytes.size.toULong())
-        }
-        return UIImage.imageWithData(data)
-    }
-
-    private fun rgbaBytesToUIImage(bytes: ByteArray, width: Int, height: Int): UIImage? {
-        if (bytes.size < width * height * RGBA_BYTES_PER_PIXEL) return null
-        val bytesPerRow = width * RGBA_BYTES_PER_PIXEL
-        val colorSpace = CGColorSpaceCreateDeviceRGB()
-        val cgImage = bytes.usePinned { pinned ->
-            val context = CGBitmapContextCreate(
-                data = pinned.addressOf(0),
-                width = width.toULong(),
-                height = height.toULong(),
-                bitsPerComponent = 8u,
-                bytesPerRow = bytesPerRow.toULong(),
-                space = colorSpace,
-                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value,
-            ) ?: return null
-
-            val image = CGBitmapContextCreateImage(context)
-            CGContextRelease(context)
-            image
-        } ?: return null
-
-        val uiImage = UIImage.imageWithCGImage(cgImage)
-        CGImageRelease(cgImage)
-        return uiImage
-    }
-
-    private fun imageDataToRgbaBytes(imageData: ImageData): Triple<ByteArray, Int, Int>? {
-        val expectedSize = imageData.width * imageData.height * RGBA_BYTES_PER_PIXEL
-        if (imageData.bytes.size == expectedSize) {
-            return Triple(imageData.bytes, imageData.width, imageData.height)
-        }
-
-        val uiImage = byteArrayToUIImage(imageData.bytes) ?: return null
-        val cgImage = uiImage.CGImage ?: return null
-        val width = CGImageGetWidth(cgImage).toInt()
-        val height = CGImageGetHeight(cgImage).toInt()
-        val bytesPerRow = width * RGBA_BYTES_PER_PIXEL
-        val rgbaBytes = ByteArray(bytesPerRow * height)
-
-        rgbaBytes.usePinned { pinned ->
-            val colorSpace = CGColorSpaceCreateDeviceRGB()
-            val context = CGBitmapContextCreate(
-                data = pinned.addressOf(0),
-                width = width.toULong(),
-                height = height.toULong(),
-                bitsPerComponent = 8u,
-                bytesPerRow = bytesPerRow.toULong(),
-                space = colorSpace,
-                bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value,
-            ) ?: return null
-
-            val rect = CGRectMake(0.0, 0.0, width.toDouble(), height.toDouble())
-            CGContextDrawImage(context, rect, cgImage)
-            CGContextRelease(context)
-        }
-
-        return Triple(rgbaBytes, width, height)
-    }
-
-    private fun calculateAspectRatioSize(
-        srcWidth: Int,
-        srcHeight: Int,
-        maxWidth: Int,
-        maxHeight: Int,
-    ): Pair<Int, Int> {
-        val aspectRatio = srcWidth.toFloat() / srcHeight.toFloat()
-        return if (maxWidth.toFloat() / maxHeight.toFloat() > aspectRatio) {
-            Pair((maxHeight * aspectRatio).toInt(), maxHeight)
-        } else {
-            Pair(maxWidth, (maxWidth / aspectRatio).toInt())
-        }
-    }
-
-    companion object {
-        /**
-         * Threshold for determining if a homography has significant perspective distortion.
-         * If h31 and h32 are below this threshold, the homography can be approximated
-         * by an affine transformation without noticeable loss of quality.
-         */
-        private const val PERSPECTIVE_THRESHOLD = 0.001f
-
-        /**
-         * Small value to prevent division by zero when normalizing homography matrix.
-         */
-        private const val EPSILON = 1e-6f
-        private const val RGBA_BYTES_PER_PIXEL = 4
-
-        /**
-         * Error message when full homography (perspective) transformation is required
-         * but OpenCV is not configured.
-         */
-        private const val HOMOGRAPHY_NOT_SUPPORTED_MESSAGE =
-            "Full perspective (homography) transformation requires OpenCV integration. " +
-                "Ensure the iOS app is built via Xcode with the OpenCV pod linked."
+        imageStore.getImageDimensions(path)
     }
 }
