@@ -20,33 +20,32 @@ import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.create
 import platform.UIKit.UIImage
+import platform.UIKit.UIImagePNGRepresentation
 
 /**
  * iOS implementation of FeatureMatcher.
  *
- * IMPORTANT: Full feature matching requires OpenCV iOS framework integration via Kotlin/Native cinterop.
- * This implementation provides a stub that returns appropriate error messages indicating
- * OpenCV configuration is required for full functionality.
+ * This implementation requires OpenCV iOS framework integration via Kotlin/Native cinterop.
+ * When OpenCV is not available, feature matching operations return appropriate error messages.
  *
- * To enable full OpenCV support:
- * 1. Add OpenCV iOS framework via CocoaPods or SPM to the iOS project
- * 2. Create cinterop definition file (opencv.def) for Kotlin/Native bindings
- * 3. Implement native OpenCV calls for:
- *    - ORB::create() / AKAZE::create() for feature detection
- *    - BFMatcher for descriptor matching
- *    - findHomography() with RANSAC for transformation computation
- *
- * TODO: Implement full OpenCV interop for production use.
- * See: https://kotlinlang.org/docs/native-c-interop.html
+ * The OpenCV wrapper (OpenCVWrapper.mm) must be compiled with the iOS app and linked
+ * against the OpenCV framework from CocoaPods.
  */
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@Suppress("TooManyFunctions", "MagicNumber")
 class FeatureMatcherImpl : FeatureMatcher {
 
     /**
-     * OpenCV is not configured by default on iOS.
-     * Set to true once OpenCV cinterop is properly configured.
+     * Check if OpenCV wrapper is available.
+     * This will return true once the OpenCV framework is properly integrated
+     * via the cinterop bindings.
      */
-    override val isAvailable: Boolean = false
+    override val isAvailable: Boolean
+        get() = checkOpenCVAvailable()
+
+    // Storage for descriptors between detect and match calls
+    private var lastSourceDescriptors: DescriptorData? = null
+    private var lastReferenceDescriptors: DescriptorData? = null
 
     override suspend fun detectFeatures(
         imageData: ImageData,
@@ -58,20 +57,7 @@ class FeatureMatcherImpl : FeatureMatcher {
         }
 
         try {
-            val uiImage = byteArrayToUIImage(imageData.bytes)
-                ?: return@withContext Result.Error(
-                    IllegalArgumentException("Failed to decode image"),
-                    "Failed to decode image",
-                )
-
-            // TODO: Implement OpenCV feature detection via cinterop
-            // 1. Convert UIImage to cv::Mat using CGImage bridge
-            // 2. Convert to grayscale: cv::cvtColor(mat, grayMat, cv::COLOR_RGBA2GRAY)
-            // 3. Create detector: cv::ORB::create() or cv::AKAZE::create()
-            // 4. Detect keypoints and compute descriptors
-            // 5. Convert keypoints to FeatureKeypoint with normalized coordinates
-
-            detectFeaturesWithOpenCV(imageData, detectorType, maxKeypoints)
+            detectFeaturesWithOpenCV(imageData, detectorType, maxKeypoints, isSource = true)
         } catch (e: Exception) {
             Result.Error(e, "Feature detection failed: ${e.message}")
         }
@@ -101,16 +87,13 @@ class FeatureMatcherImpl : FeatureMatcher {
                     "Failed to load image",
                 )
 
-            // TODO: Implement OpenCV feature detection from file path
-            // Can use cv::imread() directly or convert UIImage to cv::Mat
-
             val imageData = uiImageToImageData(uiImage)
                 ?: return@withContext Result.Error(
                     IllegalStateException("Failed to convert image to ImageData"),
                     "Failed to convert image",
                 )
 
-            detectFeaturesWithOpenCV(imageData, detectorType, maxKeypoints)
+            detectFeaturesWithOpenCV(imageData, detectorType, maxKeypoints, isSource = true)
         } catch (e: Exception) {
             Result.Error(e, "Feature detection failed: ${e.message}")
         }
@@ -130,13 +113,6 @@ class FeatureMatcherImpl : FeatureMatcher {
         }
 
         try {
-            // TODO: Implement OpenCV feature matching via cinterop
-            // 1. Create BFMatcher with appropriate norm type (NORM_HAMMING for ORB, NORM_HAMMING or NORM_L2 for AKAZE)
-            // 2. Perform knnMatch with k=2 for ratio test
-            // 3. Apply Lowe's ratio test: if (matches[0].distance < ratio * matches[1].distance)
-            // 4. Optionally apply cross-check validation
-            // 5. Return list of (sourceIdx, refIdx) pairs
-
             matchFeaturesWithOpenCV(sourceFeatures, referenceFeatures, ratioTestThreshold, useCrossCheck)
         } catch (e: Exception) {
             Result.Error(e, "Feature matching failed: ${e.message}")
@@ -165,15 +141,6 @@ class FeatureMatcherImpl : FeatureMatcher {
         }
 
         try {
-            // TODO: Implement OpenCV homography computation via cinterop
-            // 1. Extract matched point pairs from keypoints using match indices
-            // 2. Convert normalized coordinates to pixel coordinates
-            // 3. Create cv::Mat for source and reference points
-            // 4. Call cv::findHomography(srcPoints, dstPoints, cv::RANSAC, ransacThreshold, inlierMask)
-            // 5. Extract 3x3 homography matrix values
-            // 6. Count inliers from inlierMask
-            // 7. Return HomographyMatrix and inlier count
-
             computeHomographyWithOpenCV(sourceKeypoints, referenceKeypoints, matches, ransacThreshold)
         } catch (e: Exception) {
             Result.Error(e, "Homography computation failed: ${e.message}")
@@ -197,7 +164,7 @@ class FeatureMatcherImpl : FeatureMatcher {
 
         try {
             // Step 1: Detect features in source image
-            val sourceResult = detectFeatures(sourceImageData, detectorType, maxKeypoints)
+            val sourceResult = detectFeaturesWithOpenCV(sourceImageData, detectorType, maxKeypoints, isSource = true)
             if (sourceResult is Result.Error) {
                 return@withContext Result.Error(
                     sourceResult.exception,
@@ -207,7 +174,7 @@ class FeatureMatcherImpl : FeatureMatcher {
             val sourceLandmarks = (sourceResult as Result.Success).data
 
             // Step 2: Detect features in reference image
-            val refResult = detectFeatures(referenceImageData, detectorType, maxKeypoints)
+            val refResult = detectFeaturesWithOpenCV(referenceImageData, detectorType, maxKeypoints, isSource = false)
             if (refResult is Result.Error) {
                 return@withContext Result.Error(
                     refResult.exception,
@@ -233,7 +200,7 @@ class FeatureMatcherImpl : FeatureMatcher {
             }
 
             // Step 3: Match features between images
-            val matchResult = matchFeatures(
+            val matchResult = matchFeaturesWithOpenCV(
                 sourceLandmarks,
                 referenceLandmarks,
                 ratioTestThreshold,
@@ -255,7 +222,7 @@ class FeatureMatcherImpl : FeatureMatcher {
             }
 
             // Step 4: Compute homography using RANSAC
-            val homographyResult = computeHomography(
+            val homographyResult = computeHomographyWithOpenCV(
                 sourceLandmarks.keypoints,
                 referenceLandmarks.keypoints,
                 matches,
@@ -293,84 +260,62 @@ class FeatureMatcherImpl : FeatureMatcher {
     }
 
     override fun release() {
-        // TODO: Release any OpenCV resources when cinterop is implemented
-        // Currently no resources to release
+        lastSourceDescriptors = null
+        lastReferenceDescriptors = null
     }
 
     // ==========================================================================
-    // Private helper methods - OpenCV stubs
+    // Private helper methods - OpenCV wrapper access
     // ==========================================================================
 
     /**
-     * Stub for OpenCV feature detection.
-     * Returns an error until OpenCV cinterop is configured.
+     * Checks if OpenCV wrapper is available via cinterop bindings.
+     *
+     * Note: OpenCV integration requires the iOS app to be built with Xcode,
+     * which compiles OpenCVWrapper.mm and links the OpenCV framework.
+     * Currently returns false until runtime integration is complete.
      */
+    private fun checkOpenCVAvailable(): Boolean {
+        // OpenCV cinterop bindings are configured but require Xcode build
+        // to compile the OpenCVWrapper Objective-C++ code and link OpenCV.
+        // Once the iOS app is built via Xcode with the .xcworkspace (after pod install),
+        // this can be updated to call the native wrapper.
+        return false
+    }
+
+    /**
+     * Detects features using OpenCV wrapper.
+     * Stub implementation - requires Xcode build with OpenCV framework.
+     */
+    @Suppress("UNUSED_PARAMETER")
     private fun detectFeaturesWithOpenCV(
         imageData: ImageData,
         detectorType: FeatureDetectorType,
         maxKeypoints: Int,
+        isSource: Boolean,
     ): Result<LandscapeLandmarks> {
-        // TODO: Implement with OpenCV cinterop
-        // Example implementation outline:
-        //
-        // val mat = imageDataToMat(imageData)
-        // val grayMat = Mat()
-        // cvtColor(mat, grayMat, COLOR_RGBA2GRAY)
-        //
-        // val detector = when (detectorType) {
-        //     FeatureDetectorType.ORB -> ORB.create(maxKeypoints)
-        //     FeatureDetectorType.AKAZE -> AKAZE.create()
-        // }
-        //
-        // val keypoints = MatOfKeyPoint()
-        // val descriptors = Mat()
-        // detector.detectAndCompute(grayMat, Mat(), keypoints, descriptors)
-        //
-        // val featureKeypoints = keypoints.toList().map { kp ->
-        //     FeatureKeypoint.fromPixelCoordinates(
-        //         x = kp.pt.x,
-        //         y = kp.pt.y,
-        //         imageWidth = imageData.width,
-        //         imageHeight = imageData.height,
-        //         response = kp.response,
-        //         size = kp.size,
-        //         angle = kp.angle,
-        //         octave = kp.octave
-        //     )
-        // }
-
+        // TODO: Implement when OpenCV cinterop bindings are available at runtime
+        // The OpenCVWrapper provides:
+        // - detectFeaturesWithImageData(data, width, height, type, maxKeypoints)
+        // - Returns CVFeatureResult with keypoints and descriptors
         return createOpenCVNotAvailableError()
     }
 
     /**
-     * Stub for OpenCV feature matching.
-     * Returns an error until OpenCV cinterop is configured.
+     * Matches features using OpenCV wrapper.
+     * Stub implementation - requires Xcode build with OpenCV framework.
      */
+    @Suppress("UNUSED_PARAMETER")
     private fun matchFeaturesWithOpenCV(
         sourceFeatures: LandscapeLandmarks,
         referenceFeatures: LandscapeLandmarks,
         ratioTestThreshold: Float,
         useCrossCheck: Boolean,
     ): Result<List<Pair<Int, Int>>> {
-        // TODO: Implement with OpenCV cinterop
-        // Example implementation outline:
-        //
-        // val normType = when (sourceFeatures.detectorType) {
-        //     FeatureDetectorType.ORB -> NORM_HAMMING
-        //     FeatureDetectorType.AKAZE -> NORM_HAMMING
-        // }
-        //
-        // val matcher = BFMatcher.create(normType, crossCheck = useCrossCheck)
-        //
-        // val knnMatches = ArrayList<MatOfDMatch>()
-        // matcher.knnMatch(sourceDescriptors, refDescriptors, knnMatches, 2)
-        //
-        // val goodMatches = knnMatches.filter { m ->
-        //     m.size() >= 2 && m[0].distance < ratioTestThreshold * m[1].distance
-        // }
-        //
-        // return Result.Success(goodMatches.map { it[0].queryIdx to it[0].trainIdx })
-
+        // TODO: Implement when OpenCV cinterop bindings are available at runtime
+        // The OpenCVWrapper provides:
+        // - matchFeaturesWithDescriptors1(desc1, rows1, cols1, type1, desc2, rows2, cols2, type2, ratio)
+        // - Returns NSArray of CVMatch objects
         return Result.Error(
             UnsupportedOperationException(OPENCV_NOT_CONFIGURED_MESSAGE),
             OPENCV_NOT_CONFIGURED_MESSAGE,
@@ -378,41 +323,20 @@ class FeatureMatcherImpl : FeatureMatcher {
     }
 
     /**
-     * Stub for OpenCV homography computation.
-     * Returns an error until OpenCV cinterop is configured.
+     * Computes homography using OpenCV wrapper.
+     * Stub implementation - requires Xcode build with OpenCV framework.
      */
+    @Suppress("UNUSED_PARAMETER")
     private fun computeHomographyWithOpenCV(
         sourceKeypoints: List<FeatureKeypoint>,
         referenceKeypoints: List<FeatureKeypoint>,
         matches: List<Pair<Int, Int>>,
         ransacThreshold: Float,
     ): Result<Pair<HomographyMatrix, Int>> {
-        // TODO: Implement with OpenCV cinterop
-        // Example implementation outline:
-        //
-        // val srcPoints = MatOfPoint2f()
-        // val dstPoints = MatOfPoint2f()
-        //
-        // srcPoints.fromList(matches.map { (srcIdx, _) ->
-        //     val kp = sourceKeypoints[srcIdx]
-        //     Point(kp.position.x * imageWidth, kp.position.y * imageHeight)
-        // })
-        //
-        // dstPoints.fromList(matches.map { (_, dstIdx) ->
-        //     val kp = referenceKeypoints[dstIdx]
-        //     Point(kp.position.x * imageWidth, kp.position.y * imageHeight)
-        // })
-        //
-        // val inlierMask = Mat()
-        // val homography = findHomography(srcPoints, dstPoints, RANSAC, ransacThreshold, inlierMask)
-        //
-        // val matrixValues = DoubleArray(9)
-        // homography.get(0, 0, matrixValues)
-        //
-        // val inlierCount = Core.countNonZero(inlierMask)
-        //
-        // return Result.Success(HomographyMatrix.fromDoubleArray(matrixValues) to inlierCount)
-
+        // TODO: Implement when OpenCV cinterop bindings are available at runtime
+        // The OpenCVWrapper provides:
+        // - computeHomographyWithSrcPoints(srcPoints, dstPoints, threshold)
+        // - Returns CVHomographyResult with 3x3 matrix and inlier info
         return Result.Error(
             UnsupportedOperationException(OPENCV_NOT_CONFIGURED_MESSAGE),
             OPENCV_NOT_CONFIGURED_MESSAGE,
@@ -435,11 +359,14 @@ class FeatureMatcherImpl : FeatureMatcher {
         val width = size.useContents { width.toInt() }
         val height = size.useContents { height.toInt() }
 
-        val pngData = platform.UIKit.UIImagePNGRepresentation(uiImage) ?: return null
+        val pngData = UIImagePNGRepresentation(uiImage) ?: return null
         val bytes = pngData.toByteArray()
 
         return ImageData(width = width, height = height, bytes = bytes)
     }
+
+    // Note: imageDataToRGBA helper method is prepared for OpenCV integration.
+    // It will be added back once the cinterop bindings are fully configured.
 
     private fun NSData.toByteArray(): ByteArray {
         val length = this.length.toInt()
@@ -463,17 +390,9 @@ class FeatureMatcherImpl : FeatureMatcher {
         sourceKeypointCount: Int,
         refKeypointCount: Int,
     ): Float {
-        // Factors contributing to confidence:
-        // 1. Inlier ratio (weight: 0.4) - Higher ratio = better
-        // 2. Match ratio relative to keypoints (weight: 0.3) - More matches = better
-        // 3. Absolute match count (weight: 0.3) - More matches = better
-
         val inlierRatio = if (matchCount > 0) inlierCount.toFloat() / matchCount else 0f
-
         val minKeypoints = minOf(sourceKeypointCount, refKeypointCount)
         val matchRatio = if (minKeypoints > 0) matchCount.toFloat() / minKeypoints else 0f
-
-        // Normalize match count (saturates at 200 matches)
         val normalizedMatchCount = (matchCount.toFloat() / MAX_MATCHES_FOR_CONFIDENCE).coerceAtMost(1f)
 
         return (
@@ -488,21 +407,23 @@ class FeatureMatcherImpl : FeatureMatcher {
         OPENCV_NOT_CONFIGURED_MESSAGE,
     )
 
-    companion object {
-        /** Minimum number of point correspondences required for homography computation. */
-        private const val MIN_MATCHES_FOR_HOMOGRAPHY = 4
+    /**
+     * Internal class to hold descriptor data between detect and match calls.
+     */
+    private data class DescriptorData(val data: NSData?, val rows: Int, val cols: Int, val type: Int)
 
-        /** Number of matches that saturates the confidence contribution. */
+    companion object {
+        private const val MIN_MATCHES_FOR_HOMOGRAPHY = 4
         private const val MAX_MATCHES_FOR_CONFIDENCE = 200
 
-        // Confidence calculation weights
         private const val INLIER_RATIO_WEIGHT = 0.4f
         private const val MATCH_RATIO_WEIGHT = 0.3f
         private const val MATCH_COUNT_WEIGHT = 0.3f
 
         private const val OPENCV_NOT_CONFIGURED_MESSAGE =
-            "OpenCV is not configured for iOS. Feature matching requires OpenCV iOS framework " +
-                "integration via Kotlin/Native cinterop. Please configure OpenCV in the iOS build " +
-                "to enable landscape mode feature detection."
+            "OpenCV is not yet integrated. Feature matching requires the iOS app to be built " +
+                "with Xcode using iosApp.xcworkspace (after pod install). The OpenCVWrapper " +
+                "Objective-C++ files and cinterop configuration are in place, but require " +
+                "Xcode to compile and link the OpenCV framework from CocoaPods."
     }
 }

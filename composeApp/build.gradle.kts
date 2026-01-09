@@ -36,6 +36,17 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+
+        // Configure cinterop for OpenCV wrapper
+        iosTarget.compilations.getByName("main") {
+            cinterops {
+                create("opencv") {
+                    defFile("src/nativeInterop/cinterop/opencv.def")
+                    // Include path for the header files
+                    includeDirs("src/nativeInterop/cinterop")
+                }
+            }
+        }
     }
 
     sourceSets {

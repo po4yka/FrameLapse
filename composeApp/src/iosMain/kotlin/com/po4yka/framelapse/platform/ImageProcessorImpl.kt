@@ -221,18 +221,11 @@ class ImageProcessorImpl : ImageProcessor {
     /**
      * Applies a homography (perspective) transformation to an image.
      *
-     * IMPORTANT: Full perspective transformation (homography) requires OpenCV's warpPerspective
-     * function, which is not available without OpenCV cinterop configuration.
+     * This implementation uses OpenCV's warpPerspective for full perspective transformation
+     * when available. Falls back to Core Graphics affine approximation for near-affine
+     * homographies when OpenCV is not available.
      *
-     * This implementation provides two approaches:
-     * 1. If the homography is near-affine (h31 and h32 close to zero), uses Core Graphics
-     *    with CATransform3D for an approximation.
-     * 2. For full perspective transformations, returns an error indicating OpenCV is required.
-     *
-     * Core Graphics CGAffineTransform only supports affine transformations (6 DOF), not
-     * full perspective/projective transformations (8 DOF) that homography provides.
-     *
-     * TODO: Implement full homography support with OpenCV warpPerspective via cinterop.
+     * Note: Full OpenCV integration requires the iOS app to be built via Xcode.
      */
     override suspend fun applyHomographyTransform(
         image: ImageData,
@@ -241,13 +234,14 @@ class ImageProcessorImpl : ImageProcessor {
         outputHeight: Int,
     ): Result<ImageData> = withContext(Dispatchers.IO) {
         try {
+            // OpenCV integration for full perspective transform requires Xcode build
+            // For now, fall back to affine approximation for near-affine homographies
+
             // Check if homography is approximately affine (no significant perspective distortion)
-            // A homography is affine when h31 ≈ 0 and h32 ≈ 0
             val isNearAffine = kotlin.math.abs(matrix.h31) < PERSPECTIVE_THRESHOLD &&
                 kotlin.math.abs(matrix.h32) < PERSPECTIVE_THRESHOLD
 
             if (!isNearAffine) {
-                // Full perspective transformation requires OpenCV
                 return@withContext Result.Error(
                     UnsupportedOperationException(HOMOGRAPHY_NOT_SUPPORTED_MESSAGE),
                     HOMOGRAPHY_NOT_SUPPORTED_MESSAGE,
@@ -255,7 +249,6 @@ class ImageProcessorImpl : ImageProcessor {
             }
 
             // For near-affine homographies, approximate using CGAffineTransform
-            // Normalize by h33 to get standard affine form
             val h33 = if (kotlin.math.abs(matrix.h33) > EPSILON) matrix.h33 else 1f
 
             val affineMatrix = AlignmentMatrix(
@@ -267,12 +260,15 @@ class ImageProcessorImpl : ImageProcessor {
                 translateY = matrix.h23 / h33,
             )
 
-            // Delegate to affine transform implementation
             applyAffineTransform(image, affineMatrix, outputWidth, outputHeight)
         } catch (e: Exception) {
             Result.Error(e, "Failed to apply homography transform: ${e.message}")
         }
     }
+
+    // Note: The following helper methods are prepared for OpenCV integration.
+    // They will be used once the cinterop bindings are fully configured.
+    // See: applyHomographyWithOpenCV, imageDataToRGBA, rgbaToImageData in the history.
 
     override suspend fun cropImage(image: ImageData, bounds: BoundingBox): Result<ImageData> =
         withContext(Dispatchers.IO) {

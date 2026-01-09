@@ -1,0 +1,10 @@
+language = Objective-C
+package = com.po4yka.framelapse.opencv
+
+headers = headers/OpenCVWrapper.h
+
+# Header filter for the generated bindings
+headerFilter = OpenCVWrapper.h
+
+# Link against Foundation framework (required for NS* types)
+linkerOpts = -framework Foundation

@@ -1,5 +1,7 @@
 platform :ios, '15.0'
 
+project 'iosApp.xcodeproj'
+
 target 'iosApp' do
   use_frameworks!
 
@@ -7,7 +9,7 @@ target 'iosApp' do
   pod 'MediaPipeTasksVision', '~> 0.10.18'
 
   # OpenCV for feature matching (landscape mode)
-  pod 'OpenCV', '~> 4.9.0'
+  pod 'OpenCV', '~> 4.3.0'
 end
 
 post_install do |installer|
