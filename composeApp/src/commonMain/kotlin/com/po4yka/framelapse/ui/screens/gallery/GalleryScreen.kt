@@ -29,7 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,9 @@ import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
 import com.po4yka.framelapse.ui.components.EmptyState
 import com.po4yka.framelapse.ui.components.FrameGridItem
 import com.po4yka.framelapse.ui.components.FrameLapseTopBar
+import com.po4yka.framelapse.ui.components.ImportPreviewSheet
+import com.po4yka.framelapse.ui.components.ImportProgressDialog
+import com.po4yka.framelapse.ui.components.ImportResultDialog
 import com.po4yka.framelapse.ui.components.LoadingIndicator
 import com.po4yka.framelapse.ui.components.SelectionTopBar
 import com.po4yka.framelapse.ui.util.HandleEffects
@@ -81,6 +86,9 @@ fun GalleryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Import result dialog state
+    var importResultState by remember { mutableStateOf<ImportResultState?>(null) }
+
     // Photo picker launcher
     val photoPickerLauncher = rememberPhotoPickerLauncher { result ->
         when (result) {
@@ -105,6 +113,13 @@ fun GalleryScreen(
             is GalleryEffect.OpenPhotoPicker -> photoPickerLauncher.launch(maxItems = 0)
             is GalleryEffect.ShowDeleteConfirmation -> onShowDeleteDialog(effect.count)
             is GalleryEffect.NavigateToManualAdjustment -> onNavigateToManualAdjustment(effect.frameId)
+            is GalleryEffect.ShowImportResult -> {
+                importResultState = ImportResultState(
+                    successCount = effect.successCount,
+                    failedCount = effect.failedCount,
+                    thumbnailPaths = effect.thumbnailPaths,
+                )
+            }
         }
     }
 
@@ -119,7 +134,47 @@ fun GalleryScreen(
         onNavigateBack = onNavigateBack,
         modifier = modifier,
     )
+
+    // Import preview sheet
+    if (state.showImportPreview && state.pendingImportPaths.isNotEmpty()) {
+        ImportPreviewSheet(
+            photoPaths = state.pendingImportPaths,
+            onConfirm = { viewModel.onEvent(GalleryEvent.ConfirmImport) },
+            onDismiss = { viewModel.onEvent(GalleryEvent.DismissImportPreview) },
+        )
+    }
+
+    // Import progress dialog
+    val importProgress = state.importProgress
+    if (state.isImporting && importProgress != null) {
+        ImportProgressDialog(
+            progress = importProgress,
+            onCancel = { viewModel.onEvent(GalleryEvent.CancelImport) },
+        )
+    }
+
+    // Import result dialog
+    importResultState?.let { result ->
+        ImportResultDialog(
+            successCount = result.successCount,
+            failedCount = result.failedCount,
+            thumbnailPaths = result.thumbnailPaths,
+            onDismiss = {
+                importResultState = null
+                viewModel.onEvent(GalleryEvent.DismissImportResult)
+            },
+            onRetry = {
+                importResultState = null
+                viewModel.onEvent(GalleryEvent.RetryFailedImports)
+            },
+        )
+    }
 }
+
+/**
+ * State for the import result dialog.
+ */
+private data class ImportResultState(val successCount: Int, val failedCount: Int, val thumbnailPaths: List<String>)
 
 @Composable
 private fun GalleryContent(

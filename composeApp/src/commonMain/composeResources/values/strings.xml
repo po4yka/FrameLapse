@@ -72,6 +72,26 @@
     <string name="gallery_capture_button">Capture</string>
     <string name="gallery_export_button">Export</string>
 
+    <!-- Import Photos -->
+    <string name="import_title">Importing Photos</string>
+    <string name="import_preview_title">Import %d Photos</string>
+    <string name="import_preview_description">These photos will be added to your project. Face alignment will be applied automatically.</string>
+    <string name="import_progress_of">%d of %d</string>
+    <string name="import_phase_preparing">Preparing...</string>
+    <string name="import_phase_copying">Copying file...</string>
+    <string name="import_phase_detecting">Detecting face...</string>
+    <string name="import_phase_aligning">Aligning photo...</string>
+    <string name="import_phase_saving">Saving frame...</string>
+    <string name="import_phase_complete">Complete</string>
+    <string name="import_phase_cancelled">Cancelled</string>
+    <string name="import_failed_count">%d photo(s) failed</string>
+    <string name="import_result_complete">Import Complete</string>
+    <string name="import_result_with_errors">Import Completed with Errors</string>
+    <string name="import_success_count">%d photo(s) imported successfully</string>
+    <string name="import_failed_message">%d photo(s) failed to import</string>
+    <string name="import_retry_failed">Retry Failed</string>
+    <string name="import_confirm">Import</string>
+
     <!-- Delete Confirmation Dialog -->
     <string name="delete_frames_title">Delete Frames</string>
     <string name="delete_frames_message_single">Are you sure you want to delete this frame? This action cannot be undone.</string>
