@@ -25,6 +25,9 @@ import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseC
 import com.po4yka.framelapse.domain.usecase.adjustment.BatchApplyAdjustmentUseCase
 import com.po4yka.framelapse.domain.usecase.adjustment.SuggestSimilarFramesUseCase
 import com.po4yka.framelapse.domain.usecase.alignment.AlignContentUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.CaptureCalibrationImageUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.GetCalibrationUseCase
+import com.po4yka.framelapse.domain.usecase.calibration.SaveCalibrationUseCase
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.body.DetectBodyPoseUseCase
@@ -66,6 +69,7 @@ import com.po4yka.framelapse.domain.usecase.project.GetProjectsUseCase
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.platform.DatabaseDriverFactory
 import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
+import com.po4yka.framelapse.presentation.calibration.CalibrationViewModel
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel
 import com.po4yka.framelapse.presentation.export.ExportViewModel
 import com.po4yka.framelapse.presentation.gallery.GalleryViewModel
@@ -261,6 +265,11 @@ val domainModule = module {
     // Capture Use Cases (CameraController passed at runtime from UI layer)
     factory { CaptureImageUseCase(get(), get(), get()) }
 
+    // Calibration Use Cases
+    factory { SaveCalibrationUseCase(get()) }
+    factory { GetCalibrationUseCase(get()) }
+    factory { CaptureCalibrationImageUseCase(get(), get(), get()) }
+
     // Manual Adjustment Use Cases
     factory {
         ApplyManualAdjustmentUseCase(
@@ -289,6 +298,7 @@ val presentationModule = module {
     factory { ExportViewModel(get(), get(), get()) }
     factory { SettingsViewModel(get(), get()) }
     factory { ManualAdjustmentViewModel(get(), get(), get(), get()) }
+    factory { CalibrationViewModel(get(), get(), get(), get()) }
 }
 
 /**

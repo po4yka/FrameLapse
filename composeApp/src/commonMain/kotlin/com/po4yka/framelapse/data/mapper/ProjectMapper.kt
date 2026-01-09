@@ -27,6 +27,13 @@ object ProjectMapper {
         contentType = ContentType.fromString(entity.contentType),
         muscleRegion = entity.muscleRegion?.let { MuscleRegion.fromString(it) },
         referenceFrameId = entity.referenceFrameId,
+        calibrationImagePath = entity.calibrationImagePath,
+        calibrationLeftEyeX = entity.calibrationLeftEyeX?.toFloat(),
+        calibrationLeftEyeY = entity.calibrationLeftEyeY?.toFloat(),
+        calibrationRightEyeX = entity.calibrationRightEyeX?.toFloat(),
+        calibrationRightEyeY = entity.calibrationRightEyeY?.toFloat(),
+        calibrationOffsetX = entity.calibrationOffsetX?.toFloat() ?: 0f,
+        calibrationOffsetY = entity.calibrationOffsetY?.toFloat() ?: 0f,
     )
 
     /**
@@ -44,6 +51,13 @@ object ProjectMapper {
         contentType = domain.contentType.name,
         muscleRegion = domain.muscleRegion?.name,
         referenceFrameId = domain.referenceFrameId,
+        calibrationImagePath = domain.calibrationImagePath,
+        calibrationLeftEyeX = domain.calibrationLeftEyeX?.toDouble(),
+        calibrationLeftEyeY = domain.calibrationLeftEyeY?.toDouble(),
+        calibrationRightEyeX = domain.calibrationRightEyeX?.toDouble(),
+        calibrationRightEyeY = domain.calibrationRightEyeY?.toDouble(),
+        calibrationOffsetX = domain.calibrationOffsetX.toDouble(),
+        calibrationOffsetY = domain.calibrationOffsetY.toDouble(),
     )
 
     /**
@@ -60,6 +74,38 @@ object ProjectMapper {
         contentType = domain.contentType.name,
         muscleRegion = domain.muscleRegion?.name,
         referenceFrameId = domain.referenceFrameId,
+        calibrationImagePath = domain.calibrationImagePath,
+        calibrationLeftEyeX = domain.calibrationLeftEyeX?.toDouble(),
+        calibrationLeftEyeY = domain.calibrationLeftEyeY?.toDouble(),
+        calibrationRightEyeX = domain.calibrationRightEyeX?.toDouble(),
+        calibrationRightEyeY = domain.calibrationRightEyeY?.toDouble(),
+        calibrationOffsetX = domain.calibrationOffsetX.toDouble(),
+        calibrationOffsetY = domain.calibrationOffsetY.toDouble(),
+    )
+
+    /**
+     * Creates calibration parameters for updating calibration data.
+     */
+    fun toCalibrationParams(
+        projectId: String,
+        imagePath: String,
+        leftEyeX: Float,
+        leftEyeY: Float,
+        rightEyeX: Float,
+        rightEyeY: Float,
+        offsetX: Float,
+        offsetY: Float,
+        updatedAt: Long,
+    ): CalibrationParams = CalibrationParams(
+        id = projectId,
+        calibrationImagePath = imagePath,
+        calibrationLeftEyeX = leftEyeX.toDouble(),
+        calibrationLeftEyeY = leftEyeY.toDouble(),
+        calibrationRightEyeX = rightEyeX.toDouble(),
+        calibrationRightEyeY = rightEyeY.toDouble(),
+        calibrationOffsetX = offsetX.toDouble(),
+        calibrationOffsetY = offsetY.toDouble(),
+        updatedAt = updatedAt,
     )
 }
 
@@ -78,6 +124,13 @@ data class InsertProjectParams(
     val contentType: String,
     val muscleRegion: String?,
     val referenceFrameId: String?,
+    val calibrationImagePath: String?,
+    val calibrationLeftEyeX: Double?,
+    val calibrationLeftEyeY: Double?,
+    val calibrationRightEyeX: Double?,
+    val calibrationRightEyeY: Double?,
+    val calibrationOffsetX: Double,
+    val calibrationOffsetY: Double,
 )
 
 /**
@@ -94,4 +147,26 @@ data class UpdateProjectParams(
     val contentType: String,
     val muscleRegion: String?,
     val referenceFrameId: String?,
+    val calibrationImagePath: String?,
+    val calibrationLeftEyeX: Double?,
+    val calibrationLeftEyeY: Double?,
+    val calibrationRightEyeX: Double?,
+    val calibrationRightEyeY: Double?,
+    val calibrationOffsetX: Double,
+    val calibrationOffsetY: Double,
+)
+
+/**
+ * Parameters for updating calibration data only.
+ */
+data class CalibrationParams(
+    val id: String,
+    val calibrationImagePath: String,
+    val calibrationLeftEyeX: Double,
+    val calibrationLeftEyeY: Double,
+    val calibrationRightEyeX: Double,
+    val calibrationRightEyeY: Double,
+    val calibrationOffsetX: Double,
+    val calibrationOffsetY: Double,
+    val updatedAt: Long,
 )

@@ -10,7 +10,14 @@ CREATE TABLE Project (
     thumbnailPath TEXT,
     contentType TEXT NOT NULL DEFAULT 'FACE',
     muscleRegion TEXT,
-    referenceFrameId TEXT
+    referenceFrameId TEXT,
+    calibrationImagePath TEXT,
+    calibrationLeftEyeX REAL,
+    calibrationLeftEyeY REAL,
+    calibrationRightEyeX REAL,
+    calibrationRightEyeY REAL,
+    calibrationOffsetX REAL DEFAULT 0,
+    calibrationOffsetY REAL DEFAULT 0
 );
 
 -- Get all projects ordered by most recently updated
@@ -23,8 +30,8 @@ SELECT * FROM Project WHERE id = ?;
 
 -- Insert a new project
 insert:
-INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath, contentType, muscleRegion, referenceFrameId)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO Project (id, name, createdAt, updatedAt, fps, resolution, orientation, thumbnailPath, contentType, muscleRegion, referenceFrameId, calibrationImagePath, calibrationLeftEyeX, calibrationLeftEyeY, calibrationRightEyeX, calibrationRightEyeY, calibrationOffsetX, calibrationOffsetY)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Update an existing project
 update:
@@ -37,7 +44,14 @@ UPDATE Project SET
     thumbnailPath = ?,
     contentType = ?,
     muscleRegion = ?,
-    referenceFrameId = ?
+    referenceFrameId = ?,
+    calibrationImagePath = ?,
+    calibrationLeftEyeX = ?,
+    calibrationLeftEyeY = ?,
+    calibrationRightEyeX = ?,
+    calibrationRightEyeY = ?,
+    calibrationOffsetX = ?,
+    calibrationOffsetY = ?
 WHERE id = ?;
 
 -- Update only the thumbnail path
@@ -59,3 +73,29 @@ SELECT COUNT(*) FROM Project;
 -- Check if a project exists
 exists:
 SELECT EXISTS(SELECT 1 FROM Project WHERE id = ?);
+
+-- Update calibration data for a project
+updateCalibration:
+UPDATE Project SET
+    calibrationImagePath = ?,
+    calibrationLeftEyeX = ?,
+    calibrationLeftEyeY = ?,
+    calibrationRightEyeX = ?,
+    calibrationRightEyeY = ?,
+    calibrationOffsetX = ?,
+    calibrationOffsetY = ?,
+    updatedAt = ?
+WHERE id = ?;
+
+-- Clear calibration data for a project
+clearCalibration:
+UPDATE Project SET
+    calibrationImagePath = NULL,
+    calibrationLeftEyeX = NULL,
+    calibrationLeftEyeY = NULL,
+    calibrationRightEyeX = NULL,
+    calibrationRightEyeY = NULL,
+    calibrationOffsetX = 0,
+    calibrationOffsetY = 0,
+    updatedAt = ?
+WHERE id = ?;

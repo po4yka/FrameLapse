@@ -89,6 +89,40 @@ class ProjectRepositoryImpl(
         Result.Error(e, "Failed to update thumbnail: ${e.message}")
     }
 
+    override suspend fun updateCalibration(
+        projectId: String,
+        imagePath: String,
+        leftEyeX: Float,
+        leftEyeY: Float,
+        rightEyeX: Float,
+        rightEyeY: Float,
+        offsetX: Float,
+        offsetY: Float,
+    ): Result<Unit> = try {
+        val params = ProjectMapper.toCalibrationParams(
+            projectId = projectId,
+            imagePath = imagePath,
+            leftEyeX = leftEyeX,
+            leftEyeY = leftEyeY,
+            rightEyeX = rightEyeX,
+            rightEyeY = rightEyeY,
+            offsetX = offsetX,
+            offsetY = offsetY,
+            updatedAt = currentTimeMillis(),
+        )
+        localDataSource.updateCalibration(params)
+        Result.Success(Unit)
+    } catch (e: Exception) {
+        Result.Error(e, "Failed to update calibration: ${e.message}")
+    }
+
+    override suspend fun clearCalibration(projectId: String): Result<Unit> = try {
+        localDataSource.clearCalibration(projectId, currentTimeMillis())
+        Result.Success(Unit)
+    } catch (e: Exception) {
+        Result.Error(e, "Failed to clear calibration: ${e.message}")
+    }
+
     override suspend fun exists(id: String): Result<Boolean> = try {
         Result.Success(localDataSource.exists(id))
     } catch (e: Exception) {

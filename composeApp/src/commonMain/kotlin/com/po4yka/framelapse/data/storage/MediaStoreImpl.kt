@@ -30,5 +30,10 @@ class MediaStoreImpl(
         return videoStorageManager.getExportPath(projectId, filename)
     }
 
+    override fun getCalibrationPath(projectId: String, timestamp: Long, extension: String): String {
+        val filename = "calibration_$timestamp.$extension"
+        return imageStorageManager.getAlignedPath(projectId, filename)
+    }
+
     override suspend fun deleteImage(path: String): Result<Unit> = imageStorageManager.deleteImage(path)
 }

@@ -16,6 +16,7 @@ import com.po4yka.framelapse.ui.navigation.dialogs.DeleteFramesDialogContent
 import com.po4yka.framelapse.ui.navigation.dialogs.DeleteProjectDialogContent
 import com.po4yka.framelapse.ui.navigation.sheets.FrameFilterSheetContent
 import com.po4yka.framelapse.ui.screens.adjustment.ManualAdjustmentScreen
+import com.po4yka.framelapse.ui.screens.calibration.CalibrationScreen
 import com.po4yka.framelapse.ui.screens.capture.CaptureScreen
 import com.po4yka.framelapse.ui.screens.export.ExportScreen
 import com.po4yka.framelapse.ui.screens.gallery.GalleryScreen
@@ -65,6 +66,18 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         onNavigateToGallery = {
                             backStack.add(GalleryKey(key.projectId))
                         },
+                        onNavigateToCalibration = {
+                            backStack.add(CalibrationKey(key.projectId))
+                        },
+                        onNavigateBack = {
+                            backStack.removeLastOrNull()
+                        },
+                    )
+                }
+
+                is CalibrationKey -> NavEntry(key) {
+                    CalibrationScreen(
+                        projectId = key.projectId,
                         onNavigateBack = {
                             backStack.removeLastOrNull()
                         },

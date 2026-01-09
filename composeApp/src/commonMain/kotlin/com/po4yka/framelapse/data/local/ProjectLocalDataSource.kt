@@ -3,6 +3,7 @@ package com.po4yka.framelapse.data.local
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.po4yka.framelapse.data.mapper.CalibrationParams
 import com.po4yka.framelapse.data.mapper.InsertProjectParams
 import com.po4yka.framelapse.data.mapper.UpdateProjectParams
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +57,13 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             contentType = params.contentType,
             muscleRegion = params.muscleRegion,
             referenceFrameId = params.referenceFrameId,
+            calibrationImagePath = params.calibrationImagePath,
+            calibrationLeftEyeX = params.calibrationLeftEyeX,
+            calibrationLeftEyeY = params.calibrationLeftEyeY,
+            calibrationRightEyeX = params.calibrationRightEyeX,
+            calibrationRightEyeY = params.calibrationRightEyeY,
+            calibrationOffsetX = params.calibrationOffsetX,
+            calibrationOffsetY = params.calibrationOffsetY,
         )
     }
 
@@ -73,6 +81,13 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
             contentType = params.contentType,
             muscleRegion = params.muscleRegion,
             referenceFrameId = params.referenceFrameId,
+            calibrationImagePath = params.calibrationImagePath,
+            calibrationLeftEyeX = params.calibrationLeftEyeX,
+            calibrationLeftEyeY = params.calibrationLeftEyeY,
+            calibrationRightEyeX = params.calibrationRightEyeX,
+            calibrationRightEyeY = params.calibrationRightEyeY,
+            calibrationOffsetX = params.calibrationOffsetX,
+            calibrationOffsetY = params.calibrationOffsetY,
             id = params.id,
         )
     }
@@ -100,6 +115,34 @@ class ProjectLocalDataSource(private val queries: ProjectQueries) {
                 id = id,
             )
         }
+
+    /**
+     * Updates calibration data for a project.
+     * Used for FACE content type projects to set the alignment calibration.
+     */
+    suspend fun updateCalibration(params: CalibrationParams): Unit = withContext(Dispatchers.IO) {
+        queries.updateCalibration(
+            calibrationImagePath = params.calibrationImagePath,
+            calibrationLeftEyeX = params.calibrationLeftEyeX,
+            calibrationLeftEyeY = params.calibrationLeftEyeY,
+            calibrationRightEyeX = params.calibrationRightEyeX,
+            calibrationRightEyeY = params.calibrationRightEyeY,
+            calibrationOffsetX = params.calibrationOffsetX,
+            calibrationOffsetY = params.calibrationOffsetY,
+            updatedAt = params.updatedAt,
+            id = params.id,
+        )
+    }
+
+    /**
+     * Clears calibration data for a project.
+     */
+    suspend fun clearCalibration(id: String, updatedAt: Long): Unit = withContext(Dispatchers.IO) {
+        queries.clearCalibration(
+            updatedAt = updatedAt,
+            id = id,
+        )
+    }
 
     /**
      * Deletes a project by ID.

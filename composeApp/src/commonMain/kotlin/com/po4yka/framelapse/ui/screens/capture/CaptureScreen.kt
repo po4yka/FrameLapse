@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Badge
@@ -90,6 +91,7 @@ private val CONTROLS_PADDING = 16.dp
 fun CaptureScreen(
     projectId: String,
     onNavigateToGallery: () -> Unit,
+    onNavigateToCalibration: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel = koinViewModel<CaptureViewModel>(),
@@ -128,6 +130,7 @@ fun CaptureScreen(
                 viewModel.cameraController = controller
                 viewModel.onEvent(CaptureEvent.CameraReady)
             },
+            onNavigateToCalibration = onNavigateToCalibration,
             onNavigateBack = onNavigateBack,
             modifier = modifier,
         )
@@ -147,6 +150,7 @@ private fun CaptureContent(
     snackbarHostState: SnackbarHostState,
     onEvent: (CaptureEvent) -> Unit,
     onCameraReady: (CameraController) -> Unit,
+    onNavigateToCalibration: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -251,6 +255,15 @@ private fun CaptureContent(
                             } else {
                                 Color.White
                             },
+                        )
+                    }
+
+                    // Calibration button
+                    IconButton(onClick = onNavigateToCalibration) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = "Calibration",
+                            tint = Color.White,
                         )
                     }
                 }

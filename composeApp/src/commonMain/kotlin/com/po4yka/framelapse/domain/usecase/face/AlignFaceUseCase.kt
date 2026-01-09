@@ -6,6 +6,7 @@ import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
+import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.StabilizationProgress
 import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.repository.FrameRepository
@@ -43,6 +44,8 @@ class AlignFaceUseCase(
      * @param referenceFrame Optional reference frame for goal eye positions.
      *                       If provided and has landmarks, its eye positions become the goal.
      *                       Otherwise, default centered positions are calculated.
+     * @param project Optional project for calibration data. If the project has calibration,
+     *                the calibrated eye positions will be used as the goal (highest priority).
      * @param settings Alignment configuration (includes stabilization mode).
      * @param onProgress Optional callback for progress updates during stabilization.
      * @return Result containing the updated Frame with alignment data and stabilization metrics.
@@ -50,6 +53,7 @@ class AlignFaceUseCase(
     suspend operator fun invoke(
         frame: Frame,
         referenceFrame: Frame? = null,
+        project: Project? = null,
         settings: AlignmentSettings = AlignmentSettings(),
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Frame> {
@@ -78,6 +82,7 @@ class AlignFaceUseCase(
 
         // Calculate goal eye positions
         val (goalLeftEye, goalRightEye) = calculateGoalEyePositions(
+            project = project,
             referenceFrame = referenceFrame,
             settings = settings,
         )
@@ -186,21 +191,46 @@ class AlignFaceUseCase(
     /**
      * Calculates goal eye positions for stabilization.
      *
-     * If a reference frame with landmarks is provided, uses its eye positions.
-     * Otherwise, calculates default centered positions based on settings.
+     * Priority order:
+     * 1. Project calibration (if available) - user-adjusted eye positions with offsets
+     * 2. Reference frame landmarks - uses first frame's eye positions
+     * 3. Defaults - centered positions based on settings
      *
+     * @param project Optional project with calibration data.
      * @param referenceFrame Optional reference frame with landmarks.
      * @param settings Alignment settings with output size and target eye distance.
      * @return Pair of goal eye positions (left, right) in pixel coordinates.
      */
     private fun calculateGoalEyePositions(
+        project: Project?,
         referenceFrame: Frame?,
         settings: AlignmentSettings,
     ): Pair<LandmarkPoint, LandmarkPoint> {
-        // Try to use reference frame landmarks (only if they are face landmarks)
+        val outputSize = settings.outputSize.toFloat()
+
+        // Priority 1: Use project calibration if available
+        project?.let { proj ->
+            val leftEyeX = proj.calibrationLeftEyeX
+            val leftEyeY = proj.calibrationLeftEyeY
+            val rightEyeX = proj.calibrationRightEyeX
+            val rightEyeY = proj.calibrationRightEyeY
+
+            if (leftEyeX != null && leftEyeY != null && rightEyeX != null && rightEyeY != null) {
+                // Apply calibration offsets and convert to pixel coordinates
+                val leftX = (leftEyeX + proj.calibrationOffsetX) * outputSize
+                val leftY = (leftEyeY + proj.calibrationOffsetY) * outputSize
+                val rightX = (rightEyeX + proj.calibrationOffsetX) * outputSize
+                val rightY = (rightEyeY + proj.calibrationOffsetY) * outputSize
+                return Pair(
+                    LandmarkPoint(x = leftX, y = leftY, z = 0f),
+                    LandmarkPoint(x = rightX, y = rightY, z = 0f),
+                )
+            }
+        }
+
+        // Priority 2: Try to use reference frame landmarks (only if they are face landmarks)
         (referenceFrame?.landmarks as? FaceLandmarks)?.let { refLandmarks ->
             // Convert from normalized to pixel coordinates
-            val outputSize = settings.outputSize.toFloat()
             return Pair(
                 LandmarkPoint(
                     x = refLandmarks.leftEyeCenter.x * outputSize,
@@ -215,8 +245,7 @@ class AlignFaceUseCase(
             )
         }
 
-        // Calculate default centered positions
-        val outputSize = settings.outputSize.toFloat()
+        // Priority 3: Calculate default centered positions
         val eyeDistance = settings.targetEyeDistance * outputSize
         val centerX = outputSize / 2
         val centerY = outputSize / 2 - settings.verticalOffset * outputSize

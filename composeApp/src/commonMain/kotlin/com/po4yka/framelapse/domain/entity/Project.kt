@@ -29,6 +29,39 @@ data class Project(
      * Only used when contentType is LANDSCAPE, null otherwise.
      */
     val referenceFrameId: String? = null,
+    /**
+     * Path to the calibration reference image.
+     * Used as ghost overlay and alignment target for FACE mode.
+     * Null means no calibration is set.
+     */
+    val calibrationImagePath: String? = null,
+    /**
+     * Calibrated left eye X position (normalized 0-1).
+     * Null means auto-detect from calibration image.
+     */
+    val calibrationLeftEyeX: Float? = null,
+    /**
+     * Calibrated left eye Y position (normalized 0-1).
+     */
+    val calibrationLeftEyeY: Float? = null,
+    /**
+     * Calibrated right eye X position (normalized 0-1).
+     */
+    val calibrationRightEyeX: Float? = null,
+    /**
+     * Calibrated right eye Y position (normalized 0-1).
+     */
+    val calibrationRightEyeY: Float? = null,
+    /**
+     * Alignment offset X adjustment (-0.2 to +0.2).
+     * Fine-tunes the horizontal alignment target.
+     */
+    val calibrationOffsetX: Float = 0f,
+    /**
+     * Alignment offset Y adjustment (-0.2 to +0.2).
+     * Fine-tunes the vertical alignment target.
+     */
+    val calibrationOffsetY: Float = 0f,
 )
 
 /**

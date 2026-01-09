@@ -60,6 +60,39 @@ interface ProjectRepository {
     suspend fun updateThumbnail(id: String, thumbnailPath: String): Result<Unit>
 
     /**
+     * Updates calibration data for a project.
+     * Used for FACE content type projects to set the alignment calibration.
+     *
+     * @param projectId The project ID.
+     * @param imagePath Path to the calibration reference image.
+     * @param leftEyeX Calibrated left eye X position (normalized 0-1).
+     * @param leftEyeY Calibrated left eye Y position (normalized 0-1).
+     * @param rightEyeX Calibrated right eye X position (normalized 0-1).
+     * @param rightEyeY Calibrated right eye Y position (normalized 0-1).
+     * @param offsetX Alignment offset X adjustment.
+     * @param offsetY Alignment offset Y adjustment.
+     * @return Result indicating success or failure.
+     */
+    suspend fun updateCalibration(
+        projectId: String,
+        imagePath: String,
+        leftEyeX: Float,
+        leftEyeY: Float,
+        rightEyeX: Float,
+        rightEyeY: Float,
+        offsetX: Float,
+        offsetY: Float,
+    ): Result<Unit>
+
+    /**
+     * Clears calibration data for a project.
+     *
+     * @param projectId The project ID.
+     * @return Result indicating success or failure.
+     */
+    suspend fun clearCalibration(projectId: String): Result<Unit>
+
+    /**
      * Checks if a project exists.
      *
      * @param id The project ID.

@@ -50,6 +50,12 @@ data object SettingsKey : NavKey
 @Serializable
 data class ManualAdjustmentKey(val frameId: String, val projectId: String) : NavKey
 
+/**
+ * Calibration screen for setting up face alignment reference.
+ */
+@Serializable
+data class CalibrationKey(val projectId: String) : NavKey
+
 // ==================== Dialog NavKeys ====================
 
 /**
@@ -97,6 +103,7 @@ val navKeySavedStateConfig: SavedStateConfiguration = SavedStateConfiguration {
             subclass(ExportKey::class, ExportKey.serializer())
             subclass(SettingsKey::class, SettingsKey.serializer())
             subclass(ManualAdjustmentKey::class, ManualAdjustmentKey.serializer())
+            subclass(CalibrationKey::class, CalibrationKey.serializer())
             subclass(CreateProjectDialogKey::class, CreateProjectDialogKey.serializer())
             subclass(DeleteFramesDialogKey::class, DeleteFramesDialogKey.serializer())
             subclass(DeleteProjectDialogKey::class, DeleteProjectDialogKey.serializer())
