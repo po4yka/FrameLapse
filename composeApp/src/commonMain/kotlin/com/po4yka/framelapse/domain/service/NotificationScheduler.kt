@@ -1,12 +1,17 @@
 package com.po4yka.framelapse.domain.service
 
+import com.po4yka.framelapse.core.notification.NotificationConfig
 import com.po4yka.framelapse.domain.util.Result
 
 /**
- * Interface for scheduling and managing daily reminder notifications.
- * Platform implementations will use:
- * - Android: WorkManager + NotificationChannel
+ * Interface for scheduling and managing notifications.
+ *
+ * Platform implementations:
+ * - Android: AlarmManager + NotificationChannel
  * - iOS: UNUserNotificationCenter
+ *
+ * Supports both simple daily reminders (legacy API) and flexible scheduling
+ * with rich notifications (enhanced API).
  */
 interface NotificationScheduler {
 
@@ -21,6 +26,8 @@ interface NotificationScheduler {
      * @return Result containing true if permission was granted, false otherwise.
      */
     suspend fun requestPermission(): Result<Boolean>
+
+    // ==================== Legacy API (backward compatible) ====================
 
     /**
      * Schedule a daily reminder notification.
@@ -51,4 +58,48 @@ interface NotificationScheduler {
      * @return Pair of (hour, minute) or null if no reminder is scheduled.
      */
     fun getScheduledTime(): Pair<Int, Int>?
+
+    // ==================== Enhanced API ====================
+
+    /**
+     * Schedule a notification with full configuration options.
+     *
+     * Supports one-time and repeating notifications with optional:
+     * - Custom repeat intervals (hourly, daily, weekly, monthly, yearly, custom)
+     * - Deep links for in-app navigation
+     * - Image attachments (rich notifications)
+     * - Platform-specific customization
+     *
+     * If the scheduled time is in the past, it will be automatically
+     * adjusted to the next valid occurrence.
+     *
+     * @param config Notification configuration.
+     * @return Result indicating success or failure.
+     */
+    suspend fun schedule(config: NotificationConfig): Result<Unit>
+
+    /**
+     * Display a notification immediately.
+     *
+     * Useful for event-driven notifications like export completion.
+     *
+     * @param config Notification configuration. scheduledDateTime is ignored.
+     * @return Result indicating success or failure.
+     */
+    suspend fun immediate(config: NotificationConfig): Result<Unit>
+
+    /**
+     * Cancel a specific scheduled notification by UUID.
+     *
+     * @param uuid The unique identifier of the notification to cancel.
+     * @return Result indicating success or failure.
+     */
+    suspend fun cancelByUuid(uuid: String): Result<Unit>
+
+    /**
+     * Cancel all scheduled notifications.
+     *
+     * @return Result indicating success or failure.
+     */
+    suspend fun cancelAll(): Result<Unit>
 }

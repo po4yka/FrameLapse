@@ -35,6 +35,9 @@ sqldelight = "2.2.1"
 # Async
 coroutines = "1.10.2"
 
+# Date/Time
+kotlinx-datetime = "0.6.1"
+
 # Serialization
 serialization = "1.9.0"
 
@@ -58,6 +61,7 @@ mockk = "1.14.7"
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 
 # Koin - Dependency Injection
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
