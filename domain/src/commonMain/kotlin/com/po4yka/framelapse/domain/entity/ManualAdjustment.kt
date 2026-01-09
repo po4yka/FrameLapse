@@ -1,6 +1,5 @@
 package com.po4yka.framelapse.domain.entity
 
-import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -207,7 +206,7 @@ data class LandscapeManualAdjustment(
  * Creates a FaceManualAdjustment from existing FaceLandmarks.
  * Useful when initializing the adjustment UI with auto-detected values.
  */
-fun FaceLandmarks.toManualAdjustment(id: String, timestamp: Long = currentTimeMillis()): FaceManualAdjustment =
+fun FaceLandmarks.toManualAdjustment(id: String, timestamp: Long): FaceManualAdjustment =
     FaceManualAdjustment(
         id = id,
         timestamp = timestamp,
@@ -221,7 +220,7 @@ fun FaceLandmarks.toManualAdjustment(id: String, timestamp: Long = currentTimeMi
  * Creates a BodyManualAdjustment from existing BodyLandmarks.
  * Useful when initializing the adjustment UI with auto-detected values.
  */
-fun BodyLandmarks.toManualAdjustment(id: String, timestamp: Long = currentTimeMillis()): BodyManualAdjustment =
+fun BodyLandmarks.toManualAdjustment(id: String, timestamp: Long): BodyManualAdjustment =
     BodyManualAdjustment(
         id = id,
         timestamp = timestamp,

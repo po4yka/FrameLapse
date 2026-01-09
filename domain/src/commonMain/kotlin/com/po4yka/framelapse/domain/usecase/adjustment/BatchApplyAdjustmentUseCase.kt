@@ -11,8 +11,8 @@ import com.po4yka.framelapse.domain.entity.ManualAdjustment
 import com.po4yka.framelapse.domain.entity.MuscleManualAdjustment
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 import com.po4yka.framelapse.platform.uuid
 
 /**
@@ -27,6 +27,7 @@ class BatchApplyAdjustmentUseCase(
     private val applyAdjustment: ApplyManualAdjustmentUseCase,
     private val adjustmentRepository: ManualAdjustmentRepository,
     private val frameRepository: FrameRepository,
+    private val clock: Clock,
 ) {
     /**
      * Strategy for transferring adjustments between frames.
@@ -164,7 +165,7 @@ class BatchApplyAdjustmentUseCase(
      */
     private fun copyAdjustment(source: ManualAdjustment, targetFrameId: String): ManualAdjustment {
         val newId = uuid()
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
 
         return when (source) {
             is FaceManualAdjustment -> source.copy(id = newId, timestamp = timestamp)
@@ -191,7 +192,7 @@ class BatchApplyAdjustmentUseCase(
             ?: return copyAdjustment(sourceAdjustment, targetFrame.id)
 
         val newId = uuid()
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
 
         return when (sourceAdjustment) {
             is FaceManualAdjustment -> {

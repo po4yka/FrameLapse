@@ -11,11 +11,11 @@ import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.entity.StabilizationScore
 import com.po4yka.framelapse.domain.entity.StabilizationSettings
 import com.po4yka.framelapse.domain.entity.StabilizationStage
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlin.math.sqrt
 
 /**
@@ -45,6 +45,7 @@ class MultiPassStabilizationUseCase(
     private val refineRotation: RefineRotationUseCase,
     private val refineScale: RefineScaleUseCase,
     private val refineTranslation: RefineTranslationUseCase,
+    private val clock: Clock,
 ) {
     /**
      * Performs multi-pass face stabilization.
@@ -63,7 +64,7 @@ class MultiPassStabilizationUseCase(
         alignmentSettings: AlignmentSettings,
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Pair<ImageData, StabilizationResult>> {
-        val startTime = currentTimeMillis()
+        val startTime = clock.nowMillis()
         val settings = alignmentSettings.stabilizationSettings
         val outputSize = alignmentSettings.outputSize
 
@@ -156,7 +157,7 @@ class MultiPassStabilizationUseCase(
             }
         }
 
-        val totalDuration = currentTimeMillis() - startTime
+        val totalDuration = clock.nowMillis() - startTime
 
         // Get final score
         val finalScore = bestScore ?: StabilizationScore(
@@ -213,7 +214,7 @@ class MultiPassStabilizationUseCase(
         var earlyStopReason: EarlyStopReason? = null
 
         for (passNum in 1..StabilizationSettings.MAX_PASSES_FAST) {
-            val passStartTime = currentTimeMillis()
+            val passStartTime = clock.nowMillis()
 
             // Detect face in current image
             val detectResult = faceDetector.detectFace(image)
@@ -258,7 +259,7 @@ class MultiPassStabilizationUseCase(
                 earlyStopReason = EarlyStopReason.SCORE_BELOW_THRESHOLD
                 bestScore = score
                 bestImage = image
-                val passDuration = currentTimeMillis() - passStartTime
+                val passDuration = clock.nowMillis() - passStartTime
                 passes.add(
                     StabilizationPass(
                         passNumber = passNum,
@@ -279,7 +280,7 @@ class MultiPassStabilizationUseCase(
             } else if (passNum > 1) {
                 // No improvement, stop
                 earlyStopReason = EarlyStopReason.NO_IMPROVEMENT
-                val passDuration = currentTimeMillis() - passStartTime
+                val passDuration = clock.nowMillis() - passStartTime
                 passes.add(
                     StabilizationPass(
                         passNumber = passNum,
@@ -324,7 +325,7 @@ class MultiPassStabilizationUseCase(
                 }
             }
 
-            val passDuration = currentTimeMillis() - passStartTime
+            val passDuration = clock.nowMillis() - passStartTime
             passes.add(
                 StabilizationPass(
                     passNumber = passNum,
@@ -569,7 +570,7 @@ class MultiPassStabilizationUseCase(
         passes: MutableList<StabilizationPass>,
         onProgress: ((StabilizationProgress) -> Unit)?,
     ): PassResult {
-        val passStartTime = currentTimeMillis()
+        val passStartTime = clock.nowMillis()
 
         // Detect face
         val detectResult = faceDetector.detectFace(image)
@@ -604,7 +605,7 @@ class MultiPassStabilizationUseCase(
             ),
         )
 
-        val passDuration = currentTimeMillis() - passStartTime
+        val passDuration = clock.nowMillis() - passStartTime
         passes.add(
             StabilizationPass(
                 passNumber = passNum,

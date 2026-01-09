@@ -13,11 +13,11 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
+import com.po4yka.framelapse.domain.service.FileSystem
 import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.face.CalculateAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
 
 /**
  * Applies a manual adjustment to a frame and generates the aligned image.
@@ -40,7 +40,7 @@ class ApplyManualAdjustmentUseCase(
     private val calculateFaceMatrix: CalculateAlignmentMatrixUseCase,
     private val calculateBodyMatrix: CalculateBodyAlignmentMatrixUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
-    private val fileManager: FileManager,
+    private val fileSystem: FileSystem,
 ) {
     /**
      * Applies a manual adjustment to a frame.
@@ -85,7 +85,7 @@ class ApplyManualAdjustmentUseCase(
         val alignedImage = (alignedImageResult as Result.Success).data
 
         // Generate output path
-        val projectDir = fileManager.getProjectDirectory(frame.projectId)
+        val projectDir = fileSystem.getProjectDirectory(frame.projectId)
         val alignedPath = "$projectDir/aligned_${frame.id}.jpg"
 
         // Save the aligned image

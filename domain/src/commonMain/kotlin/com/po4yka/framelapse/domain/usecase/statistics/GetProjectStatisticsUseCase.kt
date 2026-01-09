@@ -5,8 +5,8 @@ import com.po4yka.framelapse.domain.entity.ProjectStatistics
 import com.po4yka.framelapse.domain.entity.WeeklyCapture
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 private const val MILLIS_PER_WEEK = 7 * 24 * 60 * 60 * 1000L
 private const val WEEKS_TO_TRACK = 12
@@ -18,6 +18,7 @@ class GetProjectStatisticsUseCase(
     private val projectRepository: ProjectRepository,
     private val frameRepository: FrameRepository,
     private val calculateStreakUseCase: CalculateStreakUseCase,
+    private val clock: Clock,
 ) {
     /**
      * Retrieves statistics for a project.
@@ -104,7 +105,7 @@ class GetProjectStatisticsUseCase(
     }
 
     private fun calculateWeeklyCaptures(frames: List<Frame>): List<WeeklyCapture> {
-        val now = currentTimeMillis()
+        val now = clock.nowMillis()
         val currentWeekStart = getWeekStart(now)
 
         // Create week buckets for the last N weeks

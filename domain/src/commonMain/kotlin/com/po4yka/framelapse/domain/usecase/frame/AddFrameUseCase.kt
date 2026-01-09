@@ -4,8 +4,8 @@ import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
-import com.po4yka.framelapse.platform.currentTimeMillis
+import com.po4yka.framelapse.domain.service.Clock
+import com.po4yka.framelapse.domain.service.FileSystem
 
 /**
  * Adds a new frame to a project.
@@ -13,7 +13,8 @@ import com.po4yka.framelapse.platform.currentTimeMillis
 class AddFrameUseCase(
     private val frameRepository: FrameRepository,
     private val projectRepository: ProjectRepository,
-    private val fileManager: FileManager,
+    private val fileSystem: FileSystem,
+    private val clock: Clock,
 ) {
     /**
      * Adds a new frame to a project.
@@ -48,7 +49,7 @@ class AddFrameUseCase(
         }
 
         // Check if image file exists
-        if (!fileManager.fileExists(imagePath)) {
+        if (!fileSystem.fileExists(imagePath)) {
             return Result.Error(
                 IllegalArgumentException("Image file not found: $imagePath"),
                 "Image file not found",
@@ -60,7 +61,7 @@ class AddFrameUseCase(
         val sortOrder = frameCountResult.getOrNull()?.toInt() ?: 0
 
         // Create frame
-        val now = currentTimeMillis()
+        val now = clock.nowMillis()
         val frame = Frame(
             id = generateFrameId(),
             projectId = projectId,
@@ -84,5 +85,5 @@ class AddFrameUseCase(
         return addResult
     }
 
-    private fun generateFrameId(): String = "frame_${currentTimeMillis()}_${(0..9999).random()}"
+    private fun generateFrameId(): String = "frame_${clock.nowMillis()}_${(0..9999).random()}"
 }

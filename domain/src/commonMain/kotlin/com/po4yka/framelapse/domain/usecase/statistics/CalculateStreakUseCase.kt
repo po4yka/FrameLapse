@@ -1,7 +1,7 @@
 package com.po4yka.framelapse.domain.usecase.statistics
 
 import com.po4yka.framelapse.domain.entity.StreakInfo
-import com.po4yka.framelapse.platform.currentTimeMillis
+import com.po4yka.framelapse.domain.service.Clock
 
 private const val MILLIS_PER_DAY = 24 * 60 * 60 * 1000L
 
@@ -12,7 +12,7 @@ private const val MILLIS_PER_DAY = 24 * 60 * 60 * 1000L
  * Current streak counts from today or yesterday backwards.
  * Best streak is the longest consecutive sequence ever achieved.
  */
-class CalculateStreakUseCase {
+class CalculateStreakUseCase(private val clock: Clock) {
 
     /**
      * Calculates streak information from capture timestamps.
@@ -35,7 +35,7 @@ class CalculateStreakUseCase {
             .distinct()
             .sorted()
 
-        val today = currentTimeMillis() / MILLIS_PER_DAY
+        val today = clock.nowMillis() / MILLIS_PER_DAY
         val lastCaptureDay = captureDays.last()
         val lastCaptureTimestamp = capturedAtTimestamps.maxOrNull()
 

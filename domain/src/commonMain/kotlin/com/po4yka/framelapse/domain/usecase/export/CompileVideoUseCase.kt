@@ -3,11 +3,11 @@ package com.po4yka.framelapse.domain.usecase.export
 import com.po4yka.framelapse.domain.entity.ExportSettings
 import com.po4yka.framelapse.domain.error.StorageError
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.service.Clock
+import com.po4yka.framelapse.domain.service.FileSystem
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.service.VideoEncoder
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.FileManager
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Error types specific to video compilation.
@@ -80,8 +80,9 @@ sealed class VideoCompilationError(message: String, val userMessage: String, cau
 class CompileVideoUseCase(
     private val frameRepository: FrameRepository,
     private val videoEncoder: VideoEncoder,
-    private val fileManager: FileManager,
+    private val fileSystem: FileSystem,
     private val mediaStore: MediaStore,
+    private val clock: Clock,
 ) {
     /**
      * Compiles all frames in a project into a video.
@@ -145,7 +146,7 @@ class CompileVideoUseCase(
 
         // Verify all frame files exist before starting encoding
         for (path in framePaths) {
-            if (!fileManager.fileExists(path)) {
+            if (!fileSystem.fileExists(path)) {
                 val error = VideoCompilationError.FrameReadError(path)
                 return Result.Error(error, error.userMessage)
             }
@@ -153,7 +154,7 @@ class CompileVideoUseCase(
 
         // Check available storage (estimate: 2MB per frame for video)
         val estimatedVideoSize = frames.size * ESTIMATED_BYTES_PER_FRAME
-        val availableStorage = fileManager.getAvailableStorageBytes()
+        val availableStorage = fileSystem.getAvailableStorageBytes()
         if (availableStorage < estimatedVideoSize) {
             val storageError = StorageError.InsufficientStorage(estimatedVideoSize, availableStorage)
             val error = VideoCompilationError.StorageFull(storageError)
@@ -161,7 +162,7 @@ class CompileVideoUseCase(
         }
 
         // Generate output path
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
         val extension = "mp4" // Both H.264 and HEVC use mp4 container
         val outputPath = mediaStore.getExportPath(projectId, timestamp, extension)
 
@@ -213,7 +214,7 @@ class CompileVideoUseCase(
         throwable.message?.contains("storage", ignoreCase = true) == true ||
             throwable.message?.contains("space", ignoreCase = true) == true ||
             throwable.message?.contains("ENOSPC", ignoreCase = true) == true -> {
-            val available = fileManager.getAvailableStorageBytes()
+            val available = fileSystem.getAvailableStorageBytes()
             val storageError = StorageError.InsufficientStorage(
                 requiredBytes = available + 1,
                 availableBytes = available,
@@ -242,8 +243,8 @@ class CompileVideoUseCase(
      */
     private fun cleanupPartialFile(outputPath: String) {
         try {
-            if (fileManager.fileExists(outputPath)) {
-                fileManager.deleteFile(outputPath)
+            if (fileSystem.fileExists(outputPath)) {
+                fileSystem.deleteFile(outputPath)
             }
         } catch (e: Exception) {
             // Ignore cleanup errors - best effort only

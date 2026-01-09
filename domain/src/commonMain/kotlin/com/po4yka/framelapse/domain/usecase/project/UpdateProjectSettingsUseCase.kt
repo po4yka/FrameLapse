@@ -2,13 +2,16 @@ package com.po4yka.framelapse.domain.usecase.project
 
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Updates project settings.
  */
-class UpdateProjectSettingsUseCase(private val projectRepository: ProjectRepository) {
+class UpdateProjectSettingsUseCase(
+    private val projectRepository: ProjectRepository,
+    private val clock: Clock,
+) {
     /**
      * Updates a project's settings.
      *
@@ -51,7 +54,7 @@ class UpdateProjectSettingsUseCase(private val projectRepository: ProjectReposit
         }
 
         // Update project with current timestamp
-        val updatedProject = project.copy(updatedAt = currentTimeMillis())
+        val updatedProject = project.copy(updatedAt = clock.nowMillis())
         return projectRepository.updateProject(updatedProject)
     }
 }

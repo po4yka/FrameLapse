@@ -10,11 +10,11 @@ import com.po4yka.framelapse.domain.entity.StabilizationProgress
 import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.entity.StabilizationScore
 import com.po4yka.framelapse.domain.entity.StabilizationStage
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Orchestrates multi-pass landscape stabilization algorithm.
@@ -44,6 +44,7 @@ class MultiPassLandscapeStabilizationUseCase(
     private val refineMatchQuality: RefineMatchQualityUseCase,
     private val refineRansacThreshold: RefineRansacThresholdUseCase,
     private val refinePerspectiveStability: RefinePerspectiveStabilityUseCase,
+    private val clock: Clock,
 ) {
     /**
      * Performs multi-pass landscape stabilization.
@@ -64,7 +65,7 @@ class MultiPassLandscapeStabilizationUseCase(
         alignmentSettings: LandscapeAlignmentSettings,
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Pair<ImageData, StabilizationResult>> {
-        val startTime = currentTimeMillis()
+        val startTime = clock.nowMillis()
         val stabilizationSettings = alignmentSettings.stabilizationSettings
 
         // Report initial progress
@@ -132,7 +133,7 @@ class MultiPassLandscapeStabilizationUseCase(
                 scoreBefore = 100f,
                 scoreAfter = (1f - currentInlierRatio) * 100f,
                 converged = false,
-                durationMs = currentTimeMillis() - startTime,
+                durationMs = clock.nowMillis() - startTime,
             ),
         )
 
@@ -147,7 +148,7 @@ class MultiPassLandscapeStabilizationUseCase(
             if (earlyStopReason != null) break
             passNumber++
 
-            val passStartTime = currentTimeMillis()
+            val passStartTime = clock.nowMillis()
 
             onProgress?.invoke(
                 createProgress(
@@ -189,7 +190,7 @@ class MultiPassLandscapeStabilizationUseCase(
                     scoreBefore = scoreBefore,
                     scoreAfter = scoreAfter,
                     converged = result.converged,
-                    durationMs = currentTimeMillis() - passStartTime,
+                    durationMs = clock.nowMillis() - passStartTime,
                 ),
             )
 
@@ -212,7 +213,7 @@ class MultiPassLandscapeStabilizationUseCase(
                 if (earlyStopReason != null) break
                 passNumber++
 
-                val passStartTime = currentTimeMillis()
+                val passStartTime = clock.nowMillis()
 
                 onProgress?.invoke(
                     createProgress(
@@ -256,7 +257,7 @@ class MultiPassLandscapeStabilizationUseCase(
                         scoreBefore = scoreBefore,
                         scoreAfter = scoreAfter,
                         converged = result.converged,
-                        durationMs = currentTimeMillis() - passStartTime,
+                        durationMs = clock.nowMillis() - passStartTime,
                     ),
                 )
 
@@ -280,7 +281,7 @@ class MultiPassLandscapeStabilizationUseCase(
                 if (earlyStopReason != null) break
                 passNumber++
 
-                val passStartTime = currentTimeMillis()
+                val passStartTime = clock.nowMillis()
 
                 onProgress?.invoke(
                     createProgress(
@@ -319,7 +320,7 @@ class MultiPassLandscapeStabilizationUseCase(
                         scoreBefore = scoreBefore,
                         scoreAfter = scoreAfter,
                         converged = result.converged,
-                        durationMs = currentTimeMillis() - passStartTime,
+                        durationMs = clock.nowMillis() - passStartTime,
                     ),
                 )
 
@@ -357,7 +358,7 @@ class MultiPassLandscapeStabilizationUseCase(
         }
 
         val alignedImage = transformResult.getOrNull()!!
-        val totalDuration = currentTimeMillis() - startTime
+        val totalDuration = clock.nowMillis() - startTime
 
         // Calculate final score (lower is better)
         val finalScore = (1f - bestInlierRatio) * 100f

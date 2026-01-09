@@ -12,13 +12,13 @@ import com.po4yka.framelapse.domain.entity.StabilizationResult
 import com.po4yka.framelapse.domain.entity.StabilizationScore
 import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipeline
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipelineStep
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Performs landscape/scenery alignment using feature-based homography.
@@ -49,6 +49,7 @@ class AlignLandscapeUseCase(
     private val detectFeatures: DetectLandscapeFeaturesUseCase,
     private val matchFeatures: MatchLandscapeFeaturesUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
+    private val clock: Clock,
     private val multiPassStabilization: MultiPassLandscapeStabilizationUseCase? = null,
 ) {
     // Cache for reference frame features to avoid re-detection
@@ -100,7 +101,7 @@ class AlignLandscapeUseCase(
         settings: LandscapeAlignmentSettings,
         onProgress: ((StabilizationProgress) -> Unit)?,
     ): Result<Frame> {
-        val startTime = currentTimeMillis()
+        val startTime = clock.nowMillis()
         val pipeline = AlignmentPipeline<LandscapePipelineContext>(
             mode = StabilizationMode.FAST,
             totalSteps = TOTAL_PROGRESS_STEPS,
@@ -304,7 +305,7 @@ class AlignLandscapeUseCase(
         )
 
         // Create stabilization result for consistency with other alignment types
-        val totalDuration = currentTimeMillis() - startTime
+        val totalDuration = clock.nowMillis() - startTime
         val stabilizationResult = createStabilizationResult(
             matchCount = matches.size,
             inlierCount = inlierCount,
@@ -369,7 +370,7 @@ class AlignLandscapeUseCase(
             return executeFastMode(frame, referenceFrame, settings, onProgress)
         }
 
-        val startTime = currentTimeMillis()
+        val startTime = clock.nowMillis()
 
         // Report initial progress
         onProgress?.invoke(

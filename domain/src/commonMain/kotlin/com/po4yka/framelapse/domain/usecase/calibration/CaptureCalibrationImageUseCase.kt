@@ -2,11 +2,11 @@ package com.po4yka.framelapse.domain.usecase.calibration
 
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.service.CameraController
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Captures a calibration reference image and detects face landmarks.
@@ -21,6 +21,7 @@ class CaptureCalibrationImageUseCase(
     private val mediaStore: MediaStore,
     private val faceDetector: FaceDetector,
     private val imageProcessor: ImageProcessor,
+    private val clock: Clock,
 ) {
 
     /**
@@ -50,7 +51,7 @@ class CaptureCalibrationImageUseCase(
         }
 
         // Generate output path for calibration image
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
         val capturePath = mediaStore.getCalibrationPath(projectId, timestamp)
 
         // Capture image

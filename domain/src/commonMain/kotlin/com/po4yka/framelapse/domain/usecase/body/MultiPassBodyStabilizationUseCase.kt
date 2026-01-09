@@ -12,11 +12,11 @@ import com.po4yka.framelapse.domain.entity.StabilizationScore
 import com.po4yka.framelapse.domain.entity.StabilizationSettings
 import com.po4yka.framelapse.domain.entity.StabilizationStage
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.FiveTuple
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlin.math.sqrt
 
 /**
@@ -40,6 +40,7 @@ class MultiPassBodyStabilizationUseCase(
     private val bodyPoseDetector: BodyPoseDetector,
     private val imageProcessor: ImageProcessor,
     private val calculateMatrix: CalculateBodyAlignmentMatrixUseCase,
+    private val clock: Clock,
 ) {
     /**
      * Performs multi-pass body stabilization.
@@ -58,7 +59,7 @@ class MultiPassBodyStabilizationUseCase(
         bodyAlignmentSettings: BodyAlignmentSettings,
         onProgress: ((StabilizationProgress) -> Unit)? = null,
     ): Result<Pair<ImageData, StabilizationResult>> {
-        val startTime = currentTimeMillis()
+        val startTime = clock.nowMillis()
         val settings = bodyAlignmentSettings.stabilizationSettings
         val outputSize = bodyAlignmentSettings.outputSize
 
@@ -150,7 +151,7 @@ class MultiPassBodyStabilizationUseCase(
             }
         }
 
-        val totalDuration = currentTimeMillis() - startTime
+        val totalDuration = clock.nowMillis() - startTime
 
         // Get final score
         val finalScore = bestScore ?: StabilizationScore(
@@ -204,7 +205,7 @@ class MultiPassBodyStabilizationUseCase(
         var earlyStopReason: EarlyStopReason? = null
 
         for (passNum in 1..StabilizationSettings.MAX_PASSES_FAST) {
-            val passStartTime = currentTimeMillis()
+            val passStartTime = clock.nowMillis()
 
             // Detect body in current image
             val detectResult = bodyPoseDetector.detectBodyPose(image)
@@ -244,7 +245,7 @@ class MultiPassBodyStabilizationUseCase(
                 earlyStopReason = EarlyStopReason.SCORE_BELOW_THRESHOLD
                 bestScore = score
                 bestImage = image
-                val passDuration = currentTimeMillis() - passStartTime
+                val passDuration = clock.nowMillis() - passStartTime
                 passes.add(
                     StabilizationPass(
                         passNumber = passNum,
@@ -265,7 +266,7 @@ class MultiPassBodyStabilizationUseCase(
             } else if (passNum > 1) {
                 // No improvement, stop
                 earlyStopReason = EarlyStopReason.NO_IMPROVEMENT
-                val passDuration = currentTimeMillis() - passStartTime
+                val passDuration = clock.nowMillis() - passStartTime
                 passes.add(
                     StabilizationPass(
                         passNumber = passNum,
@@ -305,7 +306,7 @@ class MultiPassBodyStabilizationUseCase(
                 }
             }
 
-            val passDuration = currentTimeMillis() - passStartTime
+            val passDuration = clock.nowMillis() - passStartTime
             passes.add(
                 StabilizationPass(
                     passNumber = passNum,
@@ -433,7 +434,7 @@ class MultiPassBodyStabilizationUseCase(
         passes: MutableList<StabilizationPass>,
         onProgress: ((StabilizationProgress) -> Unit)?,
     ): Pair<ImageData, StabilizationScore?> {
-        val passStartTime = currentTimeMillis()
+        val passStartTime = clock.nowMillis()
 
         // Detect body
         val detectResult = bodyPoseDetector.detectBodyPose(image)
@@ -464,7 +465,7 @@ class MultiPassBodyStabilizationUseCase(
             ),
         )
 
-        val passDuration = currentTimeMillis() - passStartTime
+        val passDuration = clock.nowMillis() - passStartTime
         passes.add(
             StabilizationPass(
                 passNumber = passNum,

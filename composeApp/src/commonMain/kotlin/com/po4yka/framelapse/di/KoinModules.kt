@@ -19,7 +19,9 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.MediaStore
+import com.po4yka.framelapse.domain.service.FileSystem
 import com.po4yka.framelapse.domain.service.ModelCapabilitiesProvider
 import com.po4yka.framelapse.domain.service.ModelCapabilitiesProviderImpl
 import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseCase
@@ -80,6 +82,8 @@ import com.po4yka.framelapse.presentation.main.MainViewModel
 import com.po4yka.framelapse.presentation.projectlist.ProjectListViewModel
 import com.po4yka.framelapse.presentation.settings.SettingsViewModel
 import com.po4yka.framelapse.presentation.statistics.StatisticsViewModel
+import com.po4yka.framelapse.infra.AppClock
+import com.po4yka.framelapse.infra.AppFileSystem
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -88,6 +92,8 @@ import org.koin.dsl.module
  */
 val commonModule = module {
     single<ModelCapabilitiesProvider> { ModelCapabilitiesProviderImpl(get(), get(), get()) }
+    single<Clock> { AppClock() }
+    single<FileSystem> { AppFileSystem(get()) }
 }
 
 /**
@@ -131,10 +137,10 @@ val domainModule = module {
     factory { GetProjectsUseCase(get()) }
     factory { GetProjectUseCase(get()) }
     factory { DeleteProjectUseCase(get()) }
-    factory { UpdateProjectSettingsUseCase(get()) }
+    factory { UpdateProjectSettingsUseCase(get(), get()) }
 
     // Frame Management Use Cases
-    factory { AddFrameUseCase(get(), get(), get()) }
+    factory { AddFrameUseCase(get(), get(), get(), get()) }
     factory { GetFramesUseCase(get()) }
     factory { GetLatestFrameUseCase(get()) }
     factory { DeleteFrameUseCase(get()) }
@@ -161,6 +167,7 @@ val domainModule = module {
             refineRotation = get(),
             refineScale = get(),
             refineTranslation = get(),
+            clock = get(),
         )
     }
 
@@ -185,6 +192,7 @@ val domainModule = module {
             bodyPoseDetector = get(),
             imageProcessor = get(),
             calculateMatrix = get<CalculateBodyAlignmentMatrixUseCase>(),
+            clock = get(),
         )
     }
     factory {
@@ -236,6 +244,7 @@ val domainModule = module {
             refineMatchQuality = get(),
             refineRansacThreshold = get(),
             refinePerspectiveStability = get(),
+            clock = get(),
         )
     }
 
@@ -249,6 +258,7 @@ val domainModule = module {
             matchFeatures = get(),
             calculateHomography = get(),
             multiPassStabilization = get(),
+            clock = get(),
         )
     }
 
@@ -263,16 +273,16 @@ val domainModule = module {
     }
 
     // Export Use Cases
-    factory { CompileVideoUseCase(get(), get(), get(), get()) }
-    factory { ExportGifUseCase(get(), get(), get(), get()) }
+    factory { CompileVideoUseCase(get(), get(), get(), get(), get()) }
+    factory { ExportGifUseCase(get(), get(), get(), get(), get()) }
 
     // Capture Use Cases (CameraController passed at runtime from UI layer)
-    factory { CaptureImageUseCase(get(), get(), get()) }
+    factory { CaptureImageUseCase(get(), get(), get(), get()) }
 
     // Calibration Use Cases
     factory { SaveCalibrationUseCase(get()) }
     factory { GetCalibrationUseCase(get()) }
-    factory { CaptureCalibrationImageUseCase(get(), get(), get()) }
+    factory { CaptureCalibrationImageUseCase(get(), get(), get(), get()) }
 
     // Manual Adjustment Use Cases
     factory {
@@ -283,16 +293,16 @@ val domainModule = module {
             calculateFaceMatrix = get(),
             calculateBodyMatrix = get(),
             calculateHomography = get(),
-            fileManager = get(),
+            fileSystem = get(),
         )
     }
     factory { SuggestSimilarFramesUseCase(get()) }
-    factory { BatchApplyAdjustmentUseCase(get(), get(), get()) }
+    factory { BatchApplyAdjustmentUseCase(get(), get(), get(), get()) }
 
     // Statistics Use Cases
-    factory { CalculateStreakUseCase() }
-    factory { GetProjectStatisticsUseCase(get(), get(), get()) }
-    factory { GetGlobalStatisticsUseCase(get(), get(), get()) }
+    factory { CalculateStreakUseCase(get()) }
+    factory { GetProjectStatisticsUseCase(get(), get(), get(), get()) }
+    factory { GetGlobalStatisticsUseCase(get(), get(), get(), get()) }
 }
 
 /**
@@ -306,7 +316,7 @@ val presentationModule = module {
     factory { GalleryViewModel(get(), get(), get(), get(), get()) }
     factory { ExportViewModel(get(), get(), get()) }
     factory { SettingsViewModel(get(), get()) }
-    factory { ManualAdjustmentViewModel(get(), get(), get(), get()) }
+    factory { ManualAdjustmentViewModel(get(), get(), get(), get(), get()) }
     factory { CalibrationViewModel(get(), get(), get(), get()) }
     factory { StatisticsViewModel(get(), get(), get()) }
 }

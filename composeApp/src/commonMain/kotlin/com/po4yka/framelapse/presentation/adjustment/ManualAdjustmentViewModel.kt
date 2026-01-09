@@ -16,6 +16,7 @@ import com.po4yka.framelapse.domain.entity.ManualAdjustment
 import com.po4yka.framelapse.domain.entity.MuscleManualAdjustment
 import com.po4yka.framelapse.domain.entity.toManualAdjustment
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.UndoRedoManager
 import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseCase
 import com.po4yka.framelapse.domain.usecase.adjustment.BatchApplyAdjustmentUseCase
@@ -39,6 +40,7 @@ class ManualAdjustmentViewModel(
     private val applyAdjustmentUseCase: ApplyManualAdjustmentUseCase,
     private val suggestSimilarFramesUseCase: SuggestSimilarFramesUseCase,
     private val batchApplyAdjustmentUseCase: BatchApplyAdjustmentUseCase,
+    private val clock: Clock,
 ) : BaseViewModel<ManualAdjustmentState, ManualAdjustmentEvent, ManualAdjustmentEffect>(
     ManualAdjustmentState(),
 ) {
@@ -161,10 +163,10 @@ class ManualAdjustmentViewModel(
         contentType: ContentType,
     ): ManualAdjustment? = when {
         landmarks is FaceLandmarks && contentType == ContentType.FACE -> {
-            landmarks.toManualAdjustment(uuid())
+            landmarks.toManualAdjustment(uuid(), clock.nowMillis())
         }
         landmarks is BodyLandmarks && (contentType == ContentType.BODY || contentType == ContentType.MUSCLE) -> {
-            landmarks.toManualAdjustment(uuid())
+            landmarks.toManualAdjustment(uuid(), clock.nowMillis())
         }
         else -> null
     }
@@ -210,24 +212,28 @@ class ManualAdjustmentViewModel(
 
         // Create command for undo/redo based on adjustment type
         val previousAdjustment = movePointTo(adjustment, pointType, startPos)
+        val commandTimestamp = clock.nowMillis()
         val command = when (previousAdjustment) {
             is FaceManualAdjustment -> AdjustmentCommandFactory.createFacePointMove(
                 pointType = pointType,
                 previousPosition = startPos,
                 newPosition = endPos,
                 originalAdjustment = previousAdjustment,
+                timestamp = commandTimestamp,
             )
             is BodyManualAdjustment -> AdjustmentCommandFactory.createBodyPointMove(
                 pointType = pointType,
                 previousPosition = startPos,
                 newPosition = endPos,
                 originalAdjustment = previousAdjustment,
+                timestamp = commandTimestamp,
             )
             is MuscleManualAdjustment -> AdjustmentCommandFactory.createBodyPointMove(
                 pointType = pointType,
                 previousPosition = startPos,
                 newPosition = endPos,
                 originalAdjustment = previousAdjustment.bodyAdjustment,
+                timestamp = commandTimestamp,
             )
             is LandscapeManualAdjustment -> {
                 // Landscape adjustments use corner commands - for now skip undo

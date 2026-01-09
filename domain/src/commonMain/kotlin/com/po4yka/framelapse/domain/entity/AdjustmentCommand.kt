@@ -1,6 +1,5 @@
 package com.po4yka.framelapse.domain.entity
 
-import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlinx.serialization.Serializable
 
 /**
@@ -169,25 +168,26 @@ object AdjustmentCommandFactory {
         previousPosition: LandmarkPoint,
         newPosition: LandmarkPoint,
         originalAdjustment: FaceManualAdjustment,
+        timestamp: Long,
     ): PointMoveCommand {
         val resultAdjustment = when (pointType) {
             AdjustmentPointType.LEFT_EYE -> originalAdjustment.copy(
                 leftEyeCenter = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             AdjustmentPointType.RIGHT_EYE -> originalAdjustment.copy(
                 rightEyeCenter = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             AdjustmentPointType.NOSE_TIP -> originalAdjustment.copy(
                 noseTip = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             else -> throw IllegalArgumentException("Invalid face point type: $pointType")
         }
 
         return PointMoveCommand(
-            timestamp = currentTimeMillis(),
+            timestamp = timestamp,
             description = "Move ${pointType.displayName}",
             pointType = pointType,
             previousPosition = previousPosition,
@@ -205,29 +205,30 @@ object AdjustmentCommandFactory {
         previousPosition: LandmarkPoint,
         newPosition: LandmarkPoint,
         originalAdjustment: BodyManualAdjustment,
+        timestamp: Long,
     ): PointMoveCommand {
         val resultAdjustment = when (pointType) {
             AdjustmentPointType.LEFT_SHOULDER -> originalAdjustment.copy(
                 leftShoulder = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             AdjustmentPointType.RIGHT_SHOULDER -> originalAdjustment.copy(
                 rightShoulder = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             AdjustmentPointType.LEFT_HIP -> originalAdjustment.copy(
                 leftHip = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             AdjustmentPointType.RIGHT_HIP -> originalAdjustment.copy(
                 rightHip = newPosition,
-                timestamp = currentTimeMillis(),
+                timestamp = timestamp,
             )
             else -> throw IllegalArgumentException("Invalid body point type: $pointType")
         }
 
         return PointMoveCommand(
-            timestamp = currentTimeMillis(),
+            timestamp = timestamp,
             description = "Move ${pointType.displayName}",
             pointType = pointType,
             previousPosition = previousPosition,
@@ -245,6 +246,7 @@ object AdjustmentCommandFactory {
         previousPosition: LandmarkPoint,
         newPosition: LandmarkPoint,
         originalAdjustment: LandscapeManualAdjustment,
+        timestamp: Long,
     ): PointMoveCommand {
         val cornerIndex = when (pointType) {
             AdjustmentPointType.CORNER_TOP_LEFT -> 0
@@ -259,11 +261,11 @@ object AdjustmentCommandFactory {
 
         val resultAdjustment = originalAdjustment.copy(
             cornerKeypoints = newCorners,
-            timestamp = currentTimeMillis(),
+            timestamp = timestamp,
         )
 
         return PointMoveCommand(
-            timestamp = currentTimeMillis(),
+            timestamp = timestamp,
             description = "Move ${pointType.displayName} corner",
             pointType = pointType,
             previousPosition = previousPosition,

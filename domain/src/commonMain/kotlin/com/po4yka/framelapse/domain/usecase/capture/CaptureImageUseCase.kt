@@ -3,11 +3,11 @@ package com.po4yka.framelapse.domain.usecase.capture
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.service.CameraController
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Captures an image, adds it to a project, and performs face alignment.
@@ -21,6 +21,7 @@ class CaptureImageUseCase(
     private val addFrameUseCase: AddFrameUseCase,
     private val alignFaceUseCase: AlignFaceUseCase,
     private val mediaStore: MediaStore,
+    private val clock: Clock,
 ) {
     /**
      * Captures an image and adds it to the project.
@@ -45,7 +46,7 @@ class CaptureImageUseCase(
         }
 
         // Generate output path for captured image
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
         val capturePath = mediaStore.getCapturePath(projectId, timestamp)
 
         // Capture image

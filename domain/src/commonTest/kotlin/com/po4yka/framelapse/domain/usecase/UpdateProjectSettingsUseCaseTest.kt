@@ -2,6 +2,7 @@ package com.po4yka.framelapse.domain.usecase
 
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Resolution
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.testutil.FakeProjectRepository
@@ -18,11 +19,12 @@ class UpdateProjectSettingsUseCaseTest {
 
     private lateinit var useCase: UpdateProjectSettingsUseCase
     private lateinit var repository: FakeProjectRepository
+    private val clock = FixedClock()
 
     @BeforeTest
     fun setup() {
         repository = FakeProjectRepository()
-        useCase = UpdateProjectSettingsUseCase(repository)
+        useCase = UpdateProjectSettingsUseCase(repository, clock)
         TestFixtures.resetCounters()
     }
 
@@ -395,4 +397,8 @@ class UpdateProjectSettingsUseCaseTest {
         val saved = repository.getProject("test_id")
         assertEquals("/path/to/thumb.jpg", (saved as Result.Success).data.thumbnailPath)
     }
+}
+
+private class FixedClock : Clock {
+    override fun nowMillis(): Long = 1_700_000_000_000
 }

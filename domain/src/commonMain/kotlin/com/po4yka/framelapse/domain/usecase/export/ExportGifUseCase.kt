@@ -2,12 +2,12 @@ package com.po4yka.framelapse.domain.usecase.export
 
 import com.po4yka.framelapse.domain.entity.DateRange
 import com.po4yka.framelapse.domain.repository.FrameRepository
+import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.GifEncoder
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
-import com.po4yka.framelapse.platform.currentTimeMillis
 
 /**
  * Exports frames as an animated GIF.
@@ -21,6 +21,7 @@ class ExportGifUseCase(
     private val imageProcessor: ImageProcessor,
     private val mediaStore: MediaStore,
     private val gifEncoder: GifEncoder,
+    private val clock: Clock,
 ) {
     /**
      * Exports frames as an animated GIF.
@@ -87,7 +88,7 @@ class ExportGifUseCase(
         }
 
         // Generate output path
-        val timestamp = currentTimeMillis()
+        val timestamp = clock.nowMillis()
         val outputPath = mediaStore.getExportPath(projectId, timestamp, "gif")
 
         // Process frames
