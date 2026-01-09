@@ -83,6 +83,9 @@ private class PickerDelegate(private val onResult: (PhotoPickerResult) -> Unit) 
 
         results.forEach { result ->
             val itemProvider = result.itemProvider
+
+            // Detect the image format by checking specific type identifiers
+            val extension = detectImageExtension(itemProvider)
             val typeIdentifier = "public.image"
 
             if (itemProvider.hasItemConformingToTypeIdentifier(typeIdentifier)) {
@@ -90,8 +93,8 @@ private class PickerDelegate(private val onResult: (PhotoPickerResult) -> Unit) 
                     if (error != null || data == null) {
                         hasError.value = true
                     } else {
-                        // Save data to internal storage
-                        val path = saveImageDataToInternalStorage(data)
+                        // Save data to internal storage with detected extension
+                        val path = saveImageDataToInternalStorage(data, extension)
                         if (path != null) {
                             val currentPaths = paths.value
                             currentPaths.add(path)
@@ -127,10 +130,35 @@ private class PickerDelegate(private val onResult: (PhotoPickerResult) -> Unit) 
 }
 
 /**
- * Saves image data to internal storage and returns the file path.
+ * Detects the image format extension based on UTType identifiers.
+ *
+ * @param itemProvider The item provider to check
+ * @return The file extension (heic, avif, png, or jpg as default)
  */
 @OptIn(ExperimentalForeignApi::class)
-private fun saveImageDataToInternalStorage(data: platform.Foundation.NSData): String? {
+private fun detectImageExtension(itemProvider: platform.Foundation.NSItemProvider): String {
+    // Check for specific image types in order of preference
+    return when {
+        itemProvider.hasItemConformingToTypeIdentifier("public.heic") -> "heic"
+        itemProvider.hasItemConformingToTypeIdentifier("public.heif") -> "heic"
+        itemProvider.hasItemConformingToTypeIdentifier("public.avif") -> "avif"
+        itemProvider.hasItemConformingToTypeIdentifier("public.png") -> "png"
+        itemProvider.hasItemConformingToTypeIdentifier("public.jpeg") -> "jpg"
+        else -> "jpg" // Default fallback
+    }
+}
+
+/**
+ * Saves image data to internal storage and returns the file path.
+ *
+ * Preserves the original image format by using the detected file extension.
+ *
+ * @param data The image data to save
+ * @param extension The file extension to use (heic, avif, png, jpg)
+ * @return The path to the saved file, or null if save failed
+ */
+@OptIn(ExperimentalForeignApi::class)
+private fun saveImageDataToInternalStorage(data: platform.Foundation.NSData, extension: String): String? {
     return try {
         val fileManager = NSFileManager.defaultManager
         val documentsPath = fileManager.URLsForDirectory(
@@ -149,7 +177,7 @@ private fun saveImageDataToInternalStorage(data: platform.Foundation.NSData): St
         }
 
         val timestamp = NSDate().timeIntervalSince1970.toLong()
-        val fileName = "import_${timestamp}_${data.hashCode()}.jpg"
+        val fileName = "import_${timestamp}_${data.hashCode()}.$extension"
         val filePath = importDir?.URLByAppendingPathComponent(fileName)?.path ?: return null
 
         data.writeToFile(filePath, atomically = true)

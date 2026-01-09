@@ -94,6 +94,12 @@ enum class ImportErrorType {
     /** Permission denied to access the file */
     PERMISSION_DENIED,
 
+    /** Image format is not supported (e.g., WebP, GIF) */
+    UNSUPPORTED_FORMAT,
+
+    /** Device lacks the required codec for this format (e.g., HEIC on older Android) */
+    CODEC_UNAVAILABLE,
+
     /** Unknown or unclassified error */
     UNKNOWN,
 }

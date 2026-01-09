@@ -2,6 +2,9 @@ package com.po4yka.framelapse.platform
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
@@ -10,6 +13,12 @@ import java.io.File
 import java.io.FileOutputStream
 
 internal class AndroidBitmapCodec {
+    /**
+     * Loads an image from the given path.
+     *
+     * Uses ImageDecoder (Android 9+) for modern format support (HEIC, AVIF),
+     * with fallback to BitmapFactory for older Android versions.
+     */
     fun loadImage(path: String): Result<ImageData> {
         return try {
             val file = File(path)
@@ -20,14 +29,16 @@ internal class AndroidBitmapCodec {
                 )
             }
 
-            val options = BitmapFactory.Options().apply {
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-            val originalBitmap = BitmapFactory.decodeFile(path, options)
-                ?: return Result.Error(
-                    IllegalArgumentException("Failed to decode image: $path"),
-                    "Failed to decode image",
-                )
+            val originalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                // Use ImageDecoder for Android 9+ (supports HEIC, AVIF)
+                loadWithImageDecoder(file)
+            } else {
+                // Fallback to BitmapFactory for older Android
+                loadWithBitmapFactory(path)
+            } ?: return Result.Error(
+                IllegalArgumentException("Failed to decode image: $path"),
+                "Failed to decode image",
+            )
 
             val bitmap = correctBitmapOrientation(originalBitmap, path)
             val bytes = bitmapToByteArray(bitmap)
@@ -46,6 +57,35 @@ internal class AndroidBitmapCodec {
         } catch (e: Exception) {
             Result.Error(e, "Failed to load image: ${e.message}")
         }
+    }
+
+    /**
+     * Loads an image using ImageDecoder (Android 9+).
+     * Supports modern formats like HEIC and AVIF with hardware codec support.
+     */
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun loadWithImageDecoder(file: File): Bitmap? = try {
+        val source = ImageDecoder.createSource(file)
+        ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+            // Use software allocator for mutable bitmaps and compatibility
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            // Request ARGB_8888 for consistency with the rest of the pipeline
+            decoder.setTargetColorSpace(android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB))
+        }
+    } catch (e: Exception) {
+        // If ImageDecoder fails (e.g., codec unavailable), try BitmapFactory
+        loadWithBitmapFactory(file.absolutePath)
+    }
+
+    /**
+     * Loads an image using BitmapFactory.
+     * Works on all Android versions but limited format support.
+     */
+    private fun loadWithBitmapFactory(path: String): Bitmap? {
+        val options = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        }
+        return BitmapFactory.decodeFile(path, options)
     }
 
     fun saveImage(data: ImageData, path: String, quality: Int): Result<String> {
@@ -111,8 +151,7 @@ internal class AndroidBitmapCodec {
         }
     }
 
-    fun byteArrayToBitmap(bytes: ByteArray): Bitmap? =
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    fun byteArrayToBitmap(bytes: ByteArray): Bitmap? = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 
     fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()

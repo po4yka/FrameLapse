@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.po4yka.framelapse.domain.util.ImageFormatUtils
 import java.io.File
 
 /**
@@ -83,6 +84,9 @@ actual fun rememberPhotoPickerLauncher(onResult: (PhotoPickerResult) -> Unit): P
  * Copies the content from a Uri to the app's internal storage.
  * This is necessary because content URIs may not be accessible later.
  *
+ * Preserves the original image format by detecting the MIME type and using
+ * the appropriate file extension (supports JPEG, PNG, HEIC, AVIF).
+ *
  * @param context Android context
  * @param uri Content URI from the photo picker
  * @return Path to the copied file, or null if copy failed
@@ -97,7 +101,11 @@ private fun copyUriToInternalStorage(context: Context, uri: Uri): String? {
             importDir.mkdirs()
         }
 
-        val fileName = "import_${System.currentTimeMillis()}_${uri.hashCode()}.jpg"
+        // Detect MIME type and use appropriate extension to preserve format
+        val mimeType = context.contentResolver.getType(uri)
+        val extension = ImageFormatUtils.getExtensionForMimeType(mimeType)
+
+        val fileName = "import_${System.currentTimeMillis()}_${uri.hashCode()}.$extension"
         val outputFile = File(importDir, fileName)
 
         inputStream.use { input ->

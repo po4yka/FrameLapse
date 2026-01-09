@@ -23,6 +23,7 @@ public sealed class FloatList(initialCapacity: Int) {
     }
 
     @PublishedApi
+    @Suppress("ktlint:standard:backing-property-naming")
     internal var _size: Int = 0
 
     /** The number of elements in the [FloatList]. */
@@ -281,11 +282,9 @@ public sealed class FloatList(initialCapacity: Int) {
     }
 
     /** Returns a new list that is a copy of the current list. */
-    public fun copy(): FloatList {
-        return MutableFloatList(_size).also {
-            content.copyInto(it.content, startIndex = 0, endIndex = _size)
-            it._size = _size
-        }
+    public fun copy(): FloatList = MutableFloatList(_size).also {
+        content.copyInto(it.content, startIndex = 0, endIndex = _size)
+        it._size = _size
     }
 
     /**
@@ -340,9 +339,7 @@ public sealed class FloatList(initialCapacity: Int) {
  * [MutableFloatList] is a [MutableList]-like collection for [Float]
  * values. It allows storing and retrieving the elements without boxing.
  */
-public class MutableFloatList(
-    initialCapacity: Int = 16,
-) : FloatList(initialCapacity) {
+public class MutableFloatList(initialCapacity: Int = 16) : FloatList(initialCapacity) {
 
     /**
      * Returns the total number of elements that can be held before the
@@ -371,7 +368,7 @@ public class MutableFloatList(
                 destination = content,
                 destinationOffset = index + 1,
                 startIndex = index,
-                endIndex = _size
+                endIndex = _size,
             )
         }
         content[index] = element
@@ -395,7 +392,7 @@ public class MutableFloatList(
             destination = content,
             destinationOffset = _size,
             startIndex = 0,
-            endIndex = elements._size
+            endIndex = elements._size,
         )
         _size += elements._size
         return true
@@ -439,7 +436,7 @@ public class MutableFloatList(
                 destination = content,
                 destinationOffset = index,
                 startIndex = index + 1,
-                endIndex = _size
+                endIndex = _size,
             )
         }
         _size--
@@ -484,9 +481,11 @@ public fun emptyFloatList(): FloatList = EmptyFloatList
 public fun floatListOf(): FloatList = EmptyFloatList
 
 /** Returns a new read-only [FloatList] with the given elements. */
-public fun floatListOf(vararg elements: Float): FloatList =
-    if (elements.isEmpty()) EmptyFloatList
-    else MutableFloatList(elements.size).apply { addAll(elements) }
+public fun floatListOf(vararg elements: Float): FloatList = if (elements.isEmpty()) {
+    EmptyFloatList
+} else {
+    MutableFloatList(elements.size).apply { addAll(elements) }
+}
 
 /** Returns a new empty [MutableFloatList] with the default capacity. */
 public fun mutableFloatListOf(): MutableFloatList = MutableFloatList()
@@ -499,9 +498,7 @@ public fun mutableFloatListOf(vararg elements: Float): MutableFloatList =
  * Builds a new [FloatList] by populating a [MutableFloatList] using the
  * given [builderAction].
  */
-public inline fun buildFloatList(
-    builderAction: MutableFloatList.() -> Unit,
-): FloatList {
+public inline fun buildFloatList(builderAction: MutableFloatList.() -> Unit): FloatList {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
     return MutableFloatList().apply(builderAction)
 }
@@ -510,10 +507,7 @@ public inline fun buildFloatList(
  * Builds a new [FloatList] with the given [initialCapacity] by populating
  * a [MutableFloatList] using the given [builderAction].
  */
-public inline fun buildFloatList(
-    initialCapacity: Int,
-    builderAction: MutableFloatList.() -> Unit,
-): FloatList {
+public inline fun buildFloatList(initialCapacity: Int, builderAction: MutableFloatList.() -> Unit): FloatList {
     contract { callsInPlace(builderAction, InvocationKind.EXACTLY_ONCE) }
     return MutableFloatList(initialCapacity).apply(builderAction)
 }

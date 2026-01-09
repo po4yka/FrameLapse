@@ -157,6 +157,8 @@
     <string name="error_camera_unavailable">Camera is unavailable.</string>
     <string name="error_not_enough_features">Not enough features detected for alignment</string>
     <string name="error_homography_failed">Failed to compute alignment transformation</string>
+    <string name="error_unsupported_format">This image format is not supported</string>
+    <string name="error_codec_unavailable">Your device does not support this image format. Try converting to JPEG first.</string>
 
     <!-- Landscape Mode -->
     <string name="settings_reference_frame">Reference Frame</string>
