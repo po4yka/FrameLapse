@@ -77,6 +77,7 @@ Thumbs.db
 .env
 .env.*
 secrets.properties
+.secrets
 
 # Crash reports
 crash_reports/

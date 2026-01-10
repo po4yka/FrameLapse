@@ -1,0 +1,15 @@
+# act configuration for running GitHub Actions locally
+# See: https://github.com/nektos/act
+
+# Runner image mappings
+-P ubuntu-22.04=catthehacker/ubuntu:act-22.04
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Architecture for Apple Silicon Macs (M1/M2/M3)
+--container-architecture linux/amd64
+
+# Reuse containers for faster subsequent runs
+--reuse
+
+# Bind working directory for file changes to persist
+--bind
