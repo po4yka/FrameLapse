@@ -133,6 +133,27 @@ FrameLapse follows **Clean Architecture** with **Unidirectional Data Flow (UDF)*
 
 Open the `/iosApp` directory in Xcode and run, or use the run configuration in your IDE.
 
+## Local CI Testing
+
+Run GitHub Actions workflows locally using [act](https://github.com/nektos/act):
+
+```shell
+# Install act
+brew install act
+
+# Use the helper script
+./scripts/run-ci-local.sh list       # List available jobs
+./scripts/run-ci-local.sh lint       # Run static analysis
+./scripts/run-ci-local.sh build      # Build Android debug APK
+./scripts/run-ci-local.sh test       # Run unit tests
+./scripts/run-ci-local.sh dry-run    # Preview without executing
+
+# iOS builds (runs via Gradle, not Docker)
+./scripts/run-ci-local.sh ios
+```
+
+> **Note:** iOS workflows require macOS and cannot run in Docker containers. The helper script runs iOS builds directly via Gradle.
+
 ## Processing Pipeline
 
 1. **Capture** - Camera captures photo or imports from gallery

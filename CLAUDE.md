@@ -215,6 +215,35 @@ fun initKoin() = startKoin {
 - `ValidateAlignmentUseCase` - Validates face detection quality
 - `CalculateAlignmentMatrixUseCase` - Computes affine transformation
 
+## Local CI Testing
+
+**Always test GitHub Actions locally before pushing CI changes.**
+
+After modifying any workflow in `.github/workflows/`:
+
+```bash
+# Install act if not already installed
+brew install act
+
+# List available jobs
+./scripts/run-ci-local.sh list
+
+# Dry run to verify workflow syntax
+./scripts/run-ci-local.sh dry-run
+
+# Run specific job locally
+./scripts/run-ci-local.sh lint    # static-analysis job
+./scripts/run-ci-local.sh test    # test job
+./scripts/run-ci-local.sh build   # build-android-debug job
+
+# For iOS workflows (cannot run in Docker, uses Gradle directly)
+./scripts/run-ci-local.sh ios
+```
+
+Configuration files:
+- `.actrc` - act runner configuration
+- `.secrets` - local secrets (gitignored)
+
 ## Static Analysis
 
 The project uses strict static analysis:
