@@ -25,6 +25,10 @@ subprojects {
         config.setFrom(files("${rootProject.projectDir}/config/detekt/detekt.yml"))
         baseline = file("${rootProject.projectDir}/config/detekt/baseline.xml")
         parallel = true
+        reports {
+            sarif.required.set(true)
+            sarif.outputLocation.set(file("$buildDir/reports/detekt/detekt.sarif"))
+        }
     }
 
     dependencies {

@@ -48,7 +48,7 @@ jobs:
         run: ./gradlew detekt --no-daemon
 
       - name: Upload Detekt SARIF
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: composeApp/build/reports/detekt/detekt.sarif
@@ -58,10 +58,10 @@ jobs:
         run: ./gradlew lintDebug --no-daemon
 
       - name: Upload Lint SARIF
-        uses: github/codeql-action/upload-sarif@45c373516f557556c15d420e3f5e0aa3d64366bc # v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: composeApp/build/reports/lint/lint-results-debug.sarif
+          sarif_file: androidApp/build/reports/lint/lint-results-debug.sarif
           category: android-lint
 
       - name: Upload Analysis Reports
