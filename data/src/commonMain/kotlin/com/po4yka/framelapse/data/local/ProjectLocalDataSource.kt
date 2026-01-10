@@ -10,11 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
 /**
  * Local data source for Project database operations.
  * Wraps SQLDelight queries with coroutine-friendly APIs.
  */
+@Single
 class ProjectLocalDataSource(private val queries: ProjectQueries) {
 
     /**

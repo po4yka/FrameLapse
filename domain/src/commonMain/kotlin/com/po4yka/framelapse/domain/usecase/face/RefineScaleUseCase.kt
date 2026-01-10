@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.face
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.StabilizationSettings
+import org.koin.core.annotation.Factory
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -19,6 +20,7 @@ import kotlin.math.sqrt
  * 4. Otherwise, calculate scale correction factor
  * 5. Apply scale correction to the current matrix
  */
+@Factory
 class RefineScaleUseCase {
 
     /**

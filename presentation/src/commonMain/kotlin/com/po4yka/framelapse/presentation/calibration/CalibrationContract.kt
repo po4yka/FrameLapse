@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import com.po4yka.framelapse.domain.entity.AdjustmentPointType
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
+import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
@@ -134,6 +135,12 @@ sealed interface CalibrationEvent : UiEvent {
      * Dismiss error message.
      */
     data object DismissError : CalibrationEvent
+
+    /**
+     * Set the camera controller instance.
+     * Called from the UI layer when the camera is initialized.
+     */
+    data class SetCameraController(val controller: CameraController) : CalibrationEvent
 }
 
 /**

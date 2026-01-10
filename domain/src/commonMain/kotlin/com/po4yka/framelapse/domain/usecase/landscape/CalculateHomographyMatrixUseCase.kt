@@ -4,6 +4,7 @@ import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 import kotlin.math.abs
 
 /**
@@ -16,6 +17,7 @@ import kotlin.math.abs
  * system to the reference image coordinate system, enabling perspective-
  * corrected alignment of landscape/scenery images.
  */
+@Factory
 class CalculateHomographyMatrixUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Computes a homography matrix from matched keypoints.

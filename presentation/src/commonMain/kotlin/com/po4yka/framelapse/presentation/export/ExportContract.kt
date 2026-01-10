@@ -3,6 +3,7 @@ package com.po4yka.framelapse.presentation.export
 import com.po4yka.framelapse.domain.entity.DateRange
 import com.po4yka.framelapse.domain.entity.ExportQuality
 import com.po4yka.framelapse.domain.entity.ExportSettings
+import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.domain.entity.VideoCodec
@@ -17,6 +18,7 @@ import com.po4yka.framelapse.presentation.common.CommonEffect
 data class ExportState(
     val projectId: String = "",
     val project: Project? = null,
+    val frames: List<Frame> = emptyList(),
     val frameCount: Int = 0,
     val exportSettings: ExportSettings = ExportSettings(),
     val isExporting: Boolean = false,

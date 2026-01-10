@@ -10,6 +10,7 @@ data class CaptureSettings(
     val flashMode: FlashMode = FlashMode.OFF,
     val cameraFacing: CameraFacing = CameraFacing.FRONT,
     val showGrid: Boolean = true,
+    val showAlignmentGuide: Boolean = true,
     val ghostOpacity: Float = 0.3f,
 ) {
     init {

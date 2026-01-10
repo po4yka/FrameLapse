@@ -2,10 +2,12 @@ package com.po4yka.framelapse.domain.usecase.frame
 
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Deletes a frame and its associated files.
  */
+@Factory
 class DeleteFrameUseCase(private val frameRepository: FrameRepository) {
     /**
      * Deletes a frame, including its image files.

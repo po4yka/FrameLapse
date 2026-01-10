@@ -5,11 +5,13 @@ import com.po4yka.framelapse.platform.FileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
 /**
  * Manages video file storage for projects.
  * Handles export paths and video file operations.
  */
+@Single
 class VideoStorageManager(private val fileManager: FileManager) {
 
     /**

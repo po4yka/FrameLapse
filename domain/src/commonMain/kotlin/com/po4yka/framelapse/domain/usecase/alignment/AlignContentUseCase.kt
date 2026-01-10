@@ -13,6 +13,7 @@ import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.AlignLandscapeUseCase
 import com.po4yka.framelapse.domain.usecase.muscle.AlignMuscleUseCase
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Unified alignment dispatcher that routes to the appropriate alignment use case
@@ -27,6 +28,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - MUSCLE: Body alignment + region cropping for fitness tracking
  * - LANDSCAPE: Feature matching for scenery/architecture using OpenCV
  */
+@Factory
 class AlignContentUseCase(
     private val alignFace: AlignFaceUseCase,
     private val alignBody: AlignBodyUseCase,

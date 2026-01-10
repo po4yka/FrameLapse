@@ -8,6 +8,7 @@ import com.po4yka.framelapse.domain.service.FileSystem
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.service.VideoEncoder
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Error types specific to video compilation.
@@ -77,6 +78,7 @@ sealed class VideoCompilationError(message: String, val userMessage: String, cau
 /**
  * Compiles frames into a timelapse video.
  */
+@Factory
 class CompileVideoUseCase(
     private val frameRepository: FrameRepository,
     private val videoEncoder: VideoEncoder,

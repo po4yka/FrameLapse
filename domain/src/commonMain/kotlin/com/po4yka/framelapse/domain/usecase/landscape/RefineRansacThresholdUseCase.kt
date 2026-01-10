@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.entity.LandscapeStabilizationSettings
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Refines homography by progressively tightening RANSAC reprojection threshold.
@@ -24,6 +25,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Pass 6: 3.0 * 0.6 = 1.8px
  * - Pass 7: 1.8px (or minThreshold if lower)
  */
+@Factory
 class RefineRansacThresholdUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Result of RANSAC threshold refinement.

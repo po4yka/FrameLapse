@@ -6,11 +6,13 @@ import com.po4yka.framelapse.platform.FileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
 /**
  * Manages image file storage for projects.
  * Handles saving, retrieving, and deleting frame images.
  */
+@Single
 class ImageStorageManager(private val fileManager: FileManager) {
 
     /**

@@ -16,6 +16,7 @@ import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 import kotlin.math.sqrt
 
 /**
@@ -36,6 +37,7 @@ import kotlin.math.sqrt
  * 4. Passes 8-10: Translation refinement (stop on convergence < 0.05)
  * 5. Pass 11: Optional cleanup if score >= 20.0
  */
+@Factory
 class MultiPassStabilizationUseCase(
     private val faceDetector: FaceDetector,
     private val imageProcessor: ImageProcessor,

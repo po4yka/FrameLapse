@@ -7,7 +7,6 @@ import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.GifEncoder
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.NotificationScheduler
-import com.po4yka.framelapse.domain.service.ProcessingQueue
 import com.po4yka.framelapse.domain.service.ShareHandler
 import com.po4yka.framelapse.domain.service.SoundPlayer
 import com.po4yka.framelapse.domain.service.VideoEncoder
@@ -35,7 +34,6 @@ actual val platformModule: Module = module {
     single<VideoEncoder> { VideoEncoderImpl(androidContext()) }
     single<GifEncoder> { GifEncoderImpl(androidContext()) }
     single<NotificationScheduler> { NotificationSchedulerImpl(androidContext()) }
-    single { ProcessingQueue() }
     single<ShareHandler> { ShareHandlerImpl(androidContext()) }
     single<SoundPlayer> { SoundPlayerImpl() }
 }

@@ -14,6 +14,7 @@ import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.ConfidenceCalculator
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Performs face alignment pipeline using multi-pass stabilization.
@@ -29,6 +30,7 @@ import com.po4yka.framelapse.domain.util.Result
  * 4. Save aligned image
  * 5. Update frame in database with stabilization metrics
  */
+@Factory
 class AlignFaceUseCase(
     private val faceDetector: FaceDetector,
     private val imageProcessor: ImageProcessor,

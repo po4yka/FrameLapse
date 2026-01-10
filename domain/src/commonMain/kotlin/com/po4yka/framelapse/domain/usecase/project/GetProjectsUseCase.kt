@@ -4,10 +4,12 @@ import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Factory
 
 /**
  * Retrieves all projects.
  */
+@Factory
 class GetProjectsUseCase(private val projectRepository: ProjectRepository) {
     /**
      * Gets all projects sorted by last updated.

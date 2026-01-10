@@ -4,10 +4,12 @@ import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Retrieves calibration data for a project.
  */
+@Factory
 class GetCalibrationUseCase(private val projectRepository: ProjectRepository) {
 
     /**

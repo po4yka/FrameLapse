@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.body
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
+import org.koin.core.annotation.Factory
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -18,6 +19,7 @@ import kotlin.math.sqrt
  * 4. Apply vertical offset for head-to-waist framing
  * 5. Compose these into an affine transformation matrix
  */
+@Factory
 class CalculateBodyAlignmentMatrixUseCase {
     /**
      * Calculates the alignment matrix for the given body landmarks.

@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.face
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.StabilizationSettings
+import org.koin.core.annotation.Factory
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -20,6 +21,7 @@ import kotlin.math.sin
  * 3. Otherwise, calculate rotation correction angle
  * 4. Apply rotation correction to the current matrix
  */
+@Factory
 class RefineRotationUseCase {
 
     /**

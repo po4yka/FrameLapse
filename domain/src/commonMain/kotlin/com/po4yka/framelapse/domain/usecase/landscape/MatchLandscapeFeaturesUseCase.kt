@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.landscape
 import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Matches feature keypoints between two landscape images.
@@ -14,6 +15,7 @@ import com.po4yka.framelapse.domain.util.Result
  * The matched keypoint pairs can then be used to compute a homography
  * matrix for perspective-corrected alignment.
  */
+@Factory
 class MatchLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Matches features between source and reference landmarks.

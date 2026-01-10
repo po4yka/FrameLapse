@@ -10,6 +10,7 @@ import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.body.AlignBodyUseCase
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Performs muscle alignment: body alignment followed by region-specific cropping.
@@ -26,6 +27,7 @@ import com.po4yka.framelapse.domain.util.Result
  * 6. Save the muscle-cropped image
  * 7. Update frame in database
  */
+@Factory
 class AlignMuscleUseCase(
     private val alignBody: AlignBodyUseCase,
     private val bodyPoseDetector: BodyPoseDetector,

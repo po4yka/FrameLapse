@@ -2,6 +2,7 @@ package com.po4yka.framelapse.domain.usecase.face
 
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.OvershootCorrection
+import org.koin.core.annotation.Factory
 
 /**
  * Refines the translation component of the alignment matrix.
@@ -16,6 +17,7 @@ import com.po4yka.framelapse.domain.entity.OvershootCorrection
  * 2. Subtract overshoot from current translation
  * 3. Return corrected matrix
  */
+@Factory
 class RefineTranslationUseCase {
 
     /**

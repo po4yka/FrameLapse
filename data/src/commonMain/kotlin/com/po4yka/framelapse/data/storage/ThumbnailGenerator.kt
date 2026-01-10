@@ -2,10 +2,12 @@ package com.po4yka.framelapse.data.storage
 
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Single
 
 /**
  * Generates thumbnail images for projects.
  */
+@Single
 class ThumbnailGenerator(
     private val imageProcessor: ImageProcessor,
     private val imageStorageManager: ImageStorageManager,

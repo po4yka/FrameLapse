@@ -2,11 +2,13 @@ package com.po4yka.framelapse.domain.usecase.face
 
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
+import org.koin.core.annotation.Factory
 import kotlin.math.sqrt
 
 /**
  * Validates face detection results for alignment quality.
  */
+@Factory
 class ValidateAlignmentUseCase {
     /**
      * Validates if the detected landmarks meet quality requirements for alignment.

@@ -18,6 +18,7 @@ import com.po4yka.framelapse.domain.usecase.body.CalculateBodyAlignmentMatrixUse
 import com.po4yka.framelapse.domain.usecase.face.CalculateAlignmentMatrixUseCase
 import com.po4yka.framelapse.domain.usecase.landscape.CalculateHomographyMatrixUseCase
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Applies a manual adjustment to a frame and generates the aligned image.
@@ -33,6 +34,7 @@ import com.po4yka.framelapse.domain.util.Result
  *
  * Supports all content types: Face, Body, Muscle, and Landscape.
  */
+@Factory
 class ApplyManualAdjustmentUseCase(
     private val frameRepository: FrameRepository,
     private val adjustmentRepository: ManualAdjustmentRepository,

@@ -14,6 +14,7 @@ import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.uuid
+import org.koin.core.annotation.Factory
 
 /**
  * Applies a manual adjustment from a source frame to multiple target frames.
@@ -23,6 +24,7 @@ import com.po4yka.framelapse.platform.uuid
  * - RELATIVE: Preserve relative offsets from auto-detected points
  * - SCALED: Scale adjustment based on face/body size differences
  */
+@Factory
 class BatchApplyAdjustmentUseCase(
     private val applyAdjustment: ApplyManualAdjustmentUseCase,
     private val adjustmentRepository: ManualAdjustmentRepository,

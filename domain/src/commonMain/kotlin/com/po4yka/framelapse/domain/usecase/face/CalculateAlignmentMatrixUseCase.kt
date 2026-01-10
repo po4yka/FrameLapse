@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.face
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
+import org.koin.core.annotation.Factory
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -17,6 +18,7 @@ import kotlin.math.sqrt
  * 3. Calculate translation to center the face
  * 4. Compose these into an affine transformation matrix
  */
+@Factory
 class CalculateAlignmentMatrixUseCase {
     /**
      * Calculates the alignment matrix for the given landmarks.

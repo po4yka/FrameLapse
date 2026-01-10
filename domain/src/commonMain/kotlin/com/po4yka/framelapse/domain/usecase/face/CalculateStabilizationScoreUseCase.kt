@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.face
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.StabilizationScore
+import org.koin.core.annotation.Factory
 
 /**
  * Calculates the stabilization score for face alignment quality.
@@ -20,6 +21,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationScore
  * - < 20.0: Successful stabilization
  * - >= 20.0: Stabilization failed
  */
+@Factory
 class CalculateStabilizationScoreUseCase {
 
     /**

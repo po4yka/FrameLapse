@@ -8,6 +8,7 @@ import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Exports frames as an animated GIF.
@@ -16,6 +17,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Android: Built-in GIF89a encoder with LZW compression
  * - iOS: ImageIO framework (CGImageDestination)
  */
+@Factory
 class ExportGifUseCase(
     private val frameRepository: FrameRepository,
     private val imageProcessor: ImageProcessor,

@@ -57,6 +57,7 @@ import com.po4yka.framelapse.presentation.capture.CaptureEvent
 import com.po4yka.framelapse.presentation.capture.CaptureState
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel
 import com.po4yka.framelapse.ui.components.ConfidenceIndicator
+import com.po4yka.framelapse.ui.components.FaceAlignmentGuide
 import com.po4yka.framelapse.ui.components.GhostImageOverlay
 import com.po4yka.framelapse.ui.components.GridOverlay
 import com.po4yka.framelapse.ui.components.PermissionDeniedScreen
@@ -127,7 +128,7 @@ fun CaptureScreen(
             snackbarHostState = snackbarHostState,
             onEvent = viewModel::onEvent,
             onCameraReady = { controller ->
-                viewModel.cameraController = controller
+                viewModel.onEvent(CaptureEvent.SetCameraController(controller))
                 viewModel.onEvent(CaptureEvent.CameraReady)
             },
             onNavigateToCalibration = onNavigateToCalibration,
@@ -184,6 +185,16 @@ private fun CaptureContent(
                 showGrid = state.captureSettings.showGrid,
                 modifier = Modifier.fillMaxSize(),
             )
+
+            // Face alignment guide overlay
+            if (state.captureSettings.showAlignmentGuide) {
+                FaceAlignmentGuide(
+                    currentLandmarks = state.currentFaceLandmarks,
+                    targetLandmarks = state.referenceLandmarks,
+                    showTargetGuide = state.referenceLandmarks != null,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
             // Face detection confidence indicator
             ConfidenceIndicator(

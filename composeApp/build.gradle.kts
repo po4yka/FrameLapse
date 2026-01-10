@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
 }
@@ -75,6 +77,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            api(libs.koin.annotations)
 
             // Lifecycle
             implementation(libs.lifecycle.runtime.compose)
@@ -160,4 +163,39 @@ kover {
             }
         }
     }
+}
+
+// KSP compiler dependencies for Koin Annotations
+dependencies {
+    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
+    add("kspAndroid", libs.koin.ksp.compiler)
+    add("kspIosX64", libs.koin.ksp.compiler)
+    add("kspIosArm64", libs.koin.ksp.compiler)
+    add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
+}
+
+// Add generated KSP sources to commonMain
+kotlin.sourceSets.named("commonMain") {
+    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+}
+
+// Ensure KSP runs before compilation and other KSP tasks depend on metadata
+tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+
+// Ensure platform-specific KSP tasks depend on commonMain KSP
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+    dependsOn("kspCommonMainKotlinMetadata")
+}
+
+// KSP configuration for Koin Annotations
+// Note: KOIN_CONFIG_CHECK disabled in composeApp because we use a hybrid approach
+// where annotation-based modules (CommonModule, DataModule, DomainModule, PresentationModule)
+// are combined with DSL-based platformModule for platform-specific dependencies.
+// Individual modules (data, domain, presentation) have their own KOIN_CONFIG_CHECK enabled.
+ksp {
+    arg("KOIN_CONFIG_CHECK", "false")
 }

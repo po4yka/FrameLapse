@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.MuscleAlignmentSettings
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Crops an aligned image to the specified muscle region.
@@ -19,6 +20,7 @@ import com.po4yka.framelapse.domain.util.Result
  * 3. Crop the image
  * 4. Resize to square output size
  */
+@Factory
 class CropToMuscleRegionUseCase(
     private val imageProcessor: ImageProcessor,
     private val calculateBounds: CalculateMuscleRegionBoundsUseCase,

@@ -7,11 +7,13 @@ import com.po4yka.framelapse.domain.usecase.statistics.GetProjectStatisticsUseCa
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the statistics screen.
  * Manages mode switching, project selection, and loading statistics data.
  */
+@Factory
 class StatisticsViewModel(
     private val getProjectsUseCase: GetProjectsUseCase,
     private val getProjectStatisticsUseCase: GetProjectStatisticsUseCase,

@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.Landmarks
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -18,6 +19,7 @@ import kotlin.math.sqrt
  * - Detection confidence (low confidence frames may benefit from manual adjustment)
  * - Missing detection (frames with no landmarks detected)
  */
+@Factory
 class SuggestSimilarFramesUseCase(private val frameRepository: FrameRepository) {
     /**
      * Suggestion result containing similar and low-confidence frames.

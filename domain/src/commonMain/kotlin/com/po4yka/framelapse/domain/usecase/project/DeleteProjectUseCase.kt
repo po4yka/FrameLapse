@@ -2,8 +2,10 @@ package com.po4yka.framelapse.domain.usecase.project
 
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /** Deletes a project and all its associated data. */
+@Factory
 class DeleteProjectUseCase(private val projectRepository: ProjectRepository) {
     /**
      * Deletes a project, its frames, and all associated files.

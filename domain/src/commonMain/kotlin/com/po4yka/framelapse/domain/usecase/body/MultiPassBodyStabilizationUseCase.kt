@@ -17,6 +17,7 @@ import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.FiveTuple
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 import kotlin.math.sqrt
 
 /**
@@ -36,6 +37,7 @@ import kotlin.math.sqrt
  * 3. Passes 5-7: Scale refinement
  * 4. Passes 8-10: Translation refinement
  */
+@Factory
 class MultiPassBodyStabilizationUseCase(
     private val bodyPoseDetector: BodyPoseDetector,
     private val imageProcessor: ImageProcessor,

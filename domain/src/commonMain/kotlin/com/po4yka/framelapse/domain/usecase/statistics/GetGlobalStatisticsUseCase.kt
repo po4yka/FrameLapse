@@ -8,6 +8,7 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 private const val MILLIS_PER_WEEK = 7 * 24 * 60 * 60 * 1000L
 private const val WEEKS_TO_TRACK = 12
@@ -15,6 +16,7 @@ private const val WEEKS_TO_TRACK = 12
 /**
  * Calculates comprehensive statistics across all projects.
  */
+@Factory
 class GetGlobalStatisticsUseCase(
     private val projectRepository: ProjectRepository,
     private val frameRepository: FrameRepository,

@@ -3,10 +3,12 @@ package com.po4yka.framelapse.domain.usecase.project
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Creates a new timelapse project.
  */
+@Factory
 class CreateProjectUseCase(private val projectRepository: ProjectRepository) {
     /**
      * Creates a new project with the given name.

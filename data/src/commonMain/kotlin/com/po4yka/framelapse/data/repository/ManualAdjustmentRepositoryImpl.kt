@@ -9,11 +9,13 @@ import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.currentTimeMillis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 import com.po4yka.framelapse.data.local.ManualAdjustment as DbManualAdjustment
 
 /**
  * Implementation of ManualAdjustmentRepository using SQLDelight local data source.
  */
+@Single(binds = [ManualAdjustmentRepository::class])
 class ManualAdjustmentRepositoryImpl(private val localDataSource: ManualAdjustmentLocalDataSource) :
     ManualAdjustmentRepository {
 

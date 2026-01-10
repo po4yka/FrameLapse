@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.BodyLandmarks
 import com.po4yka.framelapse.domain.entity.MuscleAlignmentSettings
 import com.po4yka.framelapse.domain.entity.MuscleRegion
 import com.po4yka.framelapse.domain.entity.MuscleRegionBounds
+import org.koin.core.annotation.Factory
 import kotlin.math.max
 import kotlin.math.min
 
@@ -20,6 +21,7 @@ import kotlin.math.min
  *
  * Works with both MediaPipe (33 keypoints) and iOS Vision (17 keypoints).
  */
+@Factory
 class CalculateMuscleRegionBoundsUseCase {
 
     /**

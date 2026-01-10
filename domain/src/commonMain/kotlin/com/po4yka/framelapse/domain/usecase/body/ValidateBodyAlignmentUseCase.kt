@@ -2,11 +2,13 @@ package com.po4yka.framelapse.domain.usecase.body
 
 import com.po4yka.framelapse.domain.entity.BodyAlignmentSettings
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
+import org.koin.core.annotation.Factory
 import kotlin.math.sqrt
 
 /**
  * Validates body pose detection results for alignment quality.
  */
+@Factory
 class ValidateBodyAlignmentUseCase {
     /**
      * Validates if the detected landmarks meet quality requirements for body alignment.

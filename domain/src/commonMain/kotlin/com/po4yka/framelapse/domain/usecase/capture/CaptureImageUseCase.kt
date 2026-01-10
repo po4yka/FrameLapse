@@ -8,6 +8,7 @@ import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.usecase.frame.AddFrameUseCase
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Captures an image, adds it to a project, and performs face alignment.
@@ -17,6 +18,7 @@ import com.po4yka.framelapse.domain.util.Result
  * 2. Frame creation
  * 3. Face detection and alignment
  */
+@Factory
 class CaptureImageUseCase(
     private val addFrameUseCase: AddFrameUseCase,
     private val alignFaceUseCase: AlignFaceUseCase,

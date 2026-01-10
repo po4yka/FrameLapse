@@ -4,10 +4,12 @@ import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Factory
 
 /**
  * Retrieves frames for a project.
  */
+@Factory
 class GetFramesUseCase(private val frameRepository: FrameRepository) {
     /**
      * Gets all frames for a project.

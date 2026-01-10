@@ -15,6 +15,7 @@ import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Orchestrates multi-pass landscape stabilization algorithm.
@@ -35,6 +36,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Feature detection failed
  * - Maximum passes reached
  */
+@Factory
 class MultiPassLandscapeStabilizationUseCase(
     private val featureMatcher: FeatureMatcher,
     private val imageProcessor: ImageProcessor,

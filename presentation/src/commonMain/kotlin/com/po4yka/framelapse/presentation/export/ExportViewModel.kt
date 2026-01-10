@@ -11,11 +11,13 @@ import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the export screen.
  * Handles export settings configuration and video compilation.
  */
+@Factory
 class ExportViewModel(
     private val getProjectUseCase: GetProjectUseCase,
     private val getFramesUseCase: GetFramesUseCase,

@@ -3,10 +3,12 @@ package com.po4yka.framelapse.data.repository
 import com.po4yka.framelapse.data.local.SettingsLocalDataSource
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Single
 
 /**
  * Implementation of SettingsRepository using SQLDelight local data source.
  */
+@Single(binds = [SettingsRepository::class])
 class SettingsRepositoryImpl(private val localDataSource: SettingsLocalDataSource) : SettingsRepository {
 
     override suspend fun getString(key: String): Result<String?> = safeCall("Failed to get string setting") {

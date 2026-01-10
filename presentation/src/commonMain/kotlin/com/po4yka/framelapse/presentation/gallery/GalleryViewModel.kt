@@ -11,11 +11,13 @@ import com.po4yka.framelapse.domain.usecase.project.GetProjectUseCase
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the gallery screen.
  * Handles frame listing, selection, deletion, and import.
  */
+@Factory
 class GalleryViewModel(
     private val getProjectUseCase: GetProjectUseCase,
     private val getFramesUseCase: GetFramesUseCase,
@@ -307,6 +309,11 @@ class GalleryViewModel(
 
             importJob = null
         }
+    }
+
+    override fun onCleared() {
+        importJob?.cancel()
+        super.onCleared()
     }
 
     companion object {

@@ -11,11 +11,13 @@ import com.po4yka.framelapse.domain.usecase.calibration.GetCalibrationUseCase
 import com.po4yka.framelapse.domain.usecase.calibration.SaveCalibrationUseCase
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the calibration screen.
  * Handles reference photo capture, eye marker adjustment, and calibration persistence.
  */
+@Factory
 class CalibrationViewModel(
     private val captureCalibrationImageUseCase: CaptureCalibrationImageUseCase,
     private val saveCalibrationUseCase: SaveCalibrationUseCase,
@@ -24,10 +26,10 @@ class CalibrationViewModel(
 ) : BaseViewModel<CalibrationState, CalibrationEvent, CalibrationEffect>(CalibrationState()) {
 
     /**
-     * Camera controller reference set from the UI layer.
+     * Camera controller reference set via [CalibrationEvent.SetCameraController].
      * Must be set before capture operations can be performed.
      */
-    var cameraController: CameraController? = null
+    private var cameraController: CameraController? = null
 
     override fun onEvent(event: CalibrationEvent) {
         when (event) {
@@ -44,7 +46,12 @@ class CalibrationViewModel(
             is CalibrationEvent.ClearCalibration -> clearCalibration()
             is CalibrationEvent.Cancel -> cancel()
             is CalibrationEvent.DismissError -> dismissError()
+            is CalibrationEvent.SetCameraController -> setCameraController(event.controller)
         }
+    }
+
+    private fun setCameraController(controller: CameraController) {
+        cameraController = controller
     }
 
     private fun initialize(projectId: String) {

@@ -10,10 +10,12 @@ import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
 /**
  * Implementation of FrameRepository using SQLDelight local data source.
  */
+@Single(binds = [FrameRepository::class])
 class FrameRepositoryImpl(
     private val localDataSource: FrameLocalDataSource,
     private val imageStorageManager: ImageStorageManager,

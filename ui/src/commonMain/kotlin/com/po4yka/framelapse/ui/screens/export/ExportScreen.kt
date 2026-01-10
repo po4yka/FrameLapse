@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -37,24 +34,20 @@ import com.po4yka.framelapse.presentation.export.ExportViewModel
 import com.po4yka.framelapse.ui.components.ExportCompleteCard
 import com.po4yka.framelapse.ui.components.ExportProgressCard
 import com.po4yka.framelapse.ui.components.FrameLapseTopBar
+import com.po4yka.framelapse.ui.components.FrameSlideshow
 import com.po4yka.framelapse.ui.components.SettingsDropdown
 import com.po4yka.framelapse.ui.components.SettingsSection
 import com.po4yka.framelapse.ui.components.SettingsSlider
 import com.po4yka.framelapse.ui.util.HandleEffects
 import framelapse.ui.generated.resources.Res
-import framelapse.ui.generated.resources.duration_minutes_seconds
-import framelapse.ui.generated.resources.duration_seconds
 import framelapse.ui.generated.resources.export_button
 import framelapse.ui.generated.resources.export_codec
-import framelapse.ui.generated.resources.export_duration
-import framelapse.ui.generated.resources.export_duration_at_fps
 import framelapse.ui.generated.resources.export_frame_rate
 import framelapse.ui.generated.resources.export_quality
 import framelapse.ui.generated.resources.export_resolution
 import framelapse.ui.generated.resources.export_title
 import framelapse.ui.generated.resources.export_video_settings
 import framelapse.ui.generated.resources.fps_label
-import framelapse.ui.generated.resources.frame_count
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -184,11 +177,12 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
             .padding(CONTENT_PADDING),
         verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
     ) {
-        // Preview card
-        ExportPreviewCard(
-            frameCount = state.frameCount,
-            estimatedDuration = state.estimatedDuration,
+        // Frame slideshow preview
+        FrameSlideshow(
+            frames = state.frames,
             fps = state.exportSettings.fps,
+            autoPlay = false,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         // Video settings
@@ -240,50 +234,4 @@ private fun ExportSettingsForm(state: ExportState, onEvent: (ExportEvent) -> Uni
     }
 }
 
-@Composable
-private fun ExportPreviewCard(frameCount: Int, estimatedDuration: Float, fps: Int, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CONTENT_PADDING),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(Res.string.frame_count, frameCount),
-                style = MaterialTheme.typography.headlineMedium,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(Res.string.export_duration, formatDuration(estimatedDuration)),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Text(
-                text = stringResource(Res.string.export_duration_at_fps, fps),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun formatDuration(seconds: Float): String {
-    val totalSeconds = seconds.toInt()
-    val minutes = totalSeconds / SECONDS_PER_MINUTE
-    val remainingSeconds = totalSeconds % SECONDS_PER_MINUTE
-    return if (minutes > 0) {
-        stringResource(Res.string.duration_minutes_seconds, minutes, remainingSeconds)
-    } else {
-        stringResource(Res.string.duration_seconds, remainingSeconds)
-    }
-}
-
-private const val SECONDS_PER_MINUTE = 60
 private const val VIDEO_MIME_TYPE = "video/mp4"

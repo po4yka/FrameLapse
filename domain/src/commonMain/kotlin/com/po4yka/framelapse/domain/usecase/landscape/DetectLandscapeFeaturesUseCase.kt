@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.LandscapeLandmarks
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Detects feature keypoints in a landscape/scenery image.
@@ -18,6 +19,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Architecture photography alignment
  * - Any scene without detectable faces or bodies
  */
+@Factory
 class DetectLandscapeFeaturesUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Detects feature keypoints from image data.

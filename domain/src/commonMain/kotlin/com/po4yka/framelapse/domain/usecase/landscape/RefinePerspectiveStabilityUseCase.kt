@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.landscape
 import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.entity.LandscapeStabilizationSettings
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 import kotlin.math.abs
 
 /**
@@ -23,6 +24,7 @@ import kotlin.math.abs
  * ## Convergence:
  * Converges when determinant change between passes < threshold (0.01)
  */
+@Factory
 class RefinePerspectiveStabilityUseCase {
     /**
      * Result of perspective stability refinement.

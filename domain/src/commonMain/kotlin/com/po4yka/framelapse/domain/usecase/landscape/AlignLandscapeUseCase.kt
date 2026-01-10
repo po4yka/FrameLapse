@@ -19,6 +19,7 @@ import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipeline
 import com.po4yka.framelapse.domain.usecase.alignment.AlignmentPipelineStep
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Performs landscape/scenery alignment using feature-based homography.
@@ -41,6 +42,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Architecture photography
  * - Any scene without detectable faces or bodies
  */
+@Factory
 class AlignLandscapeUseCase(
     private val featureMatcher: FeatureMatcher,
     private val imageProcessor: ImageProcessor,

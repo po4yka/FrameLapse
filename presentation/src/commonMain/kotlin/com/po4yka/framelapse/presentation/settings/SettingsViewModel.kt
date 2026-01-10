@@ -9,11 +9,13 @@ import com.po4yka.framelapse.domain.entity.Resolution
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the settings screen.
  * Handles app preferences and storage management.
  */
+@Factory
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val storageCleanupManager: StorageCleanupManager,

@@ -4,10 +4,12 @@ import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Updates project settings.
  */
+@Factory
 class UpdateProjectSettingsUseCase(private val projectRepository: ProjectRepository, private val clock: Clock) {
     /**
      * Updates a project's settings.

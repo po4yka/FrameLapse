@@ -7,6 +7,7 @@ import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.service.ImageProcessor
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Captures a calibration reference image and detects face landmarks.
@@ -17,6 +18,7 @@ import com.po4yka.framelapse.domain.util.Result
  * 3. Detects face and extracts eye positions
  * 4. Returns the image path and landmarks for adjustment
  */
+@Factory
 class CaptureCalibrationImageUseCase(
     private val mediaStore: MediaStore,
     private val faceDetector: FaceDetector,

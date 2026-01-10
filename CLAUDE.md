@@ -132,7 +132,7 @@ sealed class Result<out T> {
 | Layer | Technology |
 |-------|------------|
 | UI | Compose Multiplatform |
-| DI | Koin |
+| DI | Koin + Koin Annotations (KSP) |
 | Database | SQLDelight |
 | Async | Coroutines + Flow |
 | Camera (Android) | CameraX |

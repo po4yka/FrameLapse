@@ -9,11 +9,13 @@ import com.po4yka.framelapse.domain.entity.ImportResult
 import com.po4yka.framelapse.domain.usecase.face.AlignFaceUseCase
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.isActive
+import org.koin.core.annotation.Factory
 import kotlin.coroutines.coroutineContext
 
 /**
  * Batch imports photos into a project with face alignment.
  */
+@Factory
 class ImportPhotosUseCase(
     private val addFrameUseCase: AddFrameUseCase,
     private val alignFaceUseCase: AlignFaceUseCase,

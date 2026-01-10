@@ -28,6 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the manual adjustment screen.
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
  * Handles drag operations, undo/redo, preview generation, and batch application
  * of manual adjustments to frames.
  */
+@Factory
 class ManualAdjustmentViewModel(
     private val frameRepository: FrameRepository,
     private val applyAdjustmentUseCase: ApplyManualAdjustmentUseCase,
@@ -573,6 +575,11 @@ class ManualAdjustmentViewModel(
     fun confirmDiscard() {
         undoRedoManager.clear()
         sendEffect(ManualAdjustmentEffect.NavigateBack)
+    }
+
+    override fun onCleared() {
+        previewJob?.cancel()
+        super.onCleared()
     }
 
     companion object {

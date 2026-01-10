@@ -2,10 +2,12 @@ package com.po4yka.framelapse.data.storage
 
 import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Single
 
 /**
  * Default MediaStore implementation backed by storage managers.
  */
+@Single(binds = [MediaStore::class])
 class MediaStoreImpl(
     private val imageStorageManager: ImageStorageManager,
     private val videoStorageManager: VideoStorageManager,

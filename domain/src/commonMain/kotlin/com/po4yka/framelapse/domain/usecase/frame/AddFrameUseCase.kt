@@ -6,10 +6,12 @@ import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FileSystem
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Adds a new frame to a project.
  */
+@Factory
 class AddFrameUseCase(
     private val frameRepository: FrameRepository,
     private val projectRepository: ProjectRepository,

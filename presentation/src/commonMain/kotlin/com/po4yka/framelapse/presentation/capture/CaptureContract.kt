@@ -1,7 +1,9 @@
 package com.po4yka.framelapse.presentation.capture
 
 import com.po4yka.framelapse.domain.entity.CaptureSettings
+import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.Frame
+import com.po4yka.framelapse.domain.service.CameraController
 import com.po4yka.framelapse.presentation.base.UiEffect
 import com.po4yka.framelapse.presentation.base.UiEvent
 import com.po4yka.framelapse.presentation.base.UiState
@@ -18,6 +20,8 @@ data class CaptureState(
     val ghostImagePath: String? = null,
     val lastCapturedFrame: Frame? = null,
     val faceDetectionConfidence: Float? = null,
+    val currentFaceLandmarks: FaceLandmarks? = null,
+    val referenceLandmarks: FaceLandmarks? = null,
     val frameCount: Int = 0,
     val error: String? = null,
 ) : UiState
@@ -70,6 +74,12 @@ sealed interface CaptureEvent : UiEvent {
      * Camera encountered an error.
      */
     data object CameraError : CaptureEvent
+
+    /**
+     * Set the camera controller instance.
+     * Called from the UI layer when the camera is initialized.
+     */
+    data class SetCameraController(val controller: CameraController) : CaptureEvent
 }
 
 /**

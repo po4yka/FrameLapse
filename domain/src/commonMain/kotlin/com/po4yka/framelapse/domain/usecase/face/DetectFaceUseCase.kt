@@ -3,10 +3,12 @@ package com.po4yka.framelapse.domain.usecase.face
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.service.FaceDetector
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Detects face landmarks in an image.
  */
+@Factory
 class DetectFaceUseCase(private val faceDetector: FaceDetector) {
     /**
      * Detects face landmarks in an image file.

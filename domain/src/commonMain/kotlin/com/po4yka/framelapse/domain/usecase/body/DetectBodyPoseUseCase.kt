@@ -3,10 +3,12 @@ package com.po4yka.framelapse.domain.usecase.body
 import com.po4yka.framelapse.domain.entity.BodyLandmarks
 import com.po4yka.framelapse.domain.service.BodyPoseDetector
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Detects body pose landmarks in an image.
  */
+@Factory
 class DetectBodyPoseUseCase(private val bodyPoseDetector: BodyPoseDetector) {
     /**
      * Detects body pose landmarks in an image file.

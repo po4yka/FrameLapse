@@ -3,6 +3,7 @@ package com.po4yka.framelapse.domain.usecase.calibration
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Saves calibration data to a project.
@@ -12,6 +13,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Eye positions (left and right) in normalized coordinates (0-1)
  * - Offset adjustments for fine-tuning alignment target
  */
+@Factory
 class SaveCalibrationUseCase(private val projectRepository: ProjectRepository) {
 
     /**

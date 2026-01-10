@@ -4,10 +4,12 @@ import com.po4yka.framelapse.data.local.FrameLocalDataSource
 import com.po4yka.framelapse.data.local.ProjectLocalDataSource
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.FileManager
+import org.koin.core.annotation.Single
 
 /**
  * Manages storage cleanup operations for projects.
  */
+@Single
 class StorageCleanupManager(
     private val imageStorageManager: ImageStorageManager,
     private val videoStorageManager: VideoStorageManager,

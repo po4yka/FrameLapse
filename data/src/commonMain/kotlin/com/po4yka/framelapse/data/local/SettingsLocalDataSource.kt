@@ -3,11 +3,13 @@ package com.po4yka.framelapse.data.local
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
 /**
  * Local data source for Settings database operations.
  * Provides type-safe key-value storage wrapping SQLDelight queries.
  */
+@Single
 class SettingsLocalDataSource(private val queries: SettingsQueries) {
 
     /**

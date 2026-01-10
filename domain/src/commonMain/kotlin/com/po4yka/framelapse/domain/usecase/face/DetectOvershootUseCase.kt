@@ -4,6 +4,7 @@ import com.po4yka.framelapse.domain.entity.FaceLandmarks
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.OvershootCorrection
 import com.po4yka.framelapse.domain.entity.StabilizationScore
+import org.koin.core.annotation.Factory
 
 /**
  * Detects overshoot in eye positions and calculates correction.
@@ -17,6 +18,7 @@ import com.po4yka.framelapse.domain.entity.StabilizationScore
  *
  * Correction is applied by subtracting the average overshoot from the translation.
  */
+@Factory
 class DetectOvershootUseCase {
 
     /**

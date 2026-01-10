@@ -4,11 +4,13 @@ import androidx.lifecycle.viewModelScope
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the main app screen.
  * Handles app initialization and permission management.
  */
+@Factory
 class MainViewModel(private val settingsRepository: SettingsRepository) :
     BaseViewModel<MainState, MainEvent, MainEffect>(MainState()) {
 

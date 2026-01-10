@@ -119,7 +119,7 @@ fun CalibrationScreen(
                     snackbarHostState = snackbarHostState,
                     onEvent = viewModel::onEvent,
                     onCameraReady = { controller ->
-                        viewModel.cameraController = controller
+                        viewModel.onEvent(CalibrationEvent.SetCameraController(controller))
                         viewModel.onEvent(CalibrationEvent.CameraReady)
                     },
                     onNavigateBack = onNavigateBack,

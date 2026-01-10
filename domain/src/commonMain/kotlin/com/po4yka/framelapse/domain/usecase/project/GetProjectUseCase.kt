@@ -4,10 +4,12 @@ import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.util.Result
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.annotation.Factory
 
 /**
  * Retrieves a single project by ID.
  */
+@Factory
 class GetProjectUseCase(private val projectRepository: ProjectRepository) {
     /**
      * Gets a project by its ID.

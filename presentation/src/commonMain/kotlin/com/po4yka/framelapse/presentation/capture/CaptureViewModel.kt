@@ -10,11 +10,13 @@ import com.po4yka.framelapse.domain.usecase.frame.GetFramesUseCase
 import com.po4yka.framelapse.domain.usecase.frame.GetLatestFrameUseCase
 import com.po4yka.framelapse.presentation.base.BaseViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 /**
  * ViewModel for the capture screen.
  * Handles camera state, capture flow, and ghost image overlay.
  */
+@Factory
 class CaptureViewModel(
     private val captureImageUseCase: CaptureImageUseCase,
     private val getLatestFrameUseCase: GetLatestFrameUseCase,
@@ -23,10 +25,10 @@ class CaptureViewModel(
 ) : BaseViewModel<CaptureState, CaptureEvent, CaptureEffect>(CaptureState()) {
 
     /**
-     * Camera controller reference set from the UI layer.
+     * Camera controller reference set via [CaptureEvent.SetCameraController].
      * Must be set before capture operations can be performed.
      */
-    var cameraController: CameraController? = null
+    private var cameraController: CameraController? = null
 
     override fun onEvent(event: CaptureEvent) {
         when (event) {
@@ -39,7 +41,12 @@ class CaptureViewModel(
             is CaptureEvent.NavigateToGallery -> navigateToGallery()
             is CaptureEvent.CameraReady -> cameraReady()
             is CaptureEvent.CameraError -> cameraError()
+            is CaptureEvent.SetCameraController -> setCameraController(event.controller)
         }
+    }
+
+    private fun setCameraController(controller: CameraController) {
+        cameraController = controller
     }
 
     private fun initialize(projectId: String) {

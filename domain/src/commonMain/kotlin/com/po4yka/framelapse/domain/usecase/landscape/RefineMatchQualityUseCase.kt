@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.entity.LandscapeStabilizationSettings
 import com.po4yka.framelapse.domain.service.FeatureMatcher
 import com.po4yka.framelapse.domain.util.Result
+import org.koin.core.annotation.Factory
 
 /**
  * Refines homography by filtering to higher-quality feature matches.
@@ -24,6 +25,7 @@ import com.po4yka.framelapse.domain.util.Result
  * - Pass 3: Keep top 70% of matches
  * - Pass 4: Keep top 55% of matches
  */
+@Factory
 class RefineMatchQualityUseCase(private val featureMatcher: FeatureMatcher) {
     /**
      * Result of match quality refinement.
