@@ -50,7 +50,7 @@ class GetProjectStatisticsUseCase(
         val frames = (framesResult as Result.Success).data
 
         // Calculate statistics from frames
-        val statistics = calculateStatistics(project.id, project.name, project.contentType, frames)
+        val statistics = calculateStatistics(project.id, project.name, project.content.type, frames)
 
         return Result.Success(statistics)
     }

@@ -25,11 +25,11 @@ import com.po4yka.framelapse.domain.service.NotificationScheduler
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.notification.NotificationChannelManager
 import com.po4yka.framelapse.platform.notification.NotificationFactory
-import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 /**
  * Android implementation of NotificationScheduler using AlarmManager.

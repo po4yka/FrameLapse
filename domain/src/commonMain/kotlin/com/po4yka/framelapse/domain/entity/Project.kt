@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.domain.entity
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -43,27 +44,21 @@ data class FaceProjectContent(
 @Serializable
 @SerialName("body")
 data class BodyProjectContent(
-    val dummy: Boolean = false // Empty data class might be an issue for some serializers, but usually fine. Adding a dummy or keeping empty. Kotlin serialization handles empty classes.
-    // Actually, let's keep it empty but as a class.
+    // Keeping a placeholder so serialization has a stable structure.
+    val dummy: Boolean = false,
 ) : ProjectContent {
     override val type: ContentType = ContentType.BODY
-
-    // hashCode/equals needed for data class with no properties? No, Kotlin handles it.
 }
 
 @Serializable
 @SerialName("muscle")
-data class MuscleProjectContent(
-    val muscleRegion: MuscleRegion? = null,
-) : ProjectContent {
+data class MuscleProjectContent(val muscleRegion: MuscleRegion? = null) : ProjectContent {
     override val type: ContentType = ContentType.MUSCLE
 }
 
 @Serializable
 @SerialName("landscape")
-data class LandscapeProjectContent(
-    val referenceFrameId: String? = null,
-) : ProjectContent {
+data class LandscapeProjectContent(val referenceFrameId: String? = null) : ProjectContent {
     override val type: ContentType = ContentType.LANDSCAPE
 }
 

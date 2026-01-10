@@ -8,6 +8,7 @@ import com.po4yka.framelapse.domain.entity.EarlyStopReason
 import com.po4yka.framelapse.domain.entity.ExportQuality
 import com.po4yka.framelapse.domain.entity.ExportSettings
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.FeatureDetectorType
 import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.Frame
@@ -52,6 +53,7 @@ object TestFixtures {
         resolution: Resolution = Resolution.HD_1080P,
         orientation: Orientation = Orientation.PORTRAIT,
         thumbnailPath: String? = null,
+        content: FaceProjectContent = FaceProjectContent(),
     ): Project = Project(
         id = id,
         name = name,
@@ -61,6 +63,7 @@ object TestFixtures {
         resolution = resolution,
         orientation = orientation,
         thumbnailPath = thumbnailPath,
+        content = content,
     )
 
     // ==================== Frame ====================

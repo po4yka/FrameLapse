@@ -2,6 +2,7 @@ package com.po4yka.framelapse.testutil
 
 import com.po4yka.framelapse.domain.entity.AlignmentMatrix
 import com.po4yka.framelapse.domain.entity.BoundingBox
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.FeatureDetectorType
 import com.po4yka.framelapse.domain.entity.FeatureKeypoint
 import com.po4yka.framelapse.domain.entity.HomographyMatrix
@@ -90,6 +91,7 @@ class FakeCreateProjectUseCase {
             createdAt = now,
             updatedAt = now,
             fps = fps,
+            content = FaceProjectContent(),
         )
         createdProjects.add(project)
         return Result.Success(project)

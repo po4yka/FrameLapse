@@ -75,7 +75,7 @@ class GetGlobalStatisticsUseCase(
         projectFrameCounts: Map<String, Long>,
     ): GlobalStatistics {
         // Group projects by content type
-        val projectsByContentType = projects.groupBy { it.contentType }
+        val projectsByContentType = projects.groupBy { it.content.type }
             .mapValues { it.value.size }
 
         // Calculate global streak (any capture across any project)

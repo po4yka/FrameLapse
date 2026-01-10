@@ -297,7 +297,7 @@ class NotificationSchedulerImpl : NotificationScheduler {
 
             // Configure badge
             config.iosConfig.badge?.let { badge ->
-                setBadge(NSNumber.numberWithInt(badge))
+                setBadge(NSNumber(int = badge))
             }
 
             // Configure deep link via user info

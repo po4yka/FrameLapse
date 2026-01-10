@@ -56,7 +56,8 @@ class GetCalibrationUseCase(private val projectRepository: ProjectRepository) {
         }
 
         val project = (projectResult as Result.Success).data
-        return Result.Success(project.calibrationImagePath != null)
+        val faceContent = project.content as? FaceProjectContent
+        return Result.Success(faceContent?.calibrationImagePath != null)
     }
 }
 

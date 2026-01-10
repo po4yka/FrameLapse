@@ -1,7 +1,7 @@
 package com.po4yka.framelapse.data.mapper
 
-import com.po4yka.framelapse.domain.entity.ContentType
 import com.po4yka.framelapse.domain.entity.BodyProjectContent
+import com.po4yka.framelapse.domain.entity.ContentType
 import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.LandscapeProjectContent
 import com.po4yka.framelapse.domain.entity.MuscleProjectContent
