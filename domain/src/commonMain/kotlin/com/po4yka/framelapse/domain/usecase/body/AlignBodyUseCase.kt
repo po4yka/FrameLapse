@@ -35,7 +35,7 @@ class AlignBodyUseCase(
     private val frameRepository: FrameRepository,
     private val mediaStore: MediaStore,
     private val multiPassBodyStabilization: MultiPassBodyStabilizationUseCase,
-    private val validateBodyAlignment: ValidateBodyAlignmentUseCase = ValidateBodyAlignmentUseCase(),
+    private val validateBodyAlignment: ValidateBodyAlignmentUseCase,
 ) {
     /**
      * Aligns a body in the given frame using multi-pass stabilization.

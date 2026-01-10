@@ -9,6 +9,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidLibrary {
         namespace = "com.po4yka.framelapse.domain"
         compileSdk = 36
@@ -76,7 +80,6 @@ tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMet
 }
 
 // KSP configuration for Koin Annotations
-// KOIN_CONFIG_CHECK enabled for compile-time dependency verification.
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
 }

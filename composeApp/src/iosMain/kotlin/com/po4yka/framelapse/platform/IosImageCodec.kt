@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.platform
 
 import com.po4yka.framelapse.domain.service.ImageData
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.useContents
@@ -19,7 +20,7 @@ import platform.Foundation.create
 import platform.UIKit.UIImage
 import platform.posix.memcpy
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 internal class IosImageCodec {
     fun dataToByteArray(data: NSData): ByteArray {
         val length = data.length.toInt()

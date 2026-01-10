@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.testutil
 
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.Landmarks
 import com.po4yka.framelapse.domain.entity.Project
@@ -43,6 +44,7 @@ class FakeProjectRepository : ProjectRepository {
             createdAt = now,
             updatedAt = now,
             fps = fps,
+            content = FaceProjectContent(),
         )
         projects.update { it + (id to project) }
         return Result.Success(project)
@@ -119,7 +121,11 @@ class FakeProjectRepository : ProjectRepository {
 
         val project = projects.value[projectId]
             ?: return Result.Error(NoSuchElementException("Project not found: $projectId"))
-        val updated = project.copy(
+
+        val currentContent = project.content as? FaceProjectContent
+            ?: return Result.Error(IllegalStateException("Project is not a FACE project"))
+
+        val updatedContent = currentContent.copy(
             calibrationImagePath = imagePath,
             calibrationLeftEyeX = leftEyeX,
             calibrationLeftEyeY = leftEyeY,
@@ -127,6 +133,10 @@ class FakeProjectRepository : ProjectRepository {
             calibrationRightEyeY = rightEyeY,
             calibrationOffsetX = offsetX,
             calibrationOffsetY = offsetY,
+        )
+
+        val updated = project.copy(
+            content = updatedContent,
             updatedAt = currentTimeMillis(),
         )
         projects.update { it + (projectId to updated) }
@@ -138,7 +148,11 @@ class FakeProjectRepository : ProjectRepository {
 
         val project = projects.value[projectId]
             ?: return Result.Error(NoSuchElementException("Project not found: $projectId"))
-        val updated = project.copy(
+
+        val currentContent = project.content as? FaceProjectContent
+            ?: return Result.Error(IllegalStateException("Project is not a FACE project"))
+
+        val updatedContent = currentContent.copy(
             calibrationImagePath = null,
             calibrationLeftEyeX = null,
             calibrationLeftEyeY = null,
@@ -146,6 +160,10 @@ class FakeProjectRepository : ProjectRepository {
             calibrationRightEyeY = null,
             calibrationOffsetX = 0f,
             calibrationOffsetY = 0f,
+        )
+
+        val updated = project.copy(
+            content = updatedContent,
             updatedAt = currentTimeMillis(),
         )
         projects.update { it + (projectId to updated) }

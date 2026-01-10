@@ -470,11 +470,7 @@ internal class IosFeatureMatcherCore(private val codec: IosImageCodec) {
             )
         }
 
-        val matrixValues = result.matrix?.map { (it as NSNumber).doubleValue }
-            ?: return Result.Error(
-                IllegalStateException("Homography matrix is null"),
-                "Homography matrix is null",
-            )
+        val matrixValues = result.matrix.map { (it as NSNumber).doubleValue }
 
         val matrix = HomographyMatrix.fromDoubleArray(matrixValues.toDoubleArray())
         return Result.Success(Pair(matrix, result.inlierCount))

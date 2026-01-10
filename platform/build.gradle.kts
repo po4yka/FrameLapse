@@ -8,6 +8,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidLibrary {
         namespace = "com.po4yka.framelapse.platform"
         compileSdk = 36
@@ -54,6 +58,7 @@ kotlin.sourceSets.named("commonMain") {
 
 // Ensure KSP runs before compilation and other KSP tasks depend on metadata
 tasks.withType<KotlinCompilationTask<*>>().configureEach {
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
     }

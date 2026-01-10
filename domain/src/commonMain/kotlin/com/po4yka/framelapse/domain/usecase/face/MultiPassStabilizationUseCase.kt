@@ -432,7 +432,7 @@ class MultiPassStabilizationUseCase(
                 StabilizationProgress.forPass(
                     passNumber = passNum,
                     stage = StabilizationStage.ROTATION_REFINE,
-                    score = bestScore?.value ?: 0f,
+                    score = bestScore.value,
                     mode = settings.mode,
                 ),
             )
@@ -441,8 +441,8 @@ class MultiPassStabilizationUseCase(
                 StabilizationPass(
                     passNumber = passNum,
                     stage = StabilizationStage.ROTATION_REFINE,
-                    scoreBefore = bestScore?.value ?: 0f,
-                    scoreAfter = bestScore?.value ?: 0f,
+                    scoreBefore = bestScore.value,
+                    scoreAfter = bestScore.value,
                     converged = rotationResult.converged,
                     durationMs = 0L,
                 ),
@@ -494,7 +494,7 @@ class MultiPassStabilizationUseCase(
                 StabilizationProgress.forPass(
                     passNumber = passNum,
                     stage = StabilizationStage.SCALE_REFINE,
-                    score = bestScore?.value ?: 0f,
+                    score = bestScore.value,
                     mode = settings.mode,
                 ),
             )
@@ -503,7 +503,7 @@ class MultiPassStabilizationUseCase(
                 StabilizationPass(
                     passNumber = passNum,
                     stage = StabilizationStage.SCALE_REFINE,
-                    scoreBefore = bestScore?.value ?: 0f,
+                    scoreBefore = bestScore.value,
                     scoreAfter = scaleResult.scaleError,
                     converged = scaleResult.converged,
                     durationMs = 0L,
@@ -517,7 +517,8 @@ class MultiPassStabilizationUseCase(
         earlyStopReason = null
 
         // Stage 4: Translation refinement (passes 8-10)
-        var previousScore = bestScore?.value ?: Float.MAX_VALUE
+        val initialBestScore = requireNotNull(bestScore) { "Expected best score after initial pass" }
+        var previousScore = initialBestScore.value
         for (i in 1..3) {
             passNum++
             val result = executePass(
@@ -541,12 +542,13 @@ class MultiPassStabilizationUseCase(
             }
 
             // Check convergence
-            val improvement = previousScore - (bestScore?.value ?: previousScore)
+            val currentScore = requireNotNull(bestScore) { "Expected best score during translation refinement" }.value
+            val improvement = previousScore - currentScore
             if (improvement < settings.convergenceThreshold && improvement >= 0) {
                 earlyStopReason = EarlyStopReason.TRANSLATION_CONVERGED
                 break
             }
-            previousScore = bestScore?.value ?: previousScore
+            previousScore = currentScore
         }
 
         if (earlyStopReason == null) {

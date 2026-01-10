@@ -52,7 +52,7 @@ class AlignLandscapeUseCase(
     private val matchFeatures: MatchLandscapeFeaturesUseCase,
     private val calculateHomography: CalculateHomographyMatrixUseCase,
     private val clock: Clock,
-    private val multiPassStabilization: MultiPassLandscapeStabilizationUseCase? = null,
+    private val multiPassStabilization: MultiPassLandscapeStabilizationUseCase?,
 ) {
     // Cache for reference frame features to avoid re-detection
     private var cachedReferenceFrameId: String? = null

@@ -4,6 +4,7 @@ import com.po4yka.framelapse.domain.entity.AlignmentDiagnostics
 import com.po4yka.framelapse.domain.entity.AlignmentSettings
 import com.po4yka.framelapse.domain.entity.BoundingBox
 import com.po4yka.framelapse.domain.entity.FaceLandmarks
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.Project
@@ -37,7 +38,7 @@ class AlignFaceUseCase(
     private val frameRepository: FrameRepository,
     private val mediaStore: MediaStore,
     private val multiPassStabilization: MultiPassStabilizationUseCase,
-    private val validateAlignment: ValidateAlignmentUseCase = ValidateAlignmentUseCase(),
+    private val validateAlignment: ValidateAlignmentUseCase,
 ) {
     /**
      * Aligns a face in the given frame using multi-pass stabilization.
@@ -212,21 +213,24 @@ class AlignFaceUseCase(
 
         // Priority 1: Use project calibration if available
         project?.let { proj ->
-            val leftEyeX = proj.calibrationLeftEyeX
-            val leftEyeY = proj.calibrationLeftEyeY
-            val rightEyeX = proj.calibrationRightEyeX
-            val rightEyeY = proj.calibrationRightEyeY
+            val faceContent = proj.content as? FaceProjectContent
+            if (faceContent != null) {
+                val leftEyeX = faceContent.calibrationLeftEyeX
+                val leftEyeY = faceContent.calibrationLeftEyeY
+                val rightEyeX = faceContent.calibrationRightEyeX
+                val rightEyeY = faceContent.calibrationRightEyeY
 
-            if (leftEyeX != null && leftEyeY != null && rightEyeX != null && rightEyeY != null) {
-                // Apply calibration offsets and convert to pixel coordinates
-                val leftX = (leftEyeX + proj.calibrationOffsetX) * outputSize
-                val leftY = (leftEyeY + proj.calibrationOffsetY) * outputSize
-                val rightX = (rightEyeX + proj.calibrationOffsetX) * outputSize
-                val rightY = (rightEyeY + proj.calibrationOffsetY) * outputSize
-                return Pair(
-                    LandmarkPoint(x = leftX, y = leftY, z = 0f),
-                    LandmarkPoint(x = rightX, y = rightY, z = 0f),
-                )
+                if (leftEyeX != null && leftEyeY != null && rightEyeX != null && rightEyeY != null) {
+                    // Apply calibration offsets and convert to pixel coordinates
+                    val leftX = (leftEyeX + faceContent.calibrationOffsetX) * outputSize
+                    val leftY = (leftEyeY + faceContent.calibrationOffsetY) * outputSize
+                    val rightX = (rightEyeX + faceContent.calibrationOffsetX) * outputSize
+                    val rightY = (rightEyeY + faceContent.calibrationOffsetY) * outputSize
+                    return Pair(
+                        LandmarkPoint(x = leftX, y = leftY, z = 0f),
+                        LandmarkPoint(x = rightX, y = rightY, z = 0f),
+                    )
+                }
             }
         }
 

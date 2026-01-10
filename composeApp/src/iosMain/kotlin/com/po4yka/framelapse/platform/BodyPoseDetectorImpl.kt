@@ -172,11 +172,11 @@ class BodyPoseDetectorImpl : BodyPoseDetector {
                             y = 1f - point.location.useContents { y.toFloat() },
                             z = 0f, // Vision doesn't provide Z coordinate
                         ),
-                        confidence = point.confidence.toFloat(),
+                        confidence = point.confidence,
                         isVisible = point.confidence > VISIBILITY_THRESHOLD,
                     ),
                 )
-                totalConfidence += point.confidence.toFloat()
+                totalConfidence += point.confidence
                 keypointCount++
             }
         }

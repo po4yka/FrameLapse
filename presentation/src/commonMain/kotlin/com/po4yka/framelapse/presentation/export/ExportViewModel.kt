@@ -55,8 +55,8 @@ class ExportViewModel(
                         copy(
                             project = project,
                             exportSettings = exportSettings.copy(
-                                resolution = project?.resolution ?: Resolution.HD_1080P,
-                                fps = project?.fps ?: DEFAULT_FPS,
+                                resolution = project.resolution,
+                                fps = project.fps,
                             ),
                         )
                     }

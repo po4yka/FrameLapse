@@ -25,6 +25,7 @@ import platform.UIKit.UIView
  */
 @OptIn(ExperimentalForeignApi::class)
 @Composable
+@Suppress("DEPRECATION")
 actual fun CameraPreview(
     cameraFacing: CameraFacing,
     flashMode: FlashMode,

@@ -15,54 +15,57 @@ data class Project(
     val resolution: Resolution = Resolution.HD_1080P,
     val orientation: Orientation = Orientation.PORTRAIT,
     val thumbnailPath: String? = null,
-    /** The content type for this project's alignment (FACE, BODY, MUSCLE, or LANDSCAPE). */
-    val contentType: ContentType = ContentType.FACE,
-    /**
-     * The muscle region for MUSCLE content type projects.
-     * Only used when contentType is MUSCLE, null otherwise.
-     */
-    val muscleRegion: MuscleRegion? = null,
-    /**
-     * The reference frame ID for LANDSCAPE content type projects.
-     * This is the frame that all other frames will be aligned to.
-     * User-selectable; defaults to first captured frame if not set.
-     * Only used when contentType is LANDSCAPE, null otherwise.
-     */
-    val referenceFrameId: String? = null,
-    /**
-     * Path to the calibration reference image.
-     * Used as ghost overlay and alignment target for FACE mode.
-     * Null means no calibration is set.
-     */
-    val calibrationImagePath: String? = null,
-    /**
-     * Calibrated left eye X position (normalized 0-1).
-     * Null means auto-detect from calibration image.
-     */
-    val calibrationLeftEyeX: Float? = null,
-    /**
-     * Calibrated left eye Y position (normalized 0-1).
-     */
-    val calibrationLeftEyeY: Float? = null,
-    /**
-     * Calibrated right eye X position (normalized 0-1).
-     */
-    val calibrationRightEyeX: Float? = null,
-    /**
-     * Calibrated right eye Y position (normalized 0-1).
-     */
-    val calibrationRightEyeY: Float? = null,
-    /**
-     * Alignment offset X adjustment (-0.2 to +0.2).
-     * Fine-tunes the horizontal alignment target.
-     */
-    val calibrationOffsetX: Float = 0f,
-    /**
-     * Alignment offset Y adjustment (-0.2 to +0.2).
-     * Fine-tunes the vertical alignment target.
-     */
-    val calibrationOffsetY: Float = 0f,
+    val content: ProjectContent,
 )
+
+/**
+ * Represents the content specific data for a project.
+ */
+@Serializable
+sealed interface ProjectContent {
+    val type: ContentType
+}
+
+@Serializable
+@SerialName("face")
+data class FaceProjectContent(
+    val calibrationImagePath: String? = null,
+    val calibrationLeftEyeX: Float? = null,
+    val calibrationLeftEyeY: Float? = null,
+    val calibrationRightEyeX: Float? = null,
+    val calibrationRightEyeY: Float? = null,
+    val calibrationOffsetX: Float = 0f,
+    val calibrationOffsetY: Float = 0f,
+) : ProjectContent {
+    override val type: ContentType = ContentType.FACE
+}
+
+@Serializable
+@SerialName("body")
+data class BodyProjectContent(
+    val dummy: Boolean = false // Empty data class might be an issue for some serializers, but usually fine. Adding a dummy or keeping empty. Kotlin serialization handles empty classes.
+    // Actually, let's keep it empty but as a class.
+) : ProjectContent {
+    override val type: ContentType = ContentType.BODY
+
+    // hashCode/equals needed for data class with no properties? No, Kotlin handles it.
+}
+
+@Serializable
+@SerialName("muscle")
+data class MuscleProjectContent(
+    val muscleRegion: MuscleRegion? = null,
+) : ProjectContent {
+    override val type: ContentType = ContentType.MUSCLE
+}
+
+@Serializable
+@SerialName("landscape")
+data class LandscapeProjectContent(
+    val referenceFrameId: String? = null,
+) : ProjectContent {
+    override val type: ContentType = ContentType.LANDSCAPE
+}
 
 /**
  * Video resolution options.

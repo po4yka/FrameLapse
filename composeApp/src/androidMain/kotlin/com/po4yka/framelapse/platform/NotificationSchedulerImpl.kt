@@ -1,6 +1,7 @@
 package com.po4yka.framelapse.platform
 
 import android.Manifest
+import android.R
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,9 +11,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import com.po4yka.framelapse.core.notification.NotificationChannels
 import com.po4yka.framelapse.core.notification.NotificationConfig
 import com.po4yka.framelapse.core.notification.NotificationPriority
@@ -22,11 +25,11 @@ import com.po4yka.framelapse.domain.service.NotificationScheduler
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.platform.notification.NotificationChannelManager
 import com.po4yka.framelapse.platform.notification.NotificationFactory
+import java.util.Calendar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 /**
  * Android implementation of NotificationScheduler using AlarmManager.
@@ -95,11 +98,11 @@ class NotificationSchedulerImpl(private val context: Context) : NotificationSche
         )
 
         // Save scheduled time
-        sharedPrefs.edit()
-            .putInt(KEY_HOUR, hour)
-            .putInt(KEY_MINUTE, minute)
-            .putBoolean(KEY_SCHEDULED, true)
-            .apply()
+        sharedPrefs.edit {
+            putInt(KEY_HOUR, hour)
+                .putInt(KEY_MINUTE, minute)
+                .putBoolean(KEY_SCHEDULED, true)
+        }
 
         Result.Success(Unit)
     } catch (e: Exception) {
@@ -119,9 +122,9 @@ class NotificationSchedulerImpl(private val context: Context) : NotificationSche
 
         alarmManager.cancel(pendingIntent)
 
-        sharedPrefs.edit()
-            .putBoolean(KEY_SCHEDULED, false)
-            .apply()
+        sharedPrefs.edit {
+            putBoolean(KEY_SCHEDULED, false)
+        }
 
         Result.Success(Unit)
     } catch (e: Exception) {
@@ -163,6 +166,7 @@ class NotificationSchedulerImpl(private val context: Context) : NotificationSche
         Result.Error(e, e.message)
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun immediate(config: NotificationConfig): Result<Unit> = try {
         NotificationUtils.validate(config, isScheduled = false)
 
@@ -172,7 +176,7 @@ class NotificationSchedulerImpl(private val context: Context) : NotificationSche
             title = config.title,
             body = config.body,
             priority = config.androidConfig.priority,
-            iconResId = config.androidConfig.iconResId ?: android.R.drawable.ic_menu_camera,
+            iconResId = config.androidConfig.iconResId ?: R.drawable.ic_menu_camera,
             iconColor = config.androidConfig.iconColor,
             soundUri = config.androidConfig.soundFilename?.let {
                 channelManager.getRawResourceUri(it)
@@ -339,6 +343,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onReceive(context: Context, intent: Intent?) {
         when (intent?.action) {
             NotificationSchedulerImpl.ACTION_LEGACY_REMINDER -> showLegacyNotification(context)
@@ -348,6 +353,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showLegacyNotification(context: Context) {
         // Create intent to open the app
         val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -362,14 +368,15 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val notification = NotificationCompat.Builder(context, NotificationSchedulerImpl.LEGACY_CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_camera)
-            .setContentTitle("FrameLapse Reminder")
-            .setContentText("Time to capture today's photo!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, NotificationSchedulerImpl.LEGACY_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_menu_camera)
+                .setContentTitle("FrameLapse Reminder")
+                .setContentText("Time to capture today's photo!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
 
         if (hasNotificationPermission(context)) {
             NotificationManagerCompat.from(context)
@@ -377,6 +384,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private suspend fun showEnhancedNotification(context: Context, intent: Intent) {
         val uuid = intent.getStringExtra(NotificationSchedulerImpl.EXTRA_UUID) ?: return
         val title = intent.getStringExtra(NotificationSchedulerImpl.EXTRA_TITLE) ?: return
@@ -390,7 +398,7 @@ class ReminderBroadcastReceiver : BroadcastReceiver() {
         val priority = NotificationPriority.entries[priorityOrdinal]
         val iconResId = intent.getIntExtra(
             NotificationSchedulerImpl.EXTRA_ICON_RES_ID,
-            android.R.drawable.ic_menu_camera,
+            R.drawable.ic_menu_camera,
         )
         val iconColor = if (intent.hasExtra(NotificationSchedulerImpl.EXTRA_ICON_COLOR)) {
             intent.getIntExtra(NotificationSchedulerImpl.EXTRA_ICON_COLOR, 0)

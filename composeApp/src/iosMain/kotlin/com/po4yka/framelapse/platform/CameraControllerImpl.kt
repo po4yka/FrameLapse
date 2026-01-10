@@ -197,7 +197,7 @@ class CameraControllerImpl : CameraController {
             position = position,
         )
 
-        return discoverySession?.devices?.firstOrNull() as? AVCaptureDevice
+        return discoverySession.devices.firstOrNull() as? AVCaptureDevice
     }
 
     private fun reconfigureCamera() {

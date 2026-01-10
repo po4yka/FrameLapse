@@ -5,6 +5,7 @@ import com.po4yka.framelapse.domain.entity.HomographyMatrix
 import com.po4yka.framelapse.domain.service.ImageData
 import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.opencv.OpenCVWrapper
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -12,7 +13,7 @@ import platform.Foundation.NSData
 import platform.Foundation.NSNumber
 import platform.Foundation.create
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 internal class IosHomographyTransformer(private val codec: IosImageCodec) {
     fun applyHomographyTransform(
         image: ImageData,

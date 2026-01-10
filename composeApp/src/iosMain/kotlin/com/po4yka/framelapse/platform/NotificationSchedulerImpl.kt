@@ -27,6 +27,7 @@ import platform.Foundation.NSData
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSNumber
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.NSUserDefaults
@@ -243,8 +244,8 @@ class NotificationSchedulerImpl : NotificationScheduler {
             null -> {
                 // One-off: include full date
                 dateComponents.setYear(dateTime.year.toLong())
-                dateComponents.setMonth(dateTime.monthNumber.toLong())
-                dateComponents.setDay(dateTime.dayOfMonth.toLong())
+                dateComponents.setMonth((dateTime.month.ordinal + 1).toLong())
+                dateComponents.setDay(dateTime.day.toLong())
                 dateComponents.setHour(dateTime.hour.toLong())
             }
             is RepeatInterval.Hourly -> {
@@ -264,12 +265,12 @@ class NotificationSchedulerImpl : NotificationScheduler {
             }
             is RepeatInterval.Monthly -> {
                 dateComponents.setHour(dateTime.hour.toLong())
-                dateComponents.setDay(dateTime.dayOfMonth.toLong())
+                dateComponents.setDay(dateTime.day.toLong())
             }
             is RepeatInterval.Yearly -> {
                 dateComponents.setHour(dateTime.hour.toLong())
-                dateComponents.setDay(dateTime.dayOfMonth.toLong())
-                dateComponents.setMonth(dateTime.monthNumber.toLong())
+                dateComponents.setDay(dateTime.day.toLong())
+                dateComponents.setMonth((dateTime.month.ordinal + 1).toLong())
             }
             is RepeatInterval.Custom -> {
                 // Handled separately with UNTimeIntervalNotificationTrigger
@@ -296,7 +297,7 @@ class NotificationSchedulerImpl : NotificationScheduler {
 
             // Configure badge
             config.iosConfig.badge?.let { badge ->
-                setBadge(badge.toLong() as platform.Foundation.NSNumber)
+                setBadge(NSNumber.numberWithInt(badge))
             }
 
             // Configure deep link via user info

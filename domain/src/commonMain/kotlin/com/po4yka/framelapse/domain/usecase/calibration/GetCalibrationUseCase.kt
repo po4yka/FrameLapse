@@ -1,5 +1,6 @@
 package com.po4yka.framelapse.domain.usecase.calibration
 
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.LandmarkPoint
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.repository.ProjectRepository
@@ -80,18 +81,19 @@ data class CalibrationData(
  * Returns null if the project has no calibration.
  */
 fun Project.toCalibrationData(): CalibrationData? {
-    val imagePath = calibrationImagePath ?: return null
-    val leftEyeX = calibrationLeftEyeX ?: return null
-    val leftEyeY = calibrationLeftEyeY ?: return null
-    val rightEyeX = calibrationRightEyeX ?: return null
-    val rightEyeY = calibrationRightEyeY ?: return null
+    val faceContent = content as? FaceProjectContent ?: return null
+    val imagePath = faceContent.calibrationImagePath ?: return null
+    val leftEyeX = faceContent.calibrationLeftEyeX ?: return null
+    val leftEyeY = faceContent.calibrationLeftEyeY ?: return null
+    val rightEyeX = faceContent.calibrationRightEyeX ?: return null
+    val rightEyeY = faceContent.calibrationRightEyeY ?: return null
 
     return CalibrationData(
         imagePath = imagePath,
         leftEye = LandmarkPoint(x = leftEyeX, y = leftEyeY, z = 0f),
         rightEye = LandmarkPoint(x = rightEyeX, y = rightEyeY, z = 0f),
-        offsetX = calibrationOffsetX,
-        offsetY = calibrationOffsetY,
+        offsetX = faceContent.calibrationOffsetX,
+        offsetY = faceContent.calibrationOffsetY,
     )
 }
 
@@ -99,6 +101,9 @@ fun Project.toCalibrationData(): CalibrationData? {
  * Extension property to check if a project has calibration.
  */
 val Project.hasCalibration: Boolean
-    get() = calibrationImagePath != null &&
-        calibrationLeftEyeX != null &&
-        calibrationRightEyeX != null
+    get() {
+        val faceContent = content as? FaceProjectContent ?: return false
+        return faceContent.calibrationImagePath != null &&
+            faceContent.calibrationLeftEyeX != null &&
+            faceContent.calibrationRightEyeX != null
+    }

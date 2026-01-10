@@ -13,6 +13,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     // Android library configuration using new KMP plugin
     androidLibrary {
         namespace = "com.po4yka.framelapse"
@@ -36,6 +40,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "com.po4yka.framelapse.composeapp")
         }
 
         // Configure cinterop for OpenCV wrapper

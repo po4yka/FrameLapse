@@ -3,6 +3,7 @@ package com.po4yka.framelapse.data.repository
 import com.po4yka.framelapse.data.local.ProjectLocalDataSource
 import com.po4yka.framelapse.data.mapper.ProjectMapper
 import com.po4yka.framelapse.data.storage.StorageCleanupManager
+import com.po4yka.framelapse.domain.entity.FaceProjectContent
 import com.po4yka.framelapse.domain.entity.Orientation
 import com.po4yka.framelapse.domain.entity.Project
 import com.po4yka.framelapse.domain.entity.Resolution
@@ -33,6 +34,7 @@ class ProjectRepositoryImpl(
             resolution = Resolution.HD_1080P,
             orientation = Orientation.PORTRAIT,
             thumbnailPath = null,
+            content = FaceProjectContent(),
         )
 
         localDataSource.insert(ProjectMapper.toInsertParams(project))
