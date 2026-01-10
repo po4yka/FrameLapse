@@ -25,9 +25,12 @@ subprojects {
         config.setFrom(files("${rootProject.projectDir}/config/detekt/detekt.yml"))
         baseline = file("${rootProject.projectDir}/config/detekt/baseline.xml")
         parallel = true
+    }
+
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         reports {
             sarif.required.set(true)
-            sarif.outputLocation.set(file("$buildDir/reports/detekt/detekt.sarif"))
+            sarif.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.sarif"))
         }
     }
 
