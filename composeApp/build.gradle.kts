@@ -30,6 +30,10 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+
+        lint {
+            sarifReport = true
+        }
     }
 
     listOf(
