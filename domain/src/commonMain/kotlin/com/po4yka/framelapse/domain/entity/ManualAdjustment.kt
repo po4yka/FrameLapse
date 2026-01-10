@@ -206,27 +206,25 @@ data class LandscapeManualAdjustment(
  * Creates a FaceManualAdjustment from existing FaceLandmarks.
  * Useful when initializing the adjustment UI with auto-detected values.
  */
-fun FaceLandmarks.toManualAdjustment(id: String, timestamp: Long): FaceManualAdjustment =
-    FaceManualAdjustment(
-        id = id,
-        timestamp = timestamp,
-        isActive = true,
-        leftEyeCenter = leftEyeCenter,
-        rightEyeCenter = rightEyeCenter,
-        noseTip = noseTip,
-    )
+fun FaceLandmarks.toManualAdjustment(id: String, timestamp: Long): FaceManualAdjustment = FaceManualAdjustment(
+    id = id,
+    timestamp = timestamp,
+    isActive = true,
+    leftEyeCenter = leftEyeCenter,
+    rightEyeCenter = rightEyeCenter,
+    noseTip = noseTip,
+)
 
 /**
  * Creates a BodyManualAdjustment from existing BodyLandmarks.
  * Useful when initializing the adjustment UI with auto-detected values.
  */
-fun BodyLandmarks.toManualAdjustment(id: String, timestamp: Long): BodyManualAdjustment =
-    BodyManualAdjustment(
-        id = id,
-        timestamp = timestamp,
-        isActive = true,
-        leftShoulder = leftShoulder,
-        rightShoulder = rightShoulder,
-        leftHip = leftHip,
-        rightHip = rightHip,
-    )
+fun BodyLandmarks.toManualAdjustment(id: String, timestamp: Long): BodyManualAdjustment = BodyManualAdjustment(
+    id = id,
+    timestamp = timestamp,
+    isActive = true,
+    leftShoulder = leftShoulder,
+    rightShoulder = rightShoulder,
+    leftHip = leftHip,
+    rightHip = rightHip,
+)

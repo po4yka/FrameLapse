@@ -20,8 +20,8 @@ import com.po4yka.framelapse.domain.repository.ManualAdjustmentRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
 import com.po4yka.framelapse.domain.repository.SettingsRepository
 import com.po4yka.framelapse.domain.service.Clock
-import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.service.FileSystem
+import com.po4yka.framelapse.domain.service.MediaStore
 import com.po4yka.framelapse.domain.service.ModelCapabilitiesProvider
 import com.po4yka.framelapse.domain.service.ModelCapabilitiesProviderImpl
 import com.po4yka.framelapse.domain.usecase.adjustment.ApplyManualAdjustmentUseCase
@@ -73,6 +73,8 @@ import com.po4yka.framelapse.domain.usecase.project.UpdateProjectSettingsUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.CalculateStreakUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.GetGlobalStatisticsUseCase
 import com.po4yka.framelapse.domain.usecase.statistics.GetProjectStatisticsUseCase
+import com.po4yka.framelapse.infra.AppClock
+import com.po4yka.framelapse.infra.AppFileSystem
 import com.po4yka.framelapse.presentation.adjustment.ManualAdjustmentViewModel
 import com.po4yka.framelapse.presentation.calibration.CalibrationViewModel
 import com.po4yka.framelapse.presentation.capture.CaptureViewModel
@@ -82,8 +84,6 @@ import com.po4yka.framelapse.presentation.main.MainViewModel
 import com.po4yka.framelapse.presentation.projectlist.ProjectListViewModel
 import com.po4yka.framelapse.presentation.settings.SettingsViewModel
 import com.po4yka.framelapse.presentation.statistics.StatisticsViewModel
-import com.po4yka.framelapse.infra.AppClock
-import com.po4yka.framelapse.infra.AppFileSystem
 import org.koin.core.module.Module
 import org.koin.dsl.module
 

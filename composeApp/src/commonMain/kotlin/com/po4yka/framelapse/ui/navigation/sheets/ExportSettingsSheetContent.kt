@@ -22,13 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import framelapse.composeapp.generated.resources.Res
-import framelapse.composeapp.generated.resources.action_apply
-import framelapse.composeapp.generated.resources.action_cancel
-import framelapse.composeapp.generated.resources.export_frames_per_second
-import framelapse.composeapp.generated.resources.export_quality_percent
-import framelapse.composeapp.generated.resources.export_settings_title
-import framelapse.composeapp.generated.resources.fps_label
+import framelapse.ui.generated.resources.Res
+import framelapse.ui.generated.resources.action_apply
+import framelapse.ui.generated.resources.action_cancel
+import framelapse.ui.generated.resources.export_frames_per_second
+import framelapse.ui.generated.resources.export_quality_percent
+import framelapse.ui.generated.resources.export_settings_title
+import framelapse.ui.generated.resources.fps_label
 import org.jetbrains.compose.resources.stringResource
 
 /**

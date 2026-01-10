@@ -23,12 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import framelapse.composeapp.generated.resources.Res
-import framelapse.composeapp.generated.resources.action_apply
-import framelapse.composeapp.generated.resources.action_cancel
-import framelapse.composeapp.generated.resources.frame_filter_date_range
-import framelapse.composeapp.generated.resources.frame_filter_min_confidence
-import framelapse.composeapp.generated.resources.frame_filter_title
+import framelapse.ui.generated.resources.Res
+import framelapse.ui.generated.resources.action_apply
+import framelapse.ui.generated.resources.action_cancel
+import framelapse.ui.generated.resources.frame_filter_date_range
+import framelapse.ui.generated.resources.frame_filter_min_confidence
+import framelapse.ui.generated.resources.frame_filter_title
 import org.jetbrains.compose.resources.stringResource
 
 /**

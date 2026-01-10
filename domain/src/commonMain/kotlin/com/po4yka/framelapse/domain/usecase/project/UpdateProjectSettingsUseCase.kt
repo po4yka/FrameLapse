@@ -8,10 +8,7 @@ import com.po4yka.framelapse.domain.util.Result
 /**
  * Updates project settings.
  */
-class UpdateProjectSettingsUseCase(
-    private val projectRepository: ProjectRepository,
-    private val clock: Clock,
-) {
+class UpdateProjectSettingsUseCase(private val projectRepository: ProjectRepository, private val clock: Clock) {
     /**
      * Updates a project's settings.
      *

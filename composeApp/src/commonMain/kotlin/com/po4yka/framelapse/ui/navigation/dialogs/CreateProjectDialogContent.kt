@@ -11,11 +11,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import framelapse.composeapp.generated.resources.Res
-import framelapse.composeapp.generated.resources.action_cancel
-import framelapse.composeapp.generated.resources.create_project_name_hint
-import framelapse.composeapp.generated.resources.create_project_title
-import framelapse.composeapp.generated.resources.projects_create
+import framelapse.ui.generated.resources.Res
+import framelapse.ui.generated.resources.action_cancel
+import framelapse.ui.generated.resources.create_project_name_hint
+import framelapse.ui.generated.resources.create_project_title
+import framelapse.ui.generated.resources.projects_create
 import org.jetbrains.compose.resources.stringResource
 
 /**

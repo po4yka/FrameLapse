@@ -6,20 +6,19 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.kover)
+}
+
+// Make Compose resources accessible from other modules
+compose.resources {
+    publicResClass = true
+    generateResClass = always
 }
 
 kotlin {
-    // Android library configuration using new KMP plugin
     androidLibrary {
-        namespace = "com.po4yka.framelapse"
+        namespace = "com.po4yka.framelapse.ui"
         compileSdk = 36
         minSdk = 29
-
-        // Enable unit tests
-        withHostTestBuilder {
-        }
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -32,19 +31,8 @@ kotlin {
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "FrameLapseUI"
             isStatic = true
-        }
-
-        // Configure cinterop for OpenCV wrapper
-        iosTarget.compilations.getByName("main") {
-            cinterops {
-                create("opencv") {
-                    defFile("src/nativeInterop/cinterop/opencv.def")
-                    // Include path for the header files
-                    includeDirs("src/nativeInterop/cinterop")
-                }
-            }
         }
     }
 
@@ -52,10 +40,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core)
             implementation(projects.domain)
-            implementation(projects.data)
-            implementation(projects.platform)
             implementation(projects.presentation)
-            implementation(projects.ui)
 
             // Compose Multiplatform
             implementation(compose.runtime)
@@ -69,7 +54,6 @@ kotlin {
             // Kotlin
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.datetime)
 
             // Dependency Injection
             implementation(libs.koin.core)
@@ -86,7 +70,7 @@ kotlin {
         }
 
         androidMain.dependencies {
-            // Compose
+            // Compose preview
             implementation(compose.preview)
 
             // Kotlin
@@ -94,28 +78,15 @@ kotlin {
 
             // AndroidX
             implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.androidx.lifecycle.runtime)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
 
             // Dependency Injection
             implementation(libs.koin.android)
 
-            // CameraX
+            // CameraX (for CameraPreview)
             implementation(libs.camerax.core)
             implementation(libs.camerax.camera2)
             implementation(libs.camerax.lifecycle)
             implementation(libs.camerax.view)
-
-            // MediaPipe
-            implementation(libs.mediapipe.tasks.vision)
-
-            // OpenCV
-            implementation(libs.opencv.android)
-
-            // Image Processing
-            implementation(libs.androidx.exifinterface)
         }
 
         iosMain.dependencies {
@@ -124,40 +95,6 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.turbine)
-            implementation(projects.testUtils)
-        }
-
-        // Unit tests for Android (host tests in new plugin terminology)
-        getByName("androidHostTest").dependencies {
-            implementation(libs.kotlin.test.junit)
-            implementation(libs.mockk)
-        }
-    }
-}
-
-kover {
-    reports {
-        total {
-            filters {
-                excludes {
-                    classes(
-                        "*_Factory",
-                        "*BuildConfig",
-                        "*ComposableSingletons*",
-                        "*_Impl",
-                    )
-                    packages("*.generated.*")
-                    annotatedBy("androidx.compose.ui.tooling.preview.Preview")
-                }
-            }
-            xml {
-                xmlFile = layout.buildDirectory.file("reports/kover/report.xml")
-            }
-            html {
-                title = "FrameLapse Coverage Report"
-                htmlDir = layout.buildDirectory.dir("reports/kover/html")
-            }
         }
     }
 }

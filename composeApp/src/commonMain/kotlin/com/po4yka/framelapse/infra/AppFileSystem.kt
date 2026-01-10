@@ -8,8 +8,7 @@ class AppFileSystem(private val fileManager: FileManager) : FileSystem {
 
     override fun deleteFile(path: String): Boolean = fileManager.deleteFile(path)
 
-    override fun getProjectDirectory(projectId: String): String =
-        fileManager.getProjectDirectory(projectId)
+    override fun getProjectDirectory(projectId: String): String = fileManager.getProjectDirectory(projectId)
 
     override fun getAvailableStorageBytes(): Long = fileManager.getAvailableStorageBytes()
 }

@@ -3,9 +3,9 @@ package com.po4yka.framelapse.domain.usecase.frame
 import com.po4yka.framelapse.domain.entity.Frame
 import com.po4yka.framelapse.domain.repository.FrameRepository
 import com.po4yka.framelapse.domain.repository.ProjectRepository
-import com.po4yka.framelapse.domain.util.Result
 import com.po4yka.framelapse.domain.service.Clock
 import com.po4yka.framelapse.domain.service.FileSystem
+import com.po4yka.framelapse.domain.util.Result
 
 /**
  * Adds a new frame to a project.

@@ -4,11 +4,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import framelapse.composeapp.generated.resources.Res
-import framelapse.composeapp.generated.resources.action_cancel
-import framelapse.composeapp.generated.resources.action_delete
-import framelapse.composeapp.generated.resources.delete_project_message
-import framelapse.composeapp.generated.resources.delete_project_title
+import framelapse.ui.generated.resources.Res
+import framelapse.ui.generated.resources.action_cancel
+import framelapse.ui.generated.resources.action_delete
+import framelapse.ui.generated.resources.delete_project_message
+import framelapse.ui.generated.resources.delete_project_title
 import org.jetbrains.compose.resources.stringResource
 
 /**
