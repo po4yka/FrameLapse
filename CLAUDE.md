@@ -35,7 +35,7 @@
 # Static analysis
 ./gradlew spotlessCheck           # Check code formatting
 ./gradlew spotlessApply           # Auto-fix formatting issues
-./gradlew :composeApp:lintDebug   # Run Android Lint
+./gradlew :androidApp:lintDebug   # Run Android Lint
 
 # Dependency updates
 ./gradlew dependencyUpdates       # Check for available updates (report only)

@@ -1,0 +1,93 @@
+# Minimal CI workflow for act testing (no external actions)
+# Run with: act push -W .github/workflows/ci-act.yml -P ubuntu-22.04=eclipse-temurin:17-jdk-jammy
+name: CI (act)
+
+on: push
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
+  JAVA_HOME: /opt/java/openjdk
+  ANDROID_HOME: /opt/android-sdk
+
+jobs:
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment and check Java
+        run: |
+          /opt/java/openjdk/bin/java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
+      - name: Install Android SDK
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          apt-get update && apt-get install -y wget unzip
+          mkdir -p /opt/android-sdk/cmdline-tools
+          cd /opt/android-sdk/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mv cmdline-tools latest
+          rm cmdline-tools.zip
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+          echo "Android SDK installed"
+
+      - name: Check formatting (Spotless)
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew spotlessCheck --no-daemon
+
+      - name: Run Detekt
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew detekt --no-daemon
+
+      - name: Run Android Lint
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew lintDebug --no-daemon
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    needs: static-analysis
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Android SDK
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          apt-get update && apt-get install -y wget unzip
+          mkdir -p /opt/android-sdk/cmdline-tools
+          cd /opt/android-sdk/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip
+          mv cmdline-tools latest
+          rm cmdline-tools.zip
+          yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
+          echo "Android SDK installed"
+
+      - name: Build Debug APK
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew :androidApp:assembleDebug --no-daemon
+
+      - name: Build Release APK
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew :androidApp:assembleRelease --no-daemon
+
+      - name: Run Tests
+        run: |
+          export PATH="/opt/java/openjdk/bin:$PATH"
+          ./gradlew test --no-daemon

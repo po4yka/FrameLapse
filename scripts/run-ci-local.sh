@@ -43,6 +43,7 @@ usage() {
     echo "  test          Run unit tests"
     echo "  all           Run entire Android CI workflow"
     echo "  ios           Run iOS builds (native Gradle, not Docker)"
+    echo "  gradle        Run all checks via Gradle (no Docker required)"
     echo "  dry-run       Show what would be executed without running"
     echo ""
     echo "Examples:"
@@ -100,6 +101,22 @@ case "$1" in
         echo "Running iOS tests..."
         ./gradlew :composeApp:iosSimulatorArm64Test
         echo -e "${GREEN}iOS builds complete!${NC}"
+        ;;
+    "gradle"|"local")
+        echo -e "${GREEN}Running CI checks directly via Gradle (no Docker required)...${NC}"
+        echo ""
+        echo "Running Spotless check..."
+        ./gradlew spotlessCheck
+        echo ""
+        echo "Running Detekt..."
+        ./gradlew detekt
+        echo ""
+        echo "Running Android Lint..."
+        ./gradlew :androidApp:lintDebug
+        echo ""
+        echo "Running tests..."
+        ./gradlew test
+        echo -e "${GREEN}All checks passed!${NC}"
         ;;
     "dry-run"|"dry"|"-n")
         check_act
