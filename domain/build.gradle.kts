@@ -76,8 +76,7 @@ tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMet
 }
 
 // KSP configuration for Koin Annotations
-// KOIN_CONFIG_CHECK disabled because use cases depend on platform services
-// (FaceDetector, ImageProcessor, etc.) provided by DSL-based platformModule
+// KOIN_CONFIG_CHECK enabled for compile-time dependency verification.
 ksp {
-    arg("KOIN_CONFIG_CHECK", "false")
+    arg("KOIN_CONFIG_CHECK", "true")
 }

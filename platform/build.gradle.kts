@@ -65,7 +65,7 @@ tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMet
 }
 
 // KSP configuration for Koin Annotations
-// Platform module uses DSL-based configuration, no annotations to check
+// KOIN_CONFIG_CHECK enabled for compile-time dependency verification.
 ksp {
-    arg("KOIN_CONFIG_CHECK", "false")
+    arg("KOIN_CONFIG_CHECK", "true")
 }

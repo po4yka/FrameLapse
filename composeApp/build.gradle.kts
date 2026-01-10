@@ -192,10 +192,8 @@ tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMet
 }
 
 // KSP configuration for Koin Annotations
-// Note: KOIN_CONFIG_CHECK disabled in composeApp because we use a hybrid approach
-// where annotation-based modules (CommonModule, DataModule, DomainModule, PresentationModule)
-// are combined with DSL-based platformModule for platform-specific dependencies.
-// Individual modules (data, domain, presentation) have their own KOIN_CONFIG_CHECK enabled.
+// KOIN_CONFIG_CHECK enabled for compile-time dependency verification.
+// All modules including PlatformModule use annotation-based configuration.
 ksp {
-    arg("KOIN_CONFIG_CHECK", "false")
+    arg("KOIN_CONFIG_CHECK", "true")
 }

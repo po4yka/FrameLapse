@@ -127,6 +127,61 @@ sealed class Result<out T> {
 }
 ```
 
+### Koin Annotations for Dependency Injection
+
+The project uses Koin Annotations with KSP for compile-time safe dependency injection.
+
+**Annotations:**
+- `@Single` - Singleton instance (repositories, data sources, services)
+- `@Factory` - New instance per injection (use cases, ViewModels)
+- `@Module` - Module class definition
+- `@ComponentScan` - Auto-discover annotated classes in package
+
+**Examples:**
+```kotlin
+// Repository with interface binding
+@Single(binds = [ProjectRepository::class])
+class ProjectRepositoryImpl(
+    private val localDataSource: ProjectLocalDataSource,
+    private val fileManager: FileManager
+) : ProjectRepository
+
+// Use case - new instance per injection
+@Factory
+class CreateProjectUseCase(
+    private val projectRepository: ProjectRepository
+)
+
+// ViewModel - new instance per screen
+@Factory
+class CaptureViewModel(
+    private val captureImageUseCase: CaptureImageUseCase,
+    private val getLatestFrameUseCase: GetLatestFrameUseCase
+)
+```
+
+**Module structure** (see `composeApp/src/commonMain/.../di/AnnotatedModules.kt`):
+- `CommonModule` - Infrastructure services (Clock, FileSystem, ModelCapabilities)
+- `DataModule` - Repositories, data sources, database via `@ComponentScan`
+- `DomainModule` - Use cases via `@ComponentScan`
+- `PresentationModule` - ViewModels via `@ComponentScan`
+- `platformModule` - Platform services (DSL-based for Android Context support)
+
+**Generated module access:**
+```kotlin
+import org.koin.ksp.generated.module
+
+fun initKoin() = startKoin {
+    modules(
+        CommonModule().module,
+        DataModule().module,
+        DomainModule().module,
+        PresentationModule().module,
+        platformModule,
+    )
+}
+```
+
 ## Technology Stack
 
 | Layer | Technology |
@@ -181,6 +236,8 @@ The project uses strict static analysis:
 - Use suspend functions for async operations
 - Handle errors with Result<T> sealed class
 - All UI strings should be in composeResources for localization
+- Use Koin annotations (`@Single`, `@Factory`) for new dependencies
+- Add `@Factory` to use cases and ViewModels, `@Single` to repositories and services
 
 ## Testing Strategy
 
