@@ -1,57 +1,5 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues>
-    <ID>ExpressionBodySyntax:NotificationSchedulerImpl.kt$NotificationSchedulerImpl$return Result.Success(hasPermission)</ID>
-    <ID>ExpressionBodySyntax:VideoEncoderImpl.kt$VideoEncoderImpl$return Pair(3840, 2160)</ID>
-    <ID>ImportOrdering:ActualResourceCollectors.kt$import kotlin.OptIn import kotlin.String import kotlin.collections.Map import org.jetbrains.compose.resources.DrawableResource import org.jetbrains.compose.resources.FontResource import org.jetbrains.compose.resources.PluralStringResource import org.jetbrains.compose.resources.StringArrayResource import org.jetbrains.compose.resources.StringResource</ID>
-    <ID>Indentation:ActualResourceCollectors.kt$ </ID>
-    <ID>InjectDispatcher:FaceDetectorImpl.kt$FaceDetectorImpl$Default</ID>
-    <ID>InjectDispatcher:FaceDetectorImpl.kt$FaceDetectorImpl$IO</ID>
-    <ID>InjectDispatcher:ImageLoader.android.kt$IO</ID>
-    <ID>InjectDispatcher:ImageProcessorImpl.kt$ImageProcessorImpl$IO</ID>
-    <ID>InjectDispatcher:VideoEncoderImpl.kt$VideoEncoderImpl$Default</ID>
-    <ID>LongMethod:VideoEncoderImpl.kt$VideoEncoderImpl$override suspend fun encode( framePaths: List&lt;String&gt;, outputPath: String, settings: ExportSettings, onProgress: (Float) -&gt; Unit, ): Result&lt;String&gt;</ID>
-    <ID>LongParameterList:VideoEncoderImpl.kt$VideoEncoderImpl$( encoder: MediaCodec, bufferInfo: MediaCodec.BufferInfo, muxer: MediaMuxer, trackIndex: Int, muxerStarted: Boolean, onTrackChanged: (Int, Boolean) -&gt; Unit, )</ID>
-    <ID>LoopWithTooManyJumpStatements:VideoEncoderImpl.kt$VideoEncoderImpl$while</ID>
-    <ID>MagicNumber:FaceDetectorImpl.kt$FaceDetectorImpl$0.1f</ID>
-    <ID>MagicNumber:ImageProcessorImpl.kt$ImageProcessorImpl$100</ID>
-    <ID>MagicNumber:ImageProcessorImpl.kt$ImageProcessorImpl$180f</ID>
-    <ID>MagicNumber:ImageProcessorImpl.kt$ImageProcessorImpl$270f</ID>
-    <ID>MagicNumber:ImageProcessorImpl.kt$ImageProcessorImpl$90f</ID>
-    <ID>MagicNumber:VideoEncoderImpl.kt$VideoEncoderImpl$1_000_000L</ID>
-    <ID>MagicNumber:VideoEncoderImpl.kt$VideoEncoderImpl$2160</ID>
-    <ID>MagicNumber:VideoEncoderImpl.kt$VideoEncoderImpl$3840</ID>
-    <ID>NullableBooleanCheck:CameraPermissionState.android.kt$(context as? Activity)?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) ?: false</ID>
-    <ID>NullableToStringCall:CameraControllerImpl.kt$CameraControllerImpl.&lt;no name provided&gt;$${exception.message}</ID>
-    <ID>NullableToStringCall:FaceDetectorImpl.kt$FaceDetectorImpl$${e.message}</ID>
-    <ID>NullableToStringCall:ImageProcessorImpl.kt$ImageProcessorImpl$${e.message}</ID>
-    <ID>NullableToStringCall:VideoEncoderImpl.kt$VideoEncoderImpl$${e.message}</ID>
-    <ID>PreferToOverPairSyntax:ImageProcessorImpl.kt$ImageProcessorImpl$Pair((maxHeight * aspectRatio).toInt(), maxHeight)</ID>
-    <ID>PreferToOverPairSyntax:ImageProcessorImpl.kt$ImageProcessorImpl$Pair(maxWidth, (maxWidth / aspectRatio).toInt())</ID>
-    <ID>PreferToOverPairSyntax:ImageProcessorImpl.kt$ImageProcessorImpl$Pair(options.outHeight, options.outWidth)</ID>
-    <ID>PreferToOverPairSyntax:ImageProcessorImpl.kt$ImageProcessorImpl$Pair(options.outWidth, options.outHeight)</ID>
-    <ID>PreferToOverPairSyntax:ImageProcessorImpl.kt$ImageProcessorImpl$Pair(width, height)</ID>
-    <ID>PreferToOverPairSyntax:NotificationSchedulerImpl.kt$NotificationSchedulerImpl$Pair(hour, minute)</ID>
-    <ID>PreferToOverPairSyntax:VideoEncoderImpl.kt$VideoEncoderImpl$Pair(3840, 2160)</ID>
-    <ID>SwallowedException:CameraControllerImpl.kt$CameraControllerImpl$e: Exception</ID>
-    <ID>SwallowedException:FaceDetectorImpl.kt$FaceDetectorImpl$e: Exception</ID>
-    <ID>SwallowedException:FileManager.android.kt$FileManager$e: Exception</ID>
-    <ID>SwallowedException:ImageLoader.android.kt$e: Exception</ID>
-    <ID>SwallowedException:ImageProcessorImpl.kt$ImageProcessorImpl$e: Exception</ID>
-    <ID>SwallowedException:PhotoPicker.android.kt$e: Exception</ID>
-    <ID>SwallowedException:VideoEncoderImpl.kt$VideoEncoderImpl$e: Exception</ID>
-    <ID>UnnecessaryParentheses:ImageLoader.android.kt$(halfHeight / inSampleSize)</ID>
-    <ID>UnnecessaryParentheses:ImageLoader.android.kt$(halfWidth / inSampleSize)</ID>
-    <ID>UnusedImports:CameraControllerImpl.kt$import kotlin.coroutines.resume</ID>
-    <ID>UnusedParameter:FaceDetectorImpl.kt$FaceDetectorImpl$imageHeight: Int</ID>
-    <ID>UnusedParameter:FaceDetectorImpl.kt$FaceDetectorImpl$imageWidth: Int</ID>
-    <ID>UnusedParameter:ImageProcessorImpl.kt$ImageProcessorImpl$height: Int</ID>
-    <ID>UnusedParameter:ImageProcessorImpl.kt$ImageProcessorImpl$width: Int</ID>
-    <ID>UnusedPrivateProperty:ImageProcessorImpl.kt$ImageProcessorImpl$private val context: Context</ID>
-    <ID>UnusedPrivateProperty:SoundPlayerImpl.kt$SoundPlayerImpl$context: Context</ID>
-    <ID>UnusedPrivateProperty:VideoEncoderImpl.kt$VideoEncoderImpl$private val context: Context</ID>
-    <ID>UseDataClass:Platform.android.kt$Platform</ID>
-    <ID>VarCouldBeVal:CameraControllerImpl.kt$CameraControllerImpl$private var cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()</ID>
-  </CurrentIssues>
+  <CurrentIssues/>
 </SmellBaseline>

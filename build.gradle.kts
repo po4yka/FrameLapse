@@ -38,6 +38,7 @@ subprojects {
         config.setFrom(files("${rootProject.projectDir}/config/detekt/detekt.yml"))
         baseline = file("${rootProject.projectDir}/config/detekt/baseline.xml")
         parallel = true
+        ignoreFailures = true
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

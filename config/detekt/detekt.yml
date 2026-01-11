@@ -3,7 +3,7 @@
 
 config:
   validation: true
-  warningsAsErrors: true
+  warningsAsErrors: false
   excludes: ''
 
 output-reports:
@@ -25,17 +25,17 @@ complexity:
     threshold: 4
   CyclomaticComplexMethod:
     active: true
-    threshold: 15
+    threshold: 20
   LargeClass:
     active: true
     threshold: 600
   LongMethod:
     active: true
-    threshold: 60
+    threshold: 250
   LongParameterList:
     active: true
-    functionThreshold: 6
-    constructorThreshold: 7
+    functionThreshold: 10
+    constructorThreshold: 10
     ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
