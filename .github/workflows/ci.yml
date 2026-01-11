@@ -52,21 +52,28 @@ jobs:
         run: ./gradlew spotlessCheck --no-daemon
 
       - name: Run Detekt
-        run: ./gradlew detekt --no-daemon
+        run: ./gradlew detektMetadataCommonMain detektAndroidMain detekt --no-daemon --continue
 
-      - name: Upload Detekt SARIF
+      - name: Upload Detekt SARIF (commonMain)
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
+        if: always() && hashFiles('composeApp/build/reports/detekt/detekt.sarif') != ''
         with:
           sarif_file: composeApp/build/reports/detekt/detekt.sarif
-          category: detekt
+          category: detekt-common
+
+      - name: Upload Detekt SARIF (androidApp)
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('androidApp/build/reports/detekt/detekt.sarif') != ''
+        with:
+          sarif_file: androidApp/build/reports/detekt/detekt.sarif
+          category: detekt-android
 
       - name: Run Android Lint
         run: ./gradlew lintDebug --no-daemon
 
       - name: Upload Lint SARIF
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
+        if: always() && hashFiles('androidApp/build/reports/lint-results-debug.sarif') != ''
         with:
           sarif_file: androidApp/build/reports/lint-results-debug.sarif
           category: android-lint

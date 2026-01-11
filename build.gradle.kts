@@ -45,6 +45,8 @@ subprojects {
             sarif.required.set(true)
             sarif.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.sarif"))
         }
+        // Ensure detekt runs after KSP generates code
+        tasks.findByName("kspCommonMainKotlinMetadata")?.let { mustRunAfter(it) }
     }
 
     dependencies {
@@ -84,7 +86,13 @@ allprojects {
 tasks.register("staticAnalysis") {
     group = "verification"
     description = "Runs all static analysis tools"
-    dependsOn("spotlessCheck", ":composeApp:detekt", ":androidApp:lintDebug")
+    dependsOn(
+        "spotlessCheck",
+        ":composeApp:detektMetadataCommonMain",
+        ":composeApp:detektAndroidMain",
+        ":androidApp:detekt",
+        ":androidApp:lintDebug",
+    )
 }
 
 tasks.register("format") {
