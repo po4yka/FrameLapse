@@ -14,6 +14,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# CI-optimized Gradle settings (fits in Docker containers)
+export CI_GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs=-Xmx3g -Dkotlin.daemon.jvmargs=-Xmx2g -Dkotlin.compiler.execution.strategy=in-process"
+
 # Check if Docker is running
 check_docker() {
     if ! docker info > /dev/null 2>&1; then
@@ -62,31 +65,31 @@ case "$1" in
         check_docker
         check_act
         echo -e "${GREEN}Running static analysis...${NC}"
-        act -j static-analysis
+        act -j static-analysis --env GRADLE_OPTS="$CI_GRADLE_OPTS"
         ;;
     "build"|"build-debug")
         check_docker
         check_act
         echo -e "${GREEN}Building Android debug APK...${NC}"
-        act -j build-android-debug
+        act -j build-android-debug --env GRADLE_OPTS="$CI_GRADLE_OPTS"
         ;;
     "build-release")
         check_docker
         check_act
         echo -e "${GREEN}Building Android release APK...${NC}"
-        act -j build-android-release
+        act -j build-android-release --env GRADLE_OPTS="$CI_GRADLE_OPTS"
         ;;
     "test")
         check_docker
         check_act
         echo -e "${GREEN}Running unit tests...${NC}"
-        act -j test
+        act -j test --env GRADLE_OPTS="$CI_GRADLE_OPTS"
         ;;
     "all"|"ci")
         check_docker
         check_act
         echo -e "${GREEN}Running entire Android CI workflow...${NC}"
-        act -W .github/workflows/ci.yml
+        act -W .github/workflows/ci.yml --env GRADLE_OPTS="$CI_GRADLE_OPTS"
         ;;
     "ios")
         echo -e "${YELLOW}iOS workflows cannot run in Docker (requires macOS runner).${NC}"

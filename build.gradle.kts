@@ -14,6 +14,19 @@ plugins {
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.versions)
     alias(libs.plugins.versionCatalogUpdate)
+    idea
+}
+
+// Configure IDEA to exclude build/cache directories from indexing
+idea {
+    module {
+        excludeDirs = excludeDirs + setOf(
+            file(".kotlin"),
+            file("iosApp/Pods"),
+            file("iosApp/iosApp.xcodeproj/xcuserdata"),
+            file("iosApp/iosApp.xcworkspace/xcuserdata"),
+        )
+    }
 }
 
 // Detekt configuration for all subprojects

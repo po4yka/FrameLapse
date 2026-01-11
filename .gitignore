@@ -55,7 +55,6 @@ iosApp/.xcode.env.local
 /kotlin-js-store/
 
 # CocoaPods
-iosApp/Pods/
 Podfile.lock
 
 # SPM (Swift Package Manager)

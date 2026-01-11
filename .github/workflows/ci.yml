@@ -11,7 +11,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
+  # CI-optimized Gradle settings (fits in 7GB GitHub Actions runners)
+  GRADLE_OPTS: >-
+    -Dorg.gradle.daemon=false
+    -Dorg.gradle.parallel=true
+    -Dorg.gradle.caching=true
+    -Dorg.gradle.jvmargs=-Xmx3g
+    -Dkotlin.daemon.jvmargs=-Xmx2g
+    -Dkotlin.compiler.execution.strategy=in-process
   JAVA_VERSION: '17'
 
 jobs:
